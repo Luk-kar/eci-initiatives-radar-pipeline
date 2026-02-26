@@ -1,0 +1,9 @@
+registration_number,title,objectives,primary_policy_area,registration_year,signatures_numeric,is_open,days_left,commission_outcome,led_to_legislation
+ECI(2024)000001,Fur Free Europe,Ban fur farming in the EU.,Animal Welfare,2024,1502319,False,0,Proposal,True
+ECI(2025)000002,Save Bees and Farmers,Phase out synthetic pesticides.,Environment,2025,1054320,False,0,Study,False
+ECI(2026)000003,AI Regulation for Workers,Protect workers from AI monitoring.,Employment,2026,450000,True,85,,False
+ECI(2023)000004,End the Cage Age,Prohibit the use of cages for farmed animals.,Animal Welfare,2023,1397113,False,0,Proposal,True
+ECI(2026)000005,Tax the Rich,Introduce a European wealth tax.,Taxation,2026,890000,True,120,,False
+ECI(2022)000006,Stop Finning - Stop the Trade,End the trade of shark fins.,Environment,2022,1119996,False,0,Study,False
+ECI(2024)000007,Right to Water,Water and sanitation are a human right.,Human Rights,2024,1659543,False,0,Proposal,True
+ECI(2026)000008,Protect EU Borders,Strengthen Frontex.,Security,2026,120500,True,210,,False

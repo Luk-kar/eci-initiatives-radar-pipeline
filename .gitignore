@@ -1,0 +1,71 @@
+# ==============================================================================
+# ENVIRONMENT & SECRETS (CRITICAL)
+# ==============================================================================
+.env
+.env.*
+!.env.example
+
+# ==============================================================================
+# PYTHON CORE
+# ==============================================================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# pytest / Coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ==============================================================================
+# TEMPORARY & CACHE (stlite / Dash / OS)
+# ==============================================================================
+# Streamlit / stlite cache
+.streamlit/
+.cache/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# IDEs / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ==============================================================================
+# ECI PROJECT SPECIFIC DATA RULES
+# ==============================================================================
+# Ignore all zip files (e.g. downloaded artifacts)
+*.zip
+*.tar.gz
+
+# Let Git track the data directory folder structure, 
+# but specifically ignore massive raw files if they accidentally get generated
+# Note: DO NOT ignore .csv files, because we want GitHub Actions to commit them!
+# data/*.csv (intentionally left out so they are tracked)
+
+# Ignore raw HTML debugging dumps locally so you don't commit 1,000 files by accident
+data/latest_session/*.html
