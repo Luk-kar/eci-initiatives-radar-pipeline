@@ -1,0 +1,27 @@
+[project]
+name = "eci-pipeline"
+version = "0.1.0"
+description = "Serverless scraper and data processor for EU Citizens' Initiatives"
+readme = "README.md"
+requires-python = ">=3.10"
+
+# These are the exact dependencies from your requirements.txt
+dependencies = [
+    "beautifulsoup4==4.14.3",
+    "pandas==3.0.1",
+    "plotly==6.5.2",
+    "requests==2.32.5",
+    "python-dotenv", # Added to manage local secrets as discussed
+]
+
+# (Optional) You can define tools only needed for local development here.
+# These won't be installed in your lightweight GitHub Actions container.
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.3.0",    # Excellent fast linter/formatter
+]
+
+# (Optional) Specific configuration for uv
+[tool.uv]
+managed = true
