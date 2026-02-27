@@ -21,9 +21,9 @@ To avoid abusing the EU servers (rate limiting) and to facilitate easy debugging
   1. The signature collection is explicitly `closed` AND the signature count was `unsuccessful` (less than 1 million).
   2. The initiative successfully reached the `follow-up` stage and the Commission has issued its final legislative response (meaning the lifecycle is permanently locked). Only the `follow-up` will be scraped.
    
-* **Timestamped Session Folders:** Instead of just keeping one master CSV, the pipeline will save the raw HTML files and the resulting CSVs of each run into a timestamped directory (e.g., `data/2026-02-26_14-00-00/`).
+* **Raw Data Storage (GitHub Artifacts):** Raw HTML files and intermediate logs will no longer bloat the Git repository. The GitHub Actions pipeline will dynamically generate a timestamped name using `$GITHUB_OUTPUT` (e.g., `eci-raw-data-2026-02-27-10-45`) and upload the raw folder as a **GitHub Actions Artifact**.
 * **Merging Old with New:** For initiatives flagged as "do not scrape," the script will simply copy their data from the previous session's CSV and merge it with the freshly scraped data from the current session.
-* **Auto-Cleanup (Rolling Window):** For debugging purposes, the repository will only store the last **3 sessions**. If a 4th session folder is created, the Python script will automatically delete the oldest timestamped directory before committing to GitHub.
+* **Auto-Cleanup (Artifact Retention):** To prevent hitting the 500MB free-tier limit for Actions Storage, the upload action will be configured with `retention-days: 7(days) * 4(weeks) * 2(months) = 56 days total`. On the basis of the weekly scraping. GitHub will automatically delete older raw scrapes, eliminating the need for custom Python cleanup logic.
 
 ~~## 4. Machine Learning (Few-Shot Classification)~~
 ~~New initiatives will be automatically categorized (e.g., "Environment", "Health") using an LLM.~~
