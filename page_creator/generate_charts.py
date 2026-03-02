@@ -12,7 +12,7 @@ from page_creator.partials.charts import (
     chart_signatures_year,
 )
 
-CSV_PATH = Path(__file__).parent / "initiatives.csv"
+CSV_PATH = Path(__file__).parent / "data" / "initiatives.csv"
 OUT_DIR = Path(__file__).parent.parent / "page_to_export" / "partials"
 
 
