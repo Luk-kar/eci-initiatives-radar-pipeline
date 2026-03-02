@@ -1,5 +1,6 @@
 # eci-initiatives-radar
 
+-1. Check commits from one repo to other
 0. Decide what columns to keep
 1. Implement scraper initiatives
 2. Implement extractor initiatives
