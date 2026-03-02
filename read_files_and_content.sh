@@ -16,7 +16,7 @@
 #   <output_file>      Path to the file where concatenated content is written.
 #
 # Example:
-#   ./read_files_and_content.sh "./src" "code.md"
+#   ./read_files_and_content.sh "./page_creator" "code.md"
 #
 # Notes:
 #   - Overwrites <output_file> if it already exists.
@@ -38,12 +38,12 @@ INPUT_DIR=$1
 OUTPUT_FILE=$2
 
 find "$INPUT_DIR" \
-  -type d \( -name .git -o -name __pycache__ -o -name dbt \) -prune -o \
-  -type f -print | sort | while read -r FILE; do
+  -type d \( -name .git -o -name __pycache__ -o -name dbt -o -name .venv \) -prune -o \
+  -type f ! -name "*.csv" -print | sort | while read -r FILE; do
   echo "\`$FILE\`:" >> "$OUTPUT_FILE"
-  echo '```'         >> "$OUTPUT_FILE"
-  cat "$FILE"        >> "$OUTPUT_FILE"
-  echo               >> "$OUTPUT_FILE"
-  echo '```'         >> "$OUTPUT_FILE"
-  echo               >> "$OUTPUT_FILE"
+  echo '```' >> "$OUTPUT_FILE"
+  cat "$FILE" >> "$OUTPUT_FILE"
+  echo >> "$OUTPUT_FILE"
+  echo '```' >> "$OUTPUT_FILE"
+  echo >> "$OUTPUT_FILE"
 done
