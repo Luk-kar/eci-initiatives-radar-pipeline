@@ -37,10 +37,7 @@ def kpi_row_containers(df: pd.DataFrame) -> str:
 
     cards = "\n".join(
         f"""      <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-icon">{m["icon"]}</span>
-          <span class="kpi-label">{m["label"]}</span>
-        </div>
+        <span class="kpi-label">{m["icon"]} {m["label"]}</span>
         <span class="kpi-value" style="color:{m["color"]}">{m["value"]}</span>
       </div>"""
         for m in metrics
