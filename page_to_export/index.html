@@ -1,15 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="utf-8"/>
- <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
- <title>
-  ECI Dashboard POC
- </title>
- <!-- Load Plotly.js once from CDN to power all 3 charts -->
- <script src="https://cdn.plot.ly/plotly-2.32.0.min.js">
- </script>
-
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>ECI Dashboard POC</title>
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 </head>
 <link rel="stylesheet" href="./styles/styles.css">
 
@@ -17,6 +12,7 @@
   <div class="dashboard-container">
 
     <div id="header-slot"></div>
+    <div id="footer-slot"></div>
 
     <div class="top-row">
       <div id="chart1-slot"></div>
@@ -44,6 +40,7 @@
 
     (async () => {
       await loadPartial("partials/header.html",                "header-slot");
+      await loadPartial("partials/deep_dive_footer.html",      "footer-slot");
       await loadPartial("partials/chart_policy_area.html",     "chart1-slot");
       await loadPartial("partials/chart_outcomes.html",        "chart2-slot");
       await loadPartial("partials/chart_signatures_year.html", "chart3-slot");
