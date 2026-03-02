@@ -61,3 +61,49 @@ body {
   background: #e0e7ff;
   color: #3a3fcc;
 }
+/* ── KPI counter row ─────────────────────────────────────── */
+.kpi-row {
+    display: flex;
+    gap: 0;
+    border: 1.5px solid #b0c4de;
+    border-radius: 8px;
+    background: white;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+.kpi-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 14px 20px;
+    border-right: 1px solid #e0e8f0;
+}
+.kpi-card:last-child { border-right: none; }
+.kpi-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+.kpi-label {
+    font-size: 0.78rem;
+    white-space: nowrap;
+    color: #666;
+}
+.kpi-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.kpi-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+
+}
+@media (max-width: 768px) {
+    .kpi-row { flex-direction: column; }
+    .kpi-card { border-right: none; border-bottom: 1px solid #e0e8f0; }
+    .kpi-card:last-child { border-bottom: none; }
+}

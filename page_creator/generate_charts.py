@@ -11,6 +11,7 @@ from page_creator.partials.charts import (
     chart_outcomes,
     chart_signatures_year,
 )
+from page_creator.partials.counters import kpi_row_containers
 
 CSV_PATH = Path(__file__).parent / "data" / "initiatives.csv"
 OUT_DIR = Path(__file__).parent.parent / "page_to_export" / "partials"
@@ -21,6 +22,7 @@ def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     charts = {
+        "kpi_row.html": kpi_row_containers(df),
         "chart_policy_area.html": chart_policy_area(df),
         "chart_outcomes.html": chart_outcomes(df),
         "chart_signatures_year.html": chart_signatures_year(df),
