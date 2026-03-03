@@ -83,6 +83,10 @@ def generate_chart_top_10_signatures(df: pd.DataFrame) -> str:
         margin=MARGIN,
         height=HEIGHT,
         xaxis_title="Signatures",
+        yaxis=dict(
+            title="",
+            ticksuffix="   ",
+        ),
         yaxis_title="",
         showlegend=False,
         clickmode="event",
