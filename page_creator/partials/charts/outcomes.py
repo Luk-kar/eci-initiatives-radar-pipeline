@@ -21,7 +21,7 @@ STATUS_COLORS = {
 DEFAULT_COLOR = "#757575"
 
 MAX_TITLE_LEN = 40
-MAX_HOVER_ITEMS = 15
+MAX_HOVER_ITEMS = 5
 
 
 # ------------------------------------------------------------------------------
