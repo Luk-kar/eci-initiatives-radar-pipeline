@@ -79,7 +79,11 @@ def generate_chart_top_10_signatures(df: pd.DataFrame) -> str:
     )
 
     fig.update_layout(
-        title="Signatures Collected by Initiative",
+        title=dict(
+            text="Top 10 Initiatives by Signatures (All-Time)",
+            x=0.015,
+            xanchor="left",
+        ),
         margin=MARGIN,
         height=HEIGHT,
         xaxis_title="Signatures",

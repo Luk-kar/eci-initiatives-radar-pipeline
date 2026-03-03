@@ -2,8 +2,11 @@ import pandas as pd
 
 from page_creator.utils import wrap_card
 
+
 _STATUS = "Collection Ongoing"
 _TRUNCATE = 100
+_SCROLL_THRESHOLD = 5
+_COUNTRIES_THRESHOLD = 7
 
 
 def _truncate(text: str, max_len: int = _TRUNCATE) -> str:
@@ -37,7 +40,7 @@ def generate_currently_open(df: pd.DataFrame) -> str:
             else "N/A"
         )
         threshold = (
-            f"{int(row['signatures_threshold_met'])} / 27"
+            f"{int(row['signatures_threshold_met'])} / {_COUNTRIES_THRESHOLD}"
             if pd.notna(row["signatures_threshold_met"])
             else "N/A"
         )
@@ -50,7 +53,14 @@ def generate_currently_open(df: pd.DataFrame) -> str:
           <td>{threshold}</td>
         </tr>"""
 
+    scrollable = len(open_df) > _SCROLL_THRESHOLD
+    table_wrapper_open = (
+        '<div class="data-table__scroll-wrapper">' if scrollable else ""
+    )
+    table_wrapper_close = "</div>" if scrollable else ""
+
     table = f"""
+{table_wrapper_open}
 <table class="data-table">
   <thead>
     <tr>
@@ -63,6 +73,7 @@ def generate_currently_open(df: pd.DataFrame) -> str:
   <tbody>
     {rows}
   </tbody>
-</table>"""
+</table>
+{table_wrapper_close}"""
 
     return wrap_card(title + table)
