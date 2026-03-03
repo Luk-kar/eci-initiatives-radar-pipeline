@@ -8,6 +8,7 @@ from page_creator.utils import wrap_card
 
 ECI_THRESHOLD = 1_000_000
 _WRAP_WIDTH = 60
+_CHART_DIV_ID = "chart-top10-signatures"
 
 
 def _bar_color(signatures: float, max_signatures: float) -> str:
@@ -41,6 +42,7 @@ def generate_chart_top_10_signatures(df: pd.DataFrame) -> str:
             signatures_threshold_met=("signatures_threshold_met", "first"),
             objective=("objective", "first"),
             commission_answer_text=("commission_answer_text", "first"),
+            url=("url", "first"),
         )
         .nlargest(10, "signatures_numeric")
         .sort_values("signatures_numeric", ascending=True)
@@ -52,9 +54,9 @@ def generate_chart_top_10_signatures(df: pd.DataFrame) -> str:
     max_sigs = agg["signatures_numeric"].max()
     colors = [_bar_color(s, max_sigs) for s in agg["signatures_numeric"]]
 
-    # customdata columns: [0] threshold_met  [1] objective  [2] commission_answer_text
+    # customdata: [0] threshold_met  [1] objective  [2] commission_answer_text  [3] url
     customdata = agg[
-        ["signatures_threshold_met", "objective", "commission_answer_text"]
+        ["signatures_threshold_met", "objective", "commission_answer_text", "url"]
     ].values
 
     fig = go.Figure(
@@ -67,13 +69,15 @@ def generate_chart_top_10_signatures(df: pd.DataFrame) -> str:
             hovertemplate=(
                 "<b>%{y}</b><br><br>"
                 "<b>Signatures:</b> %{x:,.0f}<br>"
-                "<b>Countries Threshold Met:</b> %{customdata[0]}/7<br><br>"
+                "<b>Countries Threshold Met:</b> %{customdata[0]}/27<br><br>"
                 "<b>Objective:</b><br>%{customdata[1]}<br><br>"
-                "<b>Commission Response:</b><br>%{customdata[2]}"
+                "<b>Commission Response:</b><br>%{customdata[2]}<br><br>"
+                "<i>🔗 Click to open initiative page</i>"
                 "<extra></extra>"
             ),
         )
     )
+
     fig.update_layout(
         title="Signatures Collected by Initiative",
         margin=MARGIN,
@@ -81,7 +85,9 @@ def generate_chart_top_10_signatures(df: pd.DataFrame) -> str:
         xaxis_title="Signatures",
         yaxis_title="",
         showlegend=False,
+        clickmode="event",
     )
+
     fig.add_vline(
         x=ECI_THRESHOLD,
         line_dash="dash",
@@ -93,4 +99,29 @@ def generate_chart_top_10_signatures(df: pd.DataFrame) -> str:
         annotation_font_size=13,
     )
 
-    return wrap_card(fig.to_html(**DIV_ARGS))
+    chart_html = fig.to_html(**{**DIV_ARGS, "div_id": _CHART_DIV_ID})
+
+    click_js = f"""
+<style>
+  #{_CHART_DIV_ID} .bars path {{ cursor: pointer !important; }}
+</style>
+<script>
+(function () {{
+  var el = document.getElementById("{_CHART_DIV_ID}");
+  var drag = el.querySelector(".nsewdrag");
+
+  el.on("plotly_hover", function () {{
+    if (drag) drag.style.cursor = "pointer";
+  }});
+  el.on("plotly_unhover", function () {{
+    if (drag) drag.style.cursor = "default";
+  }});
+  el.on("plotly_click", function (data) {{
+    var url = data.points[0].customdata[3];
+    if (url) window.open(url, "_blank", "noopener,noreferrer");
+  }});
+}})();
+</script>
+"""
+
+    return wrap_card(chart_html + click_js)
