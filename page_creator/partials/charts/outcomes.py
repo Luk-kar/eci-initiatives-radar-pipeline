@@ -98,6 +98,7 @@ def generate_chart_outcomes(df: pd.DataFrame) -> str:
         title="Initiatives by Current Status",
         margin=MARGIN,
         height=HEIGHT,
+        width=500,
         showlegend=True,
         legend=dict(
             font=dict(size=12),

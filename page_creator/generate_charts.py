@@ -9,7 +9,7 @@ import pandas as pd
 from page_creator.partials.charts import (
     generate_chart_top_10_signatures,
     generate_chart_outcomes,
-    generate_chart_signatures_year,
+    generate_chart_signatures_cohorts,
 )
 from page_creator.partials.counters import generate_kpi_row
 
@@ -25,7 +25,7 @@ def main():
         "kpi_row.html": generate_kpi_row(df),
         "chart_top_10_signatures.html": generate_chart_top_10_signatures(df),
         "chart_outcomes.html": generate_chart_outcomes(df),
-        "chart_signatures_year.html": generate_chart_signatures_year(df),
+        "chart_signatures_cohorts.html": generate_chart_signatures_cohorts(df),
     }
 
     for filename, html in charts.items():
