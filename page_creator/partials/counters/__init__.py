@@ -1,5 +1,5 @@
-from .kpi_row import kpi_row_containers
+from .kpi_row import generate_kpi_row
 
 __all__ = [
-    "kpi_row_containers",
+    "generate_kpi_row",
 ]

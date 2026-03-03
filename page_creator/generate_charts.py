@@ -7,11 +7,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pandas as pd
 from page_creator.partials.charts import (
-    chart_policy_area,
-    chart_outcomes,
-    chart_signatures_year,
+    generate_chart_top_10_signatures,
+    generate_chart_outcomes,
+    generate_chart_signatures_year,
 )
-from page_creator.partials.counters import kpi_row_containers
+from page_creator.partials.counters import generate_kpi_row
 
 CSV_PATH = Path(__file__).parent / "data" / "initiatives.csv"
 OUT_DIR = Path(__file__).parent.parent / "page_to_export" / "partials"
@@ -22,10 +22,10 @@ def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     charts = {
-        "kpi_row.html": kpi_row_containers(df),
-        "chart_policy_area.html": chart_policy_area(df),
-        "chart_outcomes.html": chart_outcomes(df),
-        "chart_signatures_year.html": chart_signatures_year(df),
+        "kpi_row.html": generate_kpi_row(df),
+        "chart_top_10_signatures.html": generate_chart_top_10_signatures(df),
+        "chart_outcomes.html": generate_chart_outcomes(df),
+        "chart_signatures_year.html": generate_chart_signatures_year(df),
     }
 
     for filename, html in charts.items():

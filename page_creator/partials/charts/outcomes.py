@@ -5,7 +5,7 @@ from page_creator.config import MARGIN, HEIGHT, DIV_ARGS
 from page_creator.utils import wrap_card
 
 
-def chart_outcomes(df: pd.DataFrame) -> str:
+def generate_chart_outcomes(df: pd.DataFrame) -> str:
     counts = df["outcome"].value_counts().reset_index()
     counts.columns = ["outcome", "count"]
     fig = px.pie(

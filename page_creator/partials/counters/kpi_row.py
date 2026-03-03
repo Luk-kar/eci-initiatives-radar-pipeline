@@ -1,24 +1,24 @@
 import pandas as pd
 
 
-def kpi_row_containers(df: pd.DataFrame) -> str:
+def generate_kpi_row(df: pd.DataFrame) -> str:
     metrics = [
         {
             "label": "Total Initiatives:",
             "value": len(df),
-            "color": "#1a237e",
+            "color": "#333",
             "icon": "📋",
         },
         {
             "label": "Currently Open:",
             "value": int((df["outcome"] == "Pending").sum()),
-            "color": "#2e7d32",
+            "color": "#1069c0",
             "icon": "🗳️",
         },
         {
             "label": "Reached 1M Signatures:",
             "value": int((df["signatures_numeric"] >= 1_000_000).sum()),
-            "color": "#827717",
+            "color": "#557B2D",
             "icon": "✅",
         },
         {

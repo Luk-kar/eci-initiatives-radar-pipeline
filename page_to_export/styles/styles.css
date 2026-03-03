@@ -48,7 +48,6 @@ body {
 .deep-dive-link {
   padding: 8px 20px;
   background: #003399;
-  /* border: 1px solid #c7d2fe; */
   border-radius: 20px;
   color: #fafafa;
   font-size: 0.9rem;
@@ -77,6 +76,7 @@ body {
     flex-direction: column;
     padding: 14px 20px;
     border-right: 4px solid #f5f7f9;
+}
 .kpi-card:last-child { border-right: none; }
 .kpi-header {
     display: flex;
@@ -85,10 +85,10 @@ body {
     margin-bottom: 6px;
 }
 .kpi-label {
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     white-space: nowrap;
     text-align: center;
-    color: #666;
+    color: #333;
     margin-bottom: 8px;
 }
 .kpi-body {

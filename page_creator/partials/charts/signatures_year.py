@@ -5,7 +5,7 @@ from page_creator.config import COLORS, MARGIN, HEIGHT, DIV_ARGS
 from page_creator.utils import wrap_card
 
 
-def chart_signatures_year(df: pd.DataFrame) -> str:
+def generate_chart_signatures_year(df: pd.DataFrame) -> str:
     fig = px.scatter(
         df,
         x="registration_year",
