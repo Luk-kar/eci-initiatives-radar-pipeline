@@ -12,6 +12,7 @@ from page_creator.partials.charts import (
     generate_chart_signatures_cohorts,
 )
 from page_creator.partials.counters import generate_kpi_row
+from page_creator.partials.lists import generate_currently_open
 
 CSV_PATH = Path(__file__).parent / "data" / "initiatives.csv"
 OUT_DIR = Path(__file__).parent.parent / "page_to_export" / "partials"
@@ -24,6 +25,7 @@ def main():
     charts = {
         "kpi_row.html": generate_kpi_row(df),
         "chart_top_10_signatures.html": generate_chart_top_10_signatures(df),
+        "list_currently_open.html": generate_currently_open(df),
         "chart_outcomes.html": generate_chart_outcomes(df),
         "chart_signatures_cohorts.html": generate_chart_signatures_cohorts(df),
     }

@@ -16,6 +16,10 @@
     <div id="kpi-slot"></div>
 
     <div class="top-row">
+      <div id="currently-open"></div>
+    </div>
+
+    <div class="top-row">
       <div id="chart1-slot"></div>
     </div>
 
@@ -46,6 +50,7 @@
       await loadPartial("partials/chart_top_10_signatures.html",     "chart1-slot");
       await loadPartial("partials/chart_outcomes.html",        "chart2-slot");
       await loadPartial("partials/chart_signatures_cohorts.html", "chart3-slot");
+      await loadPartial("partials/list_currently_open.html",   "currently-open");
     })();
   </script>
 </body>
