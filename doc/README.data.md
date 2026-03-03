@@ -134,3 +134,13 @@ From **`eci_initiatives`** only:
 | `url` | Clickable link |
 
 Add a **scroller** if row count exceeds a display threshold (127 rows expected).
+
+```
+Waiting for Response
+Collection Ongoing
+Commission Engaged
+Law Passed
+Rejected Legislation
+Collection Unsuccessful
+Withdrawn
+```
