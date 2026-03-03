@@ -60,8 +60,7 @@ Desktop.ini
 !README*.md
 
 # created page to export
-page_to_export
-
+page_to_export/partials/*
 # ==============================================================================
 # ECI PROJECT SPECIFIC DATA RULES
 # ==============================================================================
