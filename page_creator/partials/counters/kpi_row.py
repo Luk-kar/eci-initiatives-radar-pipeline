@@ -11,7 +11,7 @@ def generate_kpi_row(df: pd.DataFrame) -> str:
         },
         {
             "label": "Currently Open:",
-            "value": int((df["current_status"] == "Pending").sum()),
+            "value": int((df["current_status"] == "Collection Ongoing").sum()),
             "color": "#1069c0",
             "icon": "🗳️",
         },
@@ -23,13 +23,17 @@ def generate_kpi_row(df: pd.DataFrame) -> str:
         },
         {
             "label": "Got EU Response:",
-            "value": int(df["current_status"].notna().sum()),
+            "value": int(
+                df["current_status"]
+                .isin(["Commission Engaged", "Law Passed", "Rejected Legislation"])
+                .sum()
+            ),
             "color": "#006064",
             "icon": "📬",
         },
         {
             "label": "Led to Legislation:",
-            "value": int((df["current_status"] == "Proposal").sum()),
+            "value": int((df["current_status"] == "Law Passed").sum()),
             "color": "#6a1b9a",
             "icon": "⚖️",
         },
