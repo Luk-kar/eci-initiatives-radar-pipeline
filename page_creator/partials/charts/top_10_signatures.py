@@ -38,21 +38,21 @@ def generate_chart_top_10_signatures(df: pd.DataFrame) -> str:
     agg = (
         df.groupby("title", as_index=False)
         .agg(
-            signatures_numeric=("signatures_numeric", "sum"),
+            signatures_collected=("signatures_collected", "sum"),
             signatures_threshold_met=("signatures_threshold_met", "first"),
             objective=("objective", "first"),
             commission_answer_text=("commission_answer_text", "first"),
             url=("url", "first"),
         )
-        .nlargest(10, "signatures_numeric")
-        .sort_values("signatures_numeric", ascending=True)
+        .nlargest(10, "signatures_collected")
+        .sort_values("signatures_collected", ascending=True)
     )
 
     agg["objective"] = agg["objective"].apply(_hover_wrap)
     agg["commission_answer_text"] = agg["commission_answer_text"].apply(_hover_wrap)
 
-    max_sigs = agg["signatures_numeric"].max()
-    colors = [_bar_color(s, max_sigs) for s in agg["signatures_numeric"]]
+    max_sigs = agg["signatures_collected"].max()
+    colors = [_bar_color(s, max_sigs) for s in agg["signatures_collected"]]
 
     # customdata: [0] threshold_met  [1] objective  [2] commission_answer_text  [3] url
     customdata = agg[
@@ -62,7 +62,7 @@ def generate_chart_top_10_signatures(df: pd.DataFrame) -> str:
     fig = go.Figure(
         go.Bar(
             y=agg["title"],
-            x=agg["signatures_numeric"],
+            x=agg["signatures_collected"],
             orientation="h",
             marker=dict(color=colors, line=dict(color="white", width=0.5)),
             customdata=customdata,

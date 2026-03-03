@@ -9,16 +9,14 @@ def generate_chart_signatures_year(df: pd.DataFrame) -> str:
     fig = px.scatter(
         df,
         x="registration_year",
-        y="signatures_numeric",
-        size="signatures_numeric",
-        color="primary_policy_area",
+        y="signatures_collected",
+        size="signatures_collected",
         hover_name="title",
         color_discrete_sequence=COLORS,
         title="Signatures per Initiative by Year",
         labels={
             "registration_year": "Registration Year",
-            "signatures_numeric": "Total Signatures",
-            "primary_policy_area": "primary_policy_area",
+            "signatures_collected": "Total Signatures",
         },
         size_max=60,
     )

@@ -6,11 +6,11 @@ from page_creator.utils import wrap_card
 
 
 def generate_chart_outcomes(df: pd.DataFrame) -> str:
-    counts = df["outcome"].value_counts().reset_index()
-    counts.columns = ["outcome", "count"]
+    counts = df["current_status"].value_counts().reset_index()
+    counts.columns = ["current_status", "count"]
     fig = px.pie(
         counts,
-        names="outcome",
+        names="current_status",
         values="count",
         hole=0.45,
         title="Initiatives by Commission Outcome",
