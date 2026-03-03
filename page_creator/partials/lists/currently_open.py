@@ -7,6 +7,7 @@ _STATUS = "Collection Ongoing"
 _TRUNCATE = 100
 _SCROLL_THRESHOLD = 5
 _COUNTRIES_THRESHOLD = 7
+_SIG_TARGET = 1_000_000
 
 
 def _truncate(text: str, max_len: int = _TRUNCATE) -> str:
@@ -14,6 +15,18 @@ def _truncate(text: str, max_len: int = _TRUNCATE) -> str:
         return ""
     s = str(text)
     return s if len(s) <= max_len else s[: max_len - 1] + "…"
+
+
+def _progress_bar(pct: float, modifier: str = "") -> str:
+    clamped = min(max(pct, 0.0), 100.0)
+    over = pct > 100.0
+    mod_class = f" progress-bar__fill--{modifier}" if modifier else ""
+    over_class = " progress-bar__fill--over" if over else ""
+    return (
+        f'<div class="progress-bar">'
+        f'<div class="progress-bar__fill{mod_class}{over_class}" style="width:{clamped:.1f}%">'
+        f"</div></div>"
+    )
 
 
 def generate_currently_open(df: pd.DataFrame) -> str:
@@ -34,16 +47,20 @@ def generate_currently_open(df: pd.DataFrame) -> str:
         url = row.get("url") or "#"
         name = row["title"]
         objective = _truncate(row.get("objective", ""))
-        sigs = (
-            f"{int(row['signatures_collected']):,}"
-            if pd.notna(row["signatures_collected"])
-            else "N/A"
-        )
-        threshold = (
-            f"{int(row['signatures_threshold_met'])} / {_COUNTRIES_THRESHOLD}"
-            if pd.notna(row["signatures_threshold_met"])
-            else "N/A"
-        )
+
+        if pd.notna(row["signatures_collected"]):
+            sig_val = int(row["signatures_collected"])
+            sig_pct = sig_val / _SIG_TARGET * 100
+            sigs = f"{sig_val:,}{_progress_bar(sig_pct, 'signatures')}"
+        else:
+            sigs = "N/A"
+
+        if pd.notna(row["signatures_threshold_met"]):
+            thr_val = int(row["signatures_threshold_met"])
+            thr_pct = thr_val / _COUNTRIES_THRESHOLD * 100
+            threshold = f"{thr_val} / {_COUNTRIES_THRESHOLD}{_progress_bar(thr_pct, 'threshold')}"
+        else:
+            threshold = "N/A"
 
         rows += f"""
         <tr>

@@ -270,3 +270,35 @@ body {
   font-size: 0.875rem;
   margin: 8px 0 0 0;
 }
+
+/* Progress bar — base */
+.progress-bar {
+  margin-top: 5px;
+  height: 4px;
+  background-color: #e8edf5;
+  border-radius: 2px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+/* Signatures — blue, proportional to 1 000 000 target */
+.progress-bar__fill--signatures {
+  background-color: #4a7fb5;
+}
+
+/* Countries threshold — green when making progress, gold when close */
+.progress-bar__fill--threshold {
+  background-color: #0d9488;
+}
+
+/* Overflowing bar — overlays the modifier color when value exceeds max */
+.progress-bar__fill--over {
+  background-color: #f0a500 !important;
+  box-shadow: 0 0 4px rgba(240, 165, 0, 0.5);
+}
