@@ -9,6 +9,7 @@ from page_creator.partials.charts import (
     generate_chart_outcomes,
     generate_chart_signatures_cohorts,
     generate_chart_ecis_year,
+    generate_chart_signatures_map,
     generate_chart_top_10_signatures,
 )
 from page_creator.partials.counters import generate_kpi_row
@@ -74,6 +75,7 @@ def main() -> None:
         "chart_outcomes.html": generate_chart_outcomes(df),
         "chart_signatures_cohorts.html": generate_chart_signatures_cohorts(df),
         "chart_ecis_year.html": generate_chart_ecis_year(df),
+        "chart_signatures_map.html": generate_chart_signatures_map(df),
         "chart_top_10_signatures.html": generate_chart_top_10_signatures(df),
     }
 
