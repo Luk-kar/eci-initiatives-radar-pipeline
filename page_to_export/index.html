@@ -15,17 +15,17 @@
     <div id="footer-slot"></div>
     <div id="kpi-slot"></div>
 
-    <div class="table1-slot">
+    <div class="table-curently-open-slot">
       <div id="currently-open"></div>
     </div>
 
-    <div class="top-row">
+    <div class="row-top-10-graph">
       <div id="chart1-slot"></div>
     </div>
 
     <div class="bottom-row">
-      <div id="chart2-slot"></div>
-      <div id="chart3-slot"></div>
+      <div id="chart-initiatives-status-slot"></div>
+      <div id="chart-signatures-count-slot"></div>
     </div>
 
   </div>
@@ -48,8 +48,8 @@
       await loadPartial("partials/deep_dive_footer.html",      "footer-slot");
       await loadPartial("partials/kpi_row.html",   "kpi-slot");
       await loadPartial("partials/chart_top_10_signatures.html",     "chart1-slot");
-      await loadPartial("partials/chart_outcomes.html",        "chart2-slot");
-      await loadPartial("partials/chart_signatures_cohorts.html", "chart3-slot");
+      await loadPartial("partials/chart_outcomes.html",        "chart-initiatives-status-slot");
+      await loadPartial("partials/chart_signatures_cohorts.html", "chart-signatures-count-slot");
       await loadPartial("partials/list_currently_open.html",   "currently-open");
     })();
   </script>

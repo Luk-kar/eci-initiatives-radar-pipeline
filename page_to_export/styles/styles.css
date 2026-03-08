@@ -20,7 +20,7 @@ body {
             padding: 15px; 
             margin-bottom: 20px; 
         }
-        .top-row { 
+        .row-top-10-graph { 
             display: flex; 
             flex-direction: column; 
         }
