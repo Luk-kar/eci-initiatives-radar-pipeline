@@ -43,6 +43,7 @@ def generate_chart_top_10_signatures(df: pd.DataFrame) -> str:
             objective=("objective", "first"),
             commission_answer_text=("commission_answer_text", "first"),
             url=("url", "first"),
+            registration_year=("registration_year", "first"),  # ← ADD THIS
         )
         .nlargest(10, "signatures_collected")
         .sort_values("signatures_collected", ascending=True)
@@ -50,13 +51,20 @@ def generate_chart_top_10_signatures(df: pd.DataFrame) -> str:
 
     agg["objective"] = agg["objective"].apply(_hover_wrap)
     agg["commission_answer_text"] = agg["commission_answer_text"].apply(_hover_wrap)
+    agg["registration_year",] = agg["registration_year"].apply(_hover_wrap)
 
     max_sigs = agg["signatures_collected"].max()
     colors = [_bar_color(s, max_sigs) for s in agg["signatures_collected"]]
 
     # customdata: [0] threshold_met  [1] objective  [2] commission_answer_text  [3] url
     customdata = agg[
-        ["signatures_threshold_met", "objective", "commission_answer_text", "url"]
+        [
+            "signatures_threshold_met",
+            "objective",
+            "commission_answer_text",
+            "url",
+            "registration_year",
+        ]
     ].values
 
     fig = go.Figure(
@@ -67,7 +75,8 @@ def generate_chart_top_10_signatures(df: pd.DataFrame) -> str:
             marker=dict(color=colors, line=dict(color="white", width=0.5)),
             customdata=customdata,
             hovertemplate=(
-                "<b>%{y}</b><br><br>"
+                "<b>%{y}</b><br>"
+                "<b>Year:</b> %{customdata[4]}<br><br>"
                 "<b>Signatures:</b> %{x:,.0f}<br>"
                 "<b>Countries Threshold Met:</b> %{customdata[0]}/27<br><br>"
                 "<b>Objective:</b><br>%{customdata[1]}<br><br>"
