@@ -1,0 +1,48 @@
+.kpi-row {
+    display: flex;
+    gap: 0;
+    /* border: 1.5px solid #b0c4de; */
+    border-radius: 8px;
+    background: white;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+}
+.kpi-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 14px 20px;
+    border-right: 4px solid #f5f7f9;
+}
+.kpi-card:last-child { border-right: none; }
+.kpi-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+.kpi-label {
+    font-size: 0.8rem;
+    white-space: nowrap;
+    text-align: center;
+    color: #2A3F5F;
+    margin-bottom: 8px;
+}
+.kpi-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.kpi-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+
+}
+@media (max-width: 768px) {
+    .kpi-row { flex-direction: column; }
+    .kpi-card { border-right: none; border-bottom: 1px solid #e0e8f0; }
+    .kpi-card:last-child { border-bottom: none; }
+}
