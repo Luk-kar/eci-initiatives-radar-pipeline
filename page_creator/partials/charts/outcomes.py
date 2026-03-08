@@ -12,10 +12,14 @@ STATUS_COLORS = {
     "Law Passed": "#3CA371",
     "Commission Engaged": "#9CCC65",
     "Collection Ongoing": "#F5A623",
-    "Waiting for Response": "#9E9E9E",
+    "Awaiting Response": "#9E9E9E",
     "Withdrawn": "#4B4B4B",
     "Rejected Legislation": "#F44336",
     "Collection Unsuccessful": "#8B1111",
+}
+
+_LABEL_ALIASES: dict[str, str] = {
+    "Waiting for Response": "Awaiting Response",
 }
 
 DEFAULT_COLOR = "#757575"
@@ -49,6 +53,9 @@ def _eci_list_for_hover(titles: list[str]) -> str:
 
 
 def generate_chart_outcomes(df: pd.DataFrame) -> str:
+    df = df.copy()
+    df["current_status"] = df["current_status"].replace(_LABEL_ALIASES)
+
     counts = df["current_status"].value_counts().reset_index()
     counts.columns = ["current_status", "count"]
 

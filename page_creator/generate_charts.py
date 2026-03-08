@@ -8,6 +8,7 @@ import pandas as pd
 from page_creator.partials.charts import (
     generate_chart_outcomes,
     generate_chart_signatures_cohorts,
+    generate_chart_ecis_year,
     generate_chart_top_10_signatures,
 )
 from page_creator.partials.counters import generate_kpi_row
@@ -24,31 +25,23 @@ GENERATED_JS = (
     / "generated.js"
 )
 
-# Subdir → HTML/slot prefix. Insertion order controls JS load sequence.
 _PREFIX_MAP: dict[str, str] = {
     "counters": "",
     "lists": "list",
     "charts": "chart",
 }
 
-# Pure helper modules — not partial generators.
 _EXCLUDE = frozenset({"__init__.py", "helpers.py", "utils.py"})
 
 
 def _discover_slot_map() -> dict[str, str]:
-    """
-    Walk each subdir in _PREFIX_MAP order, derive for every .py module:
-      html_name  →  "{prefix}_{stem}.html"   (e.g. "chart_outcomes.html")
-      slot_id    →  "{prefix}-{stem}-slot"   (e.g. "chart-outcomes-slot")
-    underscores in stem are replaced with dashes in the slot id.
-    """
     slot_map: dict[str, str] = {}
     for subdir, prefix in _PREFIX_MAP.items():
         for py_file in sorted((PARTIALS_DIR / subdir).glob("*.py")):
             if py_file.name in _EXCLUDE:
                 continue
-            stem = py_file.stem  # e.g. "top_10_signatures"
-            stem_dashes = stem.replace("_", "-")  # e.g. "top-10-signatures"
+            stem = py_file.stem
+            stem_dashes = stem.replace("_", "-")
             html_name = f"{prefix}_{stem}.html" if prefix else f"{stem}.html"
             slot_id = (
                 f"{prefix}-{stem_dashes}-slot" if prefix else f"{stem_dashes}-slot"
@@ -80,6 +73,7 @@ def main() -> None:
         "list_currently_open.html": generate_currently_open(df),
         "chart_outcomes.html": generate_chart_outcomes(df),
         "chart_signatures_cohorts.html": generate_chart_signatures_cohorts(df),
+        "chart_ecis_year.html": generate_chart_ecis_year(df),
         "chart_top_10_signatures.html": generate_chart_top_10_signatures(df),
     }
 

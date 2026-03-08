@@ -2,6 +2,7 @@
 const GENERATED_PARTIALS = [
     ["partials/kpi_row.html", "kpi-row-slot"],
     ["partials/list_currently_open.html", "list-currently-open-slot"],
+    ["partials/chart_ecis_year.html", "chart-ecis-year-slot"],
     ["partials/chart_outcomes.html", "chart-outcomes-slot"],
     ["partials/chart_signatures_cohorts.html", "chart-signatures-cohorts-slot"],
     ["partials/chart_top_10_signatures.html", "chart-top-10-signatures-slot"],
