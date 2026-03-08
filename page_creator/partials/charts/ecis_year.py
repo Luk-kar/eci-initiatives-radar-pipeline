@@ -3,32 +3,14 @@ import plotly.graph_objects as go
 
 from page_creator.config import MARGIN, HEIGHT, DIV_ARGS
 from page_creator.utils import wrap_card
+from page_creator.partials.charts.outcomes import STATUS_COLORS, _LABEL_ALIASES
 
 MAX_HOVER_ITEMS = 10
 
-# Current status values grouped into four outcome buckets.
-# Order here controls stacking order (bottom → top).
+# One category per STATUS_COLORS entry — order controls stacking order (bottom → top).
 _CATEGORIES = [
-    {
-        "name": "Collection Failed",
-        "statuses": {"Collection Unsuccessful", "Withdrawn"},
-        "color": "#C34242",
-    },
-    {
-        "name": "Collection Ongoing",
-        "statuses": {"Collection Ongoing"},
-        "color": "#F0B840",
-    },
-    {
-        "name": "Awaiting Response",
-        "statuses": {"Waiting for Response"},
-        "color": "#9e9e9e",
-    },
-    {
-        "name": "Commission Responded",
-        "statuses": {"Commission Engaged", "Rejected Legislation", "Law Passed"},
-        "color": "#3CA371",
-    },
+    {"name": name, "statuses": {name}, "color": color}
+    for name, color in reversed(STATUS_COLORS.items())
 ]
 
 
@@ -43,6 +25,10 @@ def _eci_hover_list(titles: list[str]) -> str:
 
 
 def generate_chart_ecis_year(df: pd.DataFrame) -> str:
+    # Normalise raw CSV labels to match STATUS_COLORS keys.
+    df = df.copy()
+    df["current_status"] = df["current_status"].replace(_LABEL_ALIASES)
+
     years = sorted(df["registration_year"].dropna().unique())
 
     fig = go.Figure()
@@ -88,17 +74,21 @@ def generate_chart_ecis_year(df: pd.DataFrame) -> str:
             xanchor="left",
         ),
         xaxis=dict(title="Registration Year", tickmode="linear", dtick=1),
-        yaxis=dict(title="Number of Initiatives"),
+        yaxis=dict(
+            title="Number of Initiatives",
+            domain=[0, 0.85],  # top pulled from 1.0 → 0.9
+        ),
         barmode="stack",
         margin=MARGIN,
-        height=HEIGHT,
+        height=HEIGHT / 4 * 3,
         showlegend=True,
         legend=dict(
             orientation="h",
             yanchor="bottom",
-            y=1.02,
+            y=0.87,  # pushed down from 1.02 → 0.92
             xanchor="right",
             x=1,
+            traceorder="reversed",
         ),
     )
 
