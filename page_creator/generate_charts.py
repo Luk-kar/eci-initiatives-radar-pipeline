@@ -6,14 +6,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pandas as pd
 from page_creator.partials.charts import (
-    generate_chart_top_10_signatures,
     generate_chart_outcomes,
     generate_chart_signatures_cohorts,
+    generate_chart_top_10_signatures,
 )
 from page_creator.partials.counters import generate_kpi_row
 from page_creator.partials.lists import generate_currently_open
 
 CSV_PATH = Path(__file__).parent / "data" / "initiatives.csv"
+PARTIALS_DIR = Path(__file__).parent / "partials"
 OUT_DIR = Path(__file__).parent.parent / "page_to_export" / "partials"
 GENERATED_JS = (
     Path(__file__).parent.parent
@@ -23,15 +24,37 @@ GENERATED_JS = (
     / "generated.js"
 )
 
-# Maps partial filename → DOM slot id.
-# Static partials (header, footer) live in elements/static.js — not here.
-SLOT_MAP: dict[str, str] = {
-    "kpi_row.html": "kpi-slot",
-    "chart_top_10_signatures.html": "chart1-slot",
-    "chart_outcomes.html": "chart-initiatives-status-slot",
-    "chart_signatures_cohorts.html": "chart-signatures-count-slot",
-    "list_currently_open.html": "currently-open",
+# Subdir → HTML/slot prefix. Insertion order controls JS load sequence.
+_PREFIX_MAP: dict[str, str] = {
+    "counters": "",
+    "lists": "list",
+    "charts": "chart",
 }
+
+# Pure helper modules — not partial generators.
+_EXCLUDE = frozenset({"__init__.py", "helpers.py", "utils.py"})
+
+
+def _discover_slot_map() -> dict[str, str]:
+    """
+    Walk each subdir in _PREFIX_MAP order, derive for every .py module:
+      html_name  →  "{prefix}_{stem}.html"   (e.g. "chart_outcomes.html")
+      slot_id    →  "{prefix}-{stem}-slot"   (e.g. "chart-outcomes-slot")
+    underscores in stem are replaced with dashes in the slot id.
+    """
+    slot_map: dict[str, str] = {}
+    for subdir, prefix in _PREFIX_MAP.items():
+        for py_file in sorted((PARTIALS_DIR / subdir).glob("*.py")):
+            if py_file.name in _EXCLUDE:
+                continue
+            stem = py_file.stem  # e.g. "top_10_signatures"
+            stem_dashes = stem.replace("_", "-")  # e.g. "top-10-signatures"
+            html_name = f"{prefix}_{stem}.html" if prefix else f"{stem}.html"
+            slot_id = (
+                f"{prefix}-{stem_dashes}-slot" if prefix else f"{stem_dashes}-slot"
+            )
+            slot_map[html_name] = slot_id
+    return slot_map
 
 
 def _build_generated_js(slot_map: dict[str, str]) -> str:
@@ -50,12 +73,14 @@ def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     GENERATED_JS.parent.mkdir(parents=True, exist_ok=True)
 
+    slot_map = _discover_slot_map()
+
     partials: dict[str, str] = {
         "kpi_row.html": generate_kpi_row(df),
-        "chart_top_10_signatures.html": generate_chart_top_10_signatures(df),
+        "list_currently_open.html": generate_currently_open(df),
         "chart_outcomes.html": generate_chart_outcomes(df),
         "chart_signatures_cohorts.html": generate_chart_signatures_cohorts(df),
-        "list_currently_open.html": generate_currently_open(df),
+        "chart_top_10_signatures.html": generate_chart_top_10_signatures(df),
     }
 
     for filename, html in partials.items():
@@ -63,7 +88,7 @@ def main() -> None:
         path.write_text(html, encoding="utf-8")
         print(f"  wrote {path}  ({path.stat().st_size:,} bytes)")
 
-    GENERATED_JS.write_text(_build_generated_js(SLOT_MAP), encoding="utf-8")
+    GENERATED_JS.write_text(_build_generated_js(slot_map), encoding="utf-8")
     print(f"  wrote {GENERATED_JS}  ({GENERATED_JS.stat().st_size:,} bytes)")
 
 
