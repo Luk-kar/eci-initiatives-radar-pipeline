@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="./styles/styles.css">
 
 <body>
-  <div class="dashboard-container">
+  <div class="dashboard-container" id="top">
 
     <div id="header-slot"></div>
     <div id="footer-slot"></div>
@@ -23,6 +23,12 @@
       <div id="chart1-slot"></div>
     </div>
 
+    <div class="move-top-page">
+      <button id="back-to-top" class="back-to-top-btn" aria-label="Scroll to top" title="Back to top">
+        &#8963;
+      </button>
+    </div>
+
     <div class="bottom-row">
       <div id="chart-initiatives-status-slot"></div>
       <div id="chart-signatures-count-slot"></div>
@@ -31,6 +37,17 @@
   </div>
 
   <script>
+
+    const backToTopBtn = document.getElementById("back-to-top");
+
+    window.addEventListener("scroll", () => {
+      backToTopBtn.classList.toggle("visible", window.scrollY > 300);
+    });
+
+    backToTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
     async function loadPartial(url, targetId) {
       const res  = await fetch(url);
       const html = await res.text();

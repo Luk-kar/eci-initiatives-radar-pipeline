@@ -1,3 +1,84 @@
+`./page_to_export/index.html`:
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>ECI Dashboard POC</title>
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+</head>
+<link rel="stylesheet" href="./styles/styles.css">
+
+<body>
+  <div class="dashboard-container" id="top"></div>
+  <div class="dashboard-container">
+
+    <div id="header-slot"></div>
+    <div id="footer-slot"></div>
+    <div id="kpi-slot"></div>
+
+    <div class="table-curently-open-slot">
+      <div id="currently-open"></div>
+    </div>
+
+    <div class="row-top-10-graph">
+      <div id="chart1-slot"></div>
+    </div>
+
+    <div class="move-top-page">
+      <button id="back-to-top" class="back-to-top-btn" aria-label="Scroll to top" title="Back to top">
+        &#8679;
+      </button>
+    </div>
+
+    <div class="bottom-row">
+      <div id="chart-initiatives-status-slot"></div>
+      <div id="chart-signatures-count-slot"></div>
+    </div>
+
+  </div>
+
+  <script>
+    
+    const backToTopBtn = document.getElementById("back-to-top");
+
+    window.addEventListener("scroll", () => {
+      backToTopBtn.classList.toggle("visible", window.scrollY > 300);
+    });
+
+    backToTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    async function loadPartial(url, targetId) {
+      const res  = await fetch(url);
+      const html = await res.text();
+      const target = document.getElementById(targetId);
+      target.innerHTML = html;
+      target.querySelectorAll("script").forEach(old => {
+        const s = document.createElement("script");
+        s.textContent = old.textContent;
+        old.replaceWith(s);
+      });
+    }
+
+    (async () => {
+      await loadPartial("partials/header.html",                "header-slot");
+      await loadPartial("partials/deep_dive_footer.html",      "footer-slot");
+      await loadPartial("partials/kpi_row.html",   "kpi-slot");
+      await loadPartial("partials/chart_top_10_signatures.html",     "chart1-slot");
+      await loadPartial("partials/chart_outcomes.html",        "chart-initiatives-status-slot");
+      await loadPartial("partials/chart_signatures_cohorts.html", "chart-signatures-count-slot");
+      await loadPartial("partials/list_currently_open.html",   "currently-open");
+    })();
+  </script>
+</body>
+</html>
+
+```
+`./page_to_export/styles/styles.css`:
+```
 body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             margin: 0; 
@@ -313,15 +394,15 @@ body {
 .back-to-top-btn {
   position: fixed;
   bottom: 2rem;
-  right: 3rem;
+  right: 2rem;
   width: 2.75rem;
   height: 2.75rem;
   border-radius: 50%;
   border: none;
-  background-color: #003399;
+  background-color: #0d6efd;   /* adjust to your dashboard accent colour */
   color: #fff;
-  font-size: 2rem;
-  line-height: 3.6rem;
+  font-size: 1.5rem;
+  line-height: 1;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 
@@ -329,14 +410,8 @@ body {
   opacity: 0;
   pointer-events: none;
   transform: translateY(0.5rem);
-  transition: opacity 0.25s ease, transform 0.25s ease,
-              background-color 0.2s ease, color 0.2s ease; /* ✅ added */
+  transition: opacity 0.25s ease, transform 0.25s ease;
   z-index: 999;
-}
-
-.back-to-top-btn:hover {
-  background-color: #e0e7ff;
-  color: #3a3fcc;
 }
 
 .back-to-top-btn.visible {
@@ -345,7 +420,15 @@ body {
   transform: translateY(0);
 }
 
+.back-to-top-btn:hover {
+  background-color: #0b5ed7;
+  transform: translateY(-2px);
+}
+
 .back-to-top-btn:focus-visible {
   outline: 3px solid #0d6efd;
   outline-offset: 3px;
 }
+
+```
+
