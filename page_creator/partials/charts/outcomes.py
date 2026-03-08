@@ -75,7 +75,7 @@ def generate_chart_outcomes(df: pd.DataFrame) -> str:
 
     fig = go.Figure(
         go.Pie(
-            labels=counts["current_status"],
+            labels=counts["current_status"].str.replace(" ", "<br>"),
             values=counts["count"],
             hole=0.45,
             marker=dict(colors=counts["color"].tolist()),
@@ -87,6 +87,7 @@ def generate_chart_outcomes(df: pd.DataFrame) -> str:
                 "<b>ECIs:</b><br>%{customdata[0][2]}"
                 "<extra></extra>"
             ),
+            # insidetextorientation="horizontal",
             textinfo="percent+label",
             textposition="inside",
             textfont=dict(size=11, color="white", family="Arial Black"),
