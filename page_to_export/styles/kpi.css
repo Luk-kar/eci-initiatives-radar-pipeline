@@ -1,7 +1,14 @@
+/*
+  Styles for the KPI counter row — the strip of headline numbers at the top of the dashboard.
+  - Cards are laid out side by side using flexbox, each taking equal width.
+  - A thin right border acts as a visual divider between cards; the last card has none.
+  - Large bold numbers draw the eye, with a small label above each value.
+  - On mobile the row stacks vertically, switching dividers from right borders to bottom borders.
+*/
+
 .kpi-row {
     display: flex;
     gap: 0;
-    /* border: 1.5px solid #b0c4de; */
     border-radius: 8px;
     background: white;
     margin-bottom: 20px;

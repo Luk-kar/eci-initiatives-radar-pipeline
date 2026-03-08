@@ -1,3 +1,7 @@
+/*
+  Entry point for all dashboard styles.
+*/
+
 @import "./base.css";
 @import "./kpi.css";
 @import "./table.css";

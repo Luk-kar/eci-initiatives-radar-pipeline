@@ -1,10 +1,17 @@
+/*
+  Styles for the deep-dive navigation banner and the back-to-top button.
+  - Deep-dive banner: a full-width centred row acting as a section link to a detailed page.
+  - Deep-dive link: a navy pill-shaped button that fades to light blue on hover.
+  - Back-to-top button: a fixed circle pinned to the bottom-right corner, hidden until triggered by JS.
+  - Visibility: controlled via opacity and pointer-events so it fades in/out smoothly without layout shifts.
+  - Hover states: both elements share the same light-blue colour scheme on interaction.
+*/
 
 .deep-dive-banner {
   display: inline-flex;
   justify-content: center;
   width: 100%;
   margin: 0 0 30px 0;
-
 }
 
 .deep-dive-link {
@@ -16,16 +23,12 @@
   font-weight: 600;
   text-decoration: none;
   transition: background 0.2s ease, color 0.2s ease;
-  
 }
 
 .deep-dive-link:hover {
   background: #e0e7ff;
   color: #1069c0;
-  
 }
-/* ── KPI counter row ─────────────────────────────────────── */
-
 
 /* Back-to-top button */
 .back-to-top-btn {
@@ -48,7 +51,7 @@
   pointer-events: none;
   transform: translateY(0.5rem);
   transition: opacity 0.25s ease, transform 0.25s ease,
-              background-color 0.2s ease, color 0.2s ease; /* ✅ added */
+              background-color 0.2s ease, color 0.2s ease;
   z-index: 999;
 }
 

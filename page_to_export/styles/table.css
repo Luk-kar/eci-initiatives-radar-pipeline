@@ -1,6 +1,11 @@
-/* ==========================================================================
-   Card Title & Count Badge
-   ========================================================================== */
+/*
+  Styles for the currently-open initiatives table and its supporting elements.
+  - The scroll wrapper constrains the table to ~5 visible rows with a fade-out gradient at the bottom.
+  - A custom navy scrollbar is applied cross-browser via both the modern and webkit APIs.
+  - Table headers are uppercase and bold; rows highlight on hover for readability.
+  - Progress bars beneath each row show signature and country-threshold progress with colour-coded fills.
+  - An amber override colour is applied when a bar value exceeds its maximum target.
+*/
 
 .card__title {
   font-size: 1rem;
@@ -21,14 +26,9 @@
   letter-spacing: 0.02em;
 }
 
-/* ==========================================================================
-   Data Table
-   ========================================================================== */
-
 .data-table__scroll-wrapper {
-  max-height: 320px;        /* ~5 rows visible */
+  max-height: 320px;
   overflow-y: auto;
-  /* keep the thead sticky while scrolling */
   position: relative;
 }
 
@@ -46,16 +46,9 @@
   transition: opacity 0.2s ease;
 }
 
-.data-table__scroll-wrapper.is-scrolled-end::after {
-  opacity: 0;
-}
+.data-table__scroll-wrapper.is-scrolled-end::after { opacity: 0; }
+.data-table__scroll-wrapper .data-table { border: none; }
 
-/* when wrapped, the table itself handles its own border */
-.data-table__scroll-wrapper .data-table {
-  border: none;
-}
-
-/* Modern standard — Chrome 121+, Firefox, Brave 1.61+ */
 @supports (scrollbar-width: auto) {
   .data-table__scroll-wrapper {
     scrollbar-width: thin;
@@ -63,28 +56,20 @@
   }
 }
 
-/* Chrome / Edge / Safari / Brave (pre-121) */
 @supports selector(::-webkit-scrollbar) {
-  .data-table__scroll-wrapper::-webkit-scrollbar {
-    width: 6px;
-  }
-
+  .data-table__scroll-wrapper::-webkit-scrollbar { width: 6px; }
   .data-table__scroll-wrapper::-webkit-scrollbar-track {
     background: #f0f4fa;
     border-radius: 0 6px 6px 0;
   }
-
   .data-table__scroll-wrapper::-webkit-scrollbar-thumb {
     background-color: #003399;
     border-radius: 6px;
   }
-
   .data-table__scroll-wrapper::-webkit-scrollbar-thumb:hover {
     background-color: #003399;
   }
 }
-
-
 
 .data-table {
   width: 100%;
@@ -114,13 +99,8 @@
   transition: background-color 0.15s ease;
 }
 
-.data-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.data-table tbody tr:hover {
-  background-color: #f7f9fd;
-}
+.data-table tbody tr:last-child { border-bottom: none; }
+.data-table tbody tr:hover { background-color: #f7f9fd; }
 
 .data-table td {
   padding: 10px 14px;
@@ -128,27 +108,10 @@
   line-height: 1.5;
 }
 
-/* Initiative link column */
-.data-table td:first-child {
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.data-table td:first-child a {
-  color: #1069c0;
-  text-decoration: none;
-}
-
-.data-table td:first-child a:hover {
-  text-decoration: underline;
-  color: #0a4d9c;
-}
-
-/* Objective column — muted, smaller */
-.data-table td:nth-child(2) {
-  color: #2a3f5f;
-  font-size: 0.82rem;
-}
+.data-table td:first-child { font-weight: 600; white-space: nowrap; }
+.data-table td:first-child a { color: #1069c0; text-decoration: none; }
+.data-table td:first-child a:hover { text-decoration: underline; color: #0a4d9c; }
+.data-table td:nth-child(2) { color: #2a3f5f; font-size: 0.82rem; }
 
 .list-empty {
   color: #8a9ab0;
@@ -157,7 +120,6 @@
   margin: 8px 0 0 0;
 }
 
-/* Progress bar — base */
 .progress-bar {
   margin-top: 5px;
   height: 4px;
@@ -173,24 +135,9 @@
   transition: width 0.4s ease;
 }
 
-/* Signatures — blue, proportional to 1 000 000 target */
-.progress-bar__fill--signatures {
-  background-color: #4a7fb5;
-}
-
-/* Countries threshold — green when making progress, gold when close */
-.progress-bar__fill--threshold {
-  background-color: #0d9488;
-}
-
-/* Overflowing bar — overlays the modifier color when value exceeds max */
+.progress-bar__fill--signatures { background-color: #4a7fb5; }
+.progress-bar__fill--threshold  { background-color: #0d9488; }
 .progress-bar__fill--over {
   background-color: #f0a500 !important;
   box-shadow: 0 0 4px rgba(240, 165, 0, 0.5);
-}
-/* Smooth scroll for the whole page */
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
 }
