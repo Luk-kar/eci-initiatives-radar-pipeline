@@ -42,21 +42,10 @@ def _map_status(status: str) -> str | None:
     if s in _STATUS_TO_CATEGORY:
         return _STATUS_TO_CATEGORY[s]
 
-    # Soft fallbacks for any unexpected variants
-    if "Law Passed" in s:
-        return "Law Passed"
-    if "Commission Engaged" in s:
-        return "Commission Engaged"
-    if "Rejected" in s:
-        return "Rejected Legislation"
-    if "Collection Ongoing" in s:
-        return "Collection Ongoing"
-    if "Unsuccessful" in s or "Withdrawn" in s:
-        return "Collection Unsuccessful"
-    if "Waiting" in s:
-        return "Awaiting Response"
-
-    return None  # unknown statuses are dropped rather than silently mis-categorised
+    result = next((cat for keyword, cat in _FALLBACKS if keyword in s), None)
+    if result is None:
+        raise ValueError(f"Unknown status: {s!r}")
+    return result
 
 
 def _parse_funding(value) -> float:
