@@ -76,7 +76,7 @@ def generate_chart_ecis_year(df: pd.DataFrame) -> str:
         xaxis=dict(title="Registration Year", tickmode="linear", dtick=1),
         yaxis=dict(
             title="Number of Initiatives",
-            domain=[0, 0.85],  # top pulled from 1.0 → 0.9
+            domain=[0, 0.85],
         ),
         barmode="stack",
         margin=MARGIN,
@@ -85,7 +85,7 @@ def generate_chart_ecis_year(df: pd.DataFrame) -> str:
         legend=dict(
             orientation="h",
             yanchor="bottom",
-            y=0.87,  # pushed down from 1.02 → 0.92
+            y=0.87,
             xanchor="right",
             x=1,
             traceorder="reversed",
