@@ -11,6 +11,7 @@ from page_creator.partials.charts import (
     generate_chart_ecis_year,
     generate_chart_signatures_map,
     generate_chart_top_10_signatures,
+    generate_chart_bubble_plot,
 )
 from page_creator.partials.counters import generate_kpi_row
 from page_creator.partials.lists import generate_currently_open
@@ -77,6 +78,7 @@ def main() -> None:
         "chart_ecis_year.html": generate_chart_ecis_year(df),
         "chart_signatures_map.html": generate_chart_signatures_map(df),
         "chart_top_10_signatures.html": generate_chart_top_10_signatures(df),
+        "chart_bubble_finance_plot.html": generate_chart_bubble_plot(df),
     }
 
     for filename, html in partials.items():
