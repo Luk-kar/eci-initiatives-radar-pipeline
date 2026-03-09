@@ -141,9 +141,9 @@
   transition: width 0.4s ease;
 }
 
-.progress-bar__fill--signatures { background-color: #4a7fb5; }
-.progress-bar__fill--threshold  { background-color: #0d9488; }
+.progress-bar__fill--signatures { background-color: #003399; }
+.progress-bar__fill--threshold  { background-color: #1565C0; }
 .progress-bar__fill--over {
-  background-color: #f0a500 !important;
-  box-shadow: 0 0 4px rgba(240, 165, 0, 0.5);
+  background-color: #FFCC00 !important;
+  box-shadow: 0 0 4px rgba(255, 204, 0, 0.5);
 }

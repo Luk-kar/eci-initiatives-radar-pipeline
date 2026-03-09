@@ -200,7 +200,7 @@ def generate_chart_bubble_finance_plot(df: pd.DataFrame) -> str:
             gridcolor="rgba(128,128,128,0.1)",
             showgrid=True,
             range=[-0.5, len(present) - 0.5],
-            domain=[0, 0.9],  # ← reserves top 15% for the legend row
+            domain=[0, 0.9],  # ← reserves top 10% for the legend row
         ),
         hovermode="closest",
         margin=MARGIN,
