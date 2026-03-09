@@ -50,8 +50,24 @@ def _format_sigs(n: int) -> str:
     return str(n)
 
 
+# Reverse lookup: country display name → alpha-2
+_NAME_TO_ALPHA2: dict[str, str] = {v[0]: k for k, v in _COUNTRIES.items()}
+
+
+def _parse_count(raw_value: str | int | dict) -> int:
+    """Extract integer from both old format (int) and new format (nested dict)."""
+    if isinstance(raw_value, int):
+        return raw_value
+    if isinstance(raw_value, dict):
+        sos = raw_value.get("statements_of_support", "0")
+        return int(str(sos).replace(",", "").replace("*", ""))
+    # plain string fallback
+    return int(str(raw_value).replace(",", "").replace("*", ""))
+
+
 def _build_country_df(df: pd.DataFrame) -> pd.DataFrame:
     totals: dict[str, int] = {}
+    threshold_met: dict[str, int] = {}  # ← new: count of ECIs where country hit ≥100%
     top_ecis: dict[str, list[tuple[int, str]]] = {}
 
     for _, row in df.iterrows():
@@ -59,16 +75,28 @@ def _build_country_df(df: pd.DataFrame) -> pd.DataFrame:
         if not raw or pd.isna(raw):
             continue
         try:
-            breakdown: dict[str, int] = json.loads(raw)
+            breakdown: dict = json.loads(raw)
         except (json.JSONDecodeError, TypeError):
             continue
 
         title = row["title"]
-        for alpha2, count in breakdown.items():
-            if alpha2 not in _COUNTRIES:
+        for key, value in breakdown.items():
+            alpha2 = key if key in _COUNTRIES else _NAME_TO_ALPHA2.get(key)
+            if alpha2 is None:
                 continue
+
+            count = _parse_count(value)
             totals[alpha2] = totals.get(alpha2, 0) + count
             top_ecis.setdefault(alpha2, []).append((count, title))
+
+            # Count how many ECIs this country met the threshold in
+            if isinstance(value, dict):
+                pct_raw = value.get("percentage", "0%").rstrip("%")
+                try:
+                    if float(pct_raw) >= 100.0:
+                        threshold_met[alpha2] = threshold_met.get(alpha2, 0) + 1
+                except ValueError:
+                    pass
 
     rows = []
     for alpha2, total in totals.items():
@@ -85,6 +113,7 @@ def _build_country_df(df: pd.DataFrame) -> pd.DataFrame:
                 "lat": lat,
                 "lon": lon,
                 "total": total,
+                "threshold_met_count": threshold_met.get(alpha2, 0),  # ← new column
                 "label": _format_sigs(total),
                 "eci_list": "<br>".join(items),
             }
@@ -108,7 +137,7 @@ def generate_chart_signatures_map(df: pd.DataFrame) -> str:
             locations=cdf["alpha3"],
             z=cdf["total"],
             text=cdf["name"],
-            customdata=cdf[["total", "eci_list"]].values,
+            customdata=cdf[["total", "threshold_met_count", "eci_list"]].values,
             colorscale="Viridis",
             colorbar=dict(
                 title="Total<br>Signatures",
@@ -116,8 +145,9 @@ def generate_chart_signatures_map(df: pd.DataFrame) -> str:
             ),
             hovertemplate=(
                 "<b>%{text}</b><br>"
-                "Total Signatures: %{customdata[0]:,.0f}<br><br>"
-                "<b>Top ECIs:</b><br>%{customdata[1]}"
+                "Total Signatures: %{customdata[0]:,.0f}<br>"
+                "Signatures Threshold Met: %{customdata[1]:,.0f}<br><br>"
+                "<b>Top ECIs:</b><br>%{customdata[2]}"
                 "<extra></extra>"
             ),
             showscale=True,
@@ -161,7 +191,7 @@ def generate_chart_signatures_map(df: pd.DataFrame) -> str:
         )
     )
 
-    add_space_to_europe = 14
+    add_space_to_europe = 16
 
     fig.update_geos(
         scope="world",
