@@ -3,17 +3,18 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from page_creator.config import DIV_ARGS, HEIGHT, MARGIN
+from page_creator.partials.charts.outcomes import STATUS_COLORS
 from page_creator.utils import wrap_card
 
 
 # ── Bubble category colour scheme ─────────────────────────────────────────────
 BUBBLE_COLORS: dict[str, str] = {
-    "Law Passed": "#2E7D32",
-    "Commission Engaged": "#FFA726",
-    "Rejected Legislation": "#C62828",
-    "Waiting for Response": "#9E9E9E",
-    "Collection Ongoing": "#1565C0",
-    "Collection Unsuccessful": "#DEDEDE",
+    "Collection Unsuccessful": STATUS_COLORS["Collection Unsuccessful"],
+    "Collection Ongoing": STATUS_COLORS["Collection Ongoing"],
+    "Awaiting Response": STATUS_COLORS["Awaiting Response"],
+    "Rejected Legislation": STATUS_COLORS["Rejected Legislation"],
+    "Commission Engaged": STATUS_COLORS["Commission Engaged"],
+    "Law Passed": STATUS_COLORS["Law Passed"],
 }
 
 _CATEGORY_ORDER = list(BUBBLE_COLORS.keys())
@@ -25,7 +26,7 @@ _STATUS_TO_CATEGORY: dict[str, str] = {
     "Law Passed": "Law Passed",
     "Commission Engaged": "Commission Engaged",
     "Rejected Legislation": "Rejected Legislation",
-    "Waiting for Response": "Waiting for Response",
+    "Waiting for Response": "Awaiting Response",
     "Collection Ongoing": "Collection Ongoing",
     "Collection Unsuccessful": "Collection Unsuccessful",
     "Withdrawn": "Collection Unsuccessful",
@@ -53,7 +54,7 @@ def _map_status(status: str) -> str | None:
     if "Unsuccessful" in s or "Withdrawn" in s:
         return "Collection Unsuccessful"
     if "Waiting" in s:
-        return "Waiting for Response"
+        return "Awaiting Response"
 
     return None  # unknown statuses are dropped rather than silently mis-categorised
 
@@ -210,6 +211,7 @@ def generate_chart_bubble_finance_plot(df: pd.DataFrame) -> str:
             y=1.02,
             xanchor="right",
             x=1,
+            traceorder="reversed",
         ),
     )
 

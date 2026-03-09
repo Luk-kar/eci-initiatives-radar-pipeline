@@ -11,11 +11,11 @@ from page_creator.utils import wrap_card
 STATUS_COLORS = {
     "Law Passed": "#3CA371",
     "Commission Engaged": "#9CCC65",
-    "Collection Ongoing": "#F5A623",
-    "Awaiting Response": "#9E9E9E",
-    "Withdrawn": "#4B4B4B",
     "Rejected Legislation": "#F44336",
+    "Awaiting Response": "#9E9E9E",
+    "Collection Ongoing": "#F5A623",
     "Collection Unsuccessful": "#8B1111",
+    "Withdrawn": "#4B4B4B",
 }
 
 _LABEL_ALIASES: dict[str, str] = {
