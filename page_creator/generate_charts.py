@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
+import re
 import sys
 from pathlib import Path
 
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 
 import pandas as pd
 from page_creator.partials.charts import (
@@ -16,6 +19,7 @@ from page_creator.partials.charts import (
 from page_creator.partials.counters import generate_kpi_row
 from page_creator.partials.lists import generate_currently_open
 
+
 CSV_PATH = Path(__file__).parent / "data" / "initiatives.csv"
 PARTIALS_DIR = Path(__file__).parent / "partials"
 OUT_DIR = Path(__file__).parent.parent / "page_to_export" / "partials"
@@ -27,13 +31,65 @@ GENERATED_JS = (
     / "generated.js"
 )
 
+
 _PREFIX_MAP: dict[str, str] = {
     "counters": "",
     "lists": "list",
     "charts": "chart",
 }
 
+
 _EXCLUDE = frozenset({"__init__.py", "helpers.py", "utils.py"})
+
+_GENERATORS = [
+    generate_kpi_row,
+    generate_currently_open,
+    generate_chart_outcomes,
+    generate_chart_signatures_cohorts,
+    generate_chart_ecis_year,
+    generate_chart_signatures_map,
+    generate_chart_top_10_signatures,
+    generate_chart_bubble_plot,
+]
+
+_PATTERN = re.compile(r"^generate_(.+)$")
+
+
+def _fn_to_key(fn) -> str:
+    """Derive an HTML filename from a generator function using its module path.
+
+    The subdir (last component of fn.__module__) is resolved against _PREFIX_MAP
+    to determine the filename prefix. Any leading '{prefix}_' embedded in the
+    function name is stripped to avoid duplication.
+
+    Examples:
+        generate_chart_outcomes    (charts/)   → chart_outcomes.html
+        generate_currently_open    (lists/)    → list_currently_open.html
+        generate_kpi_row           (counters/) → kpi_row.html
+    """
+    subdir = fn.__module__.split(".")[-2]
+    if subdir not in _PREFIX_MAP:
+        raise ValueError(
+            f"Function '{fn.__name__}' lives in module '{fn.__module__}'; "
+            f"subdir '{subdir}' is not registered in _PREFIX_MAP "
+            f"(known subdirs: {list(_PREFIX_MAP)})."
+        )
+    prefix = _PREFIX_MAP[subdir]
+
+    match = _PATTERN.fullmatch(fn.__name__)
+    if not match:
+        raise ValueError(
+            f"Generator '{fn.__name__}' does not follow the required "
+            "'generate_{element_name}' naming pattern."
+        )
+    raw = match.group(1)
+
+    # Strip the prefix segment already embedded in the function name
+    # e.g. 'chart_outcomes' with prefix 'chart' → 'outcomes'
+    # but 'currently_open' with prefix 'list'  → 'currently_open' (no match, keep as-is)
+    element = raw.removeprefix(f"{prefix}_") if prefix else raw
+
+    return f"{prefix}_{element}.html" if prefix else f"{element}.html"
 
 
 def _discover_slot_map() -> dict[str, str]:
@@ -63,6 +119,14 @@ def _build_generated_js(slot_map: dict[str, str]) -> str:
     )
 
 
+def generate_partials_a_map_html_name_function(df):
+    """
+    Build a mapping of HTML filenames to rendered HTML strings for all registered generators.
+    """
+
+    return {_fn_to_key(fn): fn(df) for fn in _GENERATORS}
+
+
 def main() -> None:
     df = pd.read_csv(CSV_PATH)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -70,16 +134,7 @@ def main() -> None:
 
     slot_map = _discover_slot_map()
 
-    partials: dict[str, str] = {
-        "kpi_row.html": generate_kpi_row(df),
-        "list_currently_open.html": generate_currently_open(df),
-        "chart_outcomes.html": generate_chart_outcomes(df),
-        "chart_signatures_cohorts.html": generate_chart_signatures_cohorts(df),
-        "chart_ecis_year.html": generate_chart_ecis_year(df),
-        "chart_signatures_map.html": generate_chart_signatures_map(df),
-        "chart_top_10_signatures.html": generate_chart_top_10_signatures(df),
-        "chart_bubble_finance_plot.html": generate_chart_bubble_plot(df),
-    }
+    partials: dict[str, str] = generate_partials_a_map_html_name_function(df)
 
     for filename, html in partials.items():
         path = OUT_DIR / filename
