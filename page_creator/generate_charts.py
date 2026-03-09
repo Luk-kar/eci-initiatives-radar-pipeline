@@ -14,7 +14,7 @@ from page_creator.partials.charts import (
     generate_chart_ecis_year,
     generate_chart_signatures_map,
     generate_chart_top_10_signatures,
-    generate_chart_bubble_plot,
+    generate_chart_bubble_finance_plot,
 )
 from page_creator.partials.counters import generate_kpi_row
 from page_creator.partials.lists import generate_currently_open
@@ -49,7 +49,7 @@ _GENERATORS = [
     generate_chart_ecis_year,
     generate_chart_signatures_map,
     generate_chart_top_10_signatures,
-    generate_chart_bubble_plot,
+    generate_chart_bubble_finance_plot,
 ]
 
 _PATTERN = re.compile(r"^generate_(.+)$")

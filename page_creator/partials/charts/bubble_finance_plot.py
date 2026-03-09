@@ -5,51 +5,57 @@ import plotly.graph_objects as go
 from page_creator.config import DIV_ARGS, HEIGHT, MARGIN
 from page_creator.utils import wrap_card
 
+
 # ── Bubble category colour scheme ─────────────────────────────────────────────
 BUBBLE_COLORS: dict[str, str] = {
-    "Law Active/Passed": "#2E7D32",
+    "Law Passed": "#2E7D32",
     "Commission Engaged": "#FFA726",
-    "Rejected": "#C62828",
+    "Rejected Legislation": "#C62828",
     "Waiting for Response": "#9E9E9E",
-    "Unsuccessful Collection": "#DEDEDE",
+    "Collection Ongoing": "#1565C0",
+    "Collection Unsuccessful": "#DEDEDE",
 }
 
 _CATEGORY_ORDER = list(BUBBLE_COLORS.keys())
 
+
 # ── current_status → bubble category ─────────────────────────────────────────
+#   Only 7 raw statuses exist; 'Withdrawn' is merged into 'Collection Unsuccessful'.
 _STATUS_TO_CATEGORY: dict[str, str] = {
-    "Law Passed": "Law Active/Passed",
-    "Law Active": "Law Active/Passed",
+    "Law Passed": "Law Passed",
     "Commission Engaged": "Commission Engaged",
-    "Law Promised": "Commission Engaged",
-    "Action Plan Created": "Commission Engaged",
-    "Being Studied": "Commission Engaged",
-    "Rejected Legislation": "Rejected",
-    "Rejected": "Rejected",
+    "Rejected Legislation": "Rejected Legislation",
     "Waiting for Response": "Waiting for Response",
-    "Collection Ongoing": "Waiting for Response",
-    "Collection Unsuccessful": "Unsuccessful Collection",
-    "Withdrawn": "Unsuccessful Collection",
+    "Collection Ongoing": "Collection Ongoing",
+    "Collection Unsuccessful": "Collection Unsuccessful",
+    "Withdrawn": "Collection Unsuccessful",
 }
 
 
 def _map_status(status: str) -> str | None:
     if pd.isna(status):
         return None
+
     s = str(status).strip()
-    # Exact-match lookup first
+
     if s in _STATUS_TO_CATEGORY:
         return _STATUS_TO_CATEGORY[s]
-    # Fallback substring checks
-    if "Law Active" in s or "Law Passed" in s:
-        return "Law Active/Passed"
-    if any(k in s for k in ("Law Promised", "Action Plan", "Being Studied", "Commission Engaged")):
+
+    # Soft fallbacks for any unexpected variants
+    if "Law Passed" in s:
+        return "Law Passed"
+    if "Commission Engaged" in s:
         return "Commission Engaged"
     if "Rejected" in s:
-        return "Rejected"
-    if any(k in s for k in ("Unsuccessful", "Withdrawn")):
-        return "Unsuccessful Collection"
-    return "Waiting for Response"
+        return "Rejected Legislation"
+    if "Collection Ongoing" in s:
+        return "Collection Ongoing"
+    if "Unsuccessful" in s or "Withdrawn" in s:
+        return "Collection Unsuccessful"
+    if "Waiting" in s:
+        return "Waiting for Response"
+
+    return None  # unknown statuses are dropped rather than silently mis-categorised
 
 
 def _parse_funding(value) -> float:
@@ -65,8 +71,7 @@ def _parse_funding(value) -> float:
 
 
 # ── Main chart generator ──────────────────────────────────────────────────────
-
-def generate_chart_bubble_plot(df: pd.DataFrame) -> str:
+def generate_chart_bubble_finance_plot(df: pd.DataFrame) -> str:
     df = df.copy()
 
     df["funding_numeric"] = df["funding_total"].apply(_parse_funding)
@@ -91,9 +96,7 @@ def generate_chart_bubble_plot(df: pd.DataFrame) -> str:
     # Marker sizes: log-normalised to [8, 43]
     log_f = np.log10(df["funding_display"])
     span = log_f.max() - log_f.min()
-    df["marker_size"] = (
-        (log_f - log_f.min()) / span * 35 + 8 if span > 0 else 20
-    )
+    df["marker_size"] = (log_f - log_f.min()) / span * 35 + 8 if span > 0 else 20
     df["marker_size"] = df["marker_size"].fillna(15).clip(lower=5, upper=50)
 
     fig = go.Figure()
@@ -161,8 +164,30 @@ def generate_chart_bubble_plot(df: pd.DataFrame) -> str:
         xaxis=dict(
             title="Funding Amount (€)",
             type="log",
-            tickvals=[200, 500, 1_000, 5_000, 10_000, 50_000, 100_000, 500_000, 1_000_000, 5_000_000],
-            ticktext=["€0", "€500", "€1k", "€5k", "€10k", "€50k", "€100k", "€500k", "€1M", "€5M"],
+            tickvals=[
+                200,
+                500,
+                1_000,
+                5_000,
+                10_000,
+                50_000,
+                100_000,
+                500_000,
+                1_000_000,
+                5_000_000,
+            ],
+            ticktext=[
+                "€0",
+                "€500",
+                "€1k",
+                "€5k",
+                "€10k",
+                "€50k",
+                "€100k",
+                "€500k",
+                "€1M",
+                "€5M",
+            ],
             gridcolor="rgba(128,128,128,0.2)",
             showgrid=True,
         ),
