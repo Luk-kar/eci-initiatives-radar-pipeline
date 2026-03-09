@@ -129,6 +129,8 @@ def generate_chart_signatures_map(df: pd.DataFrame) -> str:
     if cdf.empty:
         return wrap_card("<p>No country-level signature data available.</p>")
 
+    total_sigs = _format_sigs(int(cdf["total"].sum()))
+
     fig = go.Figure()
 
     # Choropleth fill layer
@@ -207,7 +209,7 @@ def generate_chart_signatures_map(df: pd.DataFrame) -> str:
 
     fig.update_layout(
         title=dict(
-            text="Total ECI Signatures by Country (All Time)",
+            text=f"ECI Signatures by Country ({total_sigs} total)",
             x=0.015,
             xanchor="left",
         ),

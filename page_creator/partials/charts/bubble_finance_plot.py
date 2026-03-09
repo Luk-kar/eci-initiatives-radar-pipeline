@@ -7,49 +7,30 @@ from page_creator.partials.charts.outcomes import STATUS_COLORS
 from page_creator.utils import wrap_card
 
 
-# ── Bubble category colour scheme ─────────────────────────────────────────────
+# ── Colour scheme & category order ───────────────────────────────────────────
 BUBBLE_COLORS: dict[str, str] = {
-    "Collection Unsuccessful": STATUS_COLORS["Collection Unsuccessful"],
-    "Collection Ongoing": STATUS_COLORS["Collection Ongoing"],
-    "Awaiting Response": STATUS_COLORS["Awaiting Response"],
-    "Rejected Legislation": STATUS_COLORS["Rejected Legislation"],
-    "Commission Engaged": STATUS_COLORS["Commission Engaged"],
-    "Law Passed": STATUS_COLORS["Law Passed"],
+    "Collection Unsuccessful": STATUS_COLORS["Collection Unsuccessful"],  # dark red
+    "Collection Ongoing": STATUS_COLORS["Collection Ongoing"],  # amber / orange
+    "Awaiting Response": STATUS_COLORS["Awaiting Response"],  # medium grey
+    "Rejected Legislation": STATUS_COLORS["Rejected Legislation"],  # red
+    "Commission Engaged": STATUS_COLORS["Commission Engaged"],  # light green
+    "Law Passed": STATUS_COLORS["Law Passed"],  # teal green
 }
 
 _CATEGORY_ORDER = list(BUBBLE_COLORS.keys())
 
-
-# ── current_status → bubble category ─────────────────────────────────────────
-#   Only 7 raw statuses exist; 'Withdrawn' is merged into 'Collection Unsuccessful'.
-_STATUS_TO_CATEGORY: dict[str, str] = {
-    "Law Passed": "Law Passed",
-    "Commission Engaged": "Commission Engaged",
-    "Rejected Legislation": "Rejected Legislation",
+_STATUS_ALIASES: dict[str, str] = {
     "Waiting for Response": "Awaiting Response",
-    "Collection Ongoing": "Collection Ongoing",
-    "Collection Unsuccessful": "Collection Unsuccessful",
     "Withdrawn": "Collection Unsuccessful",
 }
 
-
-def _map_status(status: str) -> str | None:
-    if pd.isna(status):
-        return None
-
-    s = str(status).strip()
-
-    if s in _STATUS_TO_CATEGORY:
-        return _STATUS_TO_CATEGORY[s]
-
-    result = next((cat for keyword, cat in _FALLBACKS if keyword in s), None)
-    if result is None:
-        raise ValueError(f"Unknown status: {s!r}")
-    return result
+_LOG_ZERO_DISPLAY = 200
 
 
+# ── Helpers ───────────────────────────────────────────────────────────────────
 def _parse_funding(value) -> float:
     """Parse comma-formatted funding strings (e.g. '12,980.15') to float."""
+
     if pd.isna(value) or value == "" or value is None:
         return 0.0
     if isinstance(value, (int, float)):
@@ -60,52 +41,63 @@ def _parse_funding(value) -> float:
         return 0.0
 
 
-# ── Main chart generator ──────────────────────────────────────────────────────
-def generate_chart_bubble_finance_plot(df: pd.DataFrame) -> str:
+def _prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    """Normalise statuses, parse funding, drop unknown rows."""
+
     df = df.copy()
+    df["current_status"] = df["current_status"].replace(_STATUS_ALIASES)
+    df["bubble_category"] = df["current_status"]
+    df = df[df["bubble_category"].isin(BUBBLE_COLORS)].reset_index(drop=True)
 
     df["funding_numeric"] = df["funding_total"].apply(_parse_funding)
-    df["bubble_category"] = df["current_status"].apply(_map_status)
-    df = df[df["bubble_category"].notna()].reset_index(drop=True)
-
-    # For log scale, replace €0 with a small display offset
-    _LOG_ZERO_DISPLAY = 200
     df["funding_display"] = df["funding_numeric"].apply(
         lambda v: _LOG_ZERO_DISPLAY if v == 0.0 else v
     )
     df["has_zero_funding"] = df["funding_numeric"] == 0.0
+    return df
 
-    # Build y-axis positions with jitter for visual separation
-    present = [c for c in _CATEGORY_ORDER if c in df["bubble_category"].values]
+
+def _add_jitter(df: pd.DataFrame, present: list[str]) -> pd.DataFrame:
+    """Assign integer y positions and add uniform jitter for visual separation."""
+
     cat_index = {c: i for i, c in enumerate(present)}
     df["y_pos"] = df["bubble_category"].map(cat_index)
-
     rng = np.random.default_rng(42)
     df["y_jitter"] = df["y_pos"] + rng.uniform(-0.15, 0.15, len(df))
+    return df
 
-    # Marker sizes: log-normalised to [8, 43]
+
+def _compute_marker_sizes(df: pd.DataFrame) -> pd.DataFrame:
+    """Log-normalise funding to marker sizes in [8, 43]."""
+
     log_f = np.log10(df["funding_display"])
     span = log_f.max() - log_f.min()
     df["marker_size"] = (log_f - log_f.min()) / span * 35 + 8 if span > 0 else 20
     df["marker_size"] = df["marker_size"].fillna(15).clip(lower=5, upper=50)
+    return df
 
-    fig = go.Figure()
+
+def _build_hover(row: pd.Series) -> str:
+    """Format a single bubble's hover tooltip with title, funding, and status."""
+
+    funding_label = (
+        "€0 (No funding data)"
+        if row["has_zero_funding"]
+        else f"€{row['funding_numeric']:,.0f}"
+    )
+    return (
+        f"<b>{str(row['title'])[:65]}</b><br>"
+        f"Funding: {funding_label}<br>"
+        f"Status: {row['current_status']}"
+    )
+
+
+def _add_traces(fig: go.Figure, df: pd.DataFrame, present: list[str]) -> None:
+    """Add one Scatter trace per category, sized and coloured by funding amount."""
 
     for category in present:
         cat_df = df[df["bubble_category"] == category]
-
-        hover_texts = []
-        for _, row in cat_df.iterrows():
-            funding_label = (
-                "€0 (No funding data)"
-                if row["has_zero_funding"]
-                else f"€{row['funding_numeric']:,.0f}"
-            )
-            hover_texts.append(
-                f"<b>{str(row['title'])[:65]}</b><br>"
-                f"Funding: {funding_label}<br>"
-                f"Status: {row['current_status']}"
-            )
+        hover_texts = [_build_hover(row) for _, row in cat_df.iterrows()]
 
         fig.add_trace(
             go.Scatter(
@@ -124,30 +116,39 @@ def generate_chart_bubble_finance_plot(df: pd.DataFrame) -> str:
             )
         )
 
-    # Dashed reference lines at key funding thresholds
-    max_display = df["funding_display"].max()
+
+def _add_threshold_lines(fig: go.Figure, df: pd.DataFrame) -> None:
+    """Draw dashed vertical reference lines at key funding thresholds."""
+
     min_display = df["funding_display"].min()
+    max_display = df["funding_display"].max()
+
     for threshold in [1_000, 10_000, 50_000, 100_000, 500_000, 1_000_000]:
-        if min_display <= threshold <= max_display:
-            label = (
-                f"€{threshold / 1_000_000:.0f}M"
-                if threshold >= 1_000_000
-                else f"€{threshold / 1_000:.0f}k"
-            )
-            fig.add_vline(
-                x=threshold,
-                line_dash="dash",
-                line_color="gray",
-                opacity=0.3,
-                line_width=1,
-                annotation_text=label,
-                annotation_position="top",
-                annotation_font_size=9,
-            )
+        if not (min_display <= threshold <= max_display):
+            continue
+        label = (
+            f"€{threshold / 1_000_000:.0f}M"
+            if threshold >= 1_000_000
+            else f"€{threshold / 1_000:.0f}k"
+        )
+        fig.add_vline(
+            x=threshold,
+            line_dash="dash",
+            line_color="gray",
+            opacity=0.3,
+            line_width=1,
+            annotation_text=label,
+            annotation_position="top",
+            annotation_font_size=9,
+        )
+
+
+def _apply_layout(fig: go.Figure, present: list[str], title_amount: str) -> None:
+    """Apply axis configuration, legend placement, and title to the figure."""
 
     fig.update_layout(
         title=dict(
-            text="ECI Funding Amount vs Outcome",
+            text=f"ECI Initiative Funding ({title_amount} total) by Final Outcome",
             x=0.015,
             xanchor="left",
         ),
@@ -189,7 +190,7 @@ def generate_chart_bubble_finance_plot(df: pd.DataFrame) -> str:
             gridcolor="rgba(128,128,128,0.1)",
             showgrid=True,
             range=[-0.5, len(present) - 0.5],
-            domain=[0, 0.9],  # ← reserves top 10% for the legend row
+            domain=[0, 0.9],
         ),
         hovermode="closest",
         margin=MARGIN,
@@ -198,11 +199,41 @@ def generate_chart_bubble_finance_plot(df: pd.DataFrame) -> str:
         legend=dict(
             orientation="h",
             yanchor="bottom",
-            y=0.92,  # ← sits in the reserved gap, below the title
+            y=0.92,
             xanchor="right",
             x=1,
             traceorder="reversed",
         ),
     )
+
+
+def _present_categories(df: pd.DataFrame) -> list[str]:
+    """Return category order filtered to those actually present in the data."""
+    return [c for c in _CATEGORY_ORDER if c in df["bubble_category"].values]
+
+
+def _format_amount(value: float) -> str:
+    """Round a euro amount to the nearest K, M, or B — omits decimal if whole."""
+    for threshold, suffix in [(1_000_000_000, "B"), (1_000_000, "M"), (1_000, "K")]:
+        if value >= threshold:
+            formatted = f"{value / threshold:.1f}".rstrip("0").rstrip(".")
+            return f"€{formatted}{suffix}"
+    return f"€{value:.0f}"
+
+
+# ── Public entry point ────────────────────────────────────────────────────────
+def generate_chart_bubble_finance_plot(df: pd.DataFrame) -> str:
+    df = _prepare_dataframe(df)
+    present = _present_categories(df)
+    df = _add_jitter(df, present)
+    df = _compute_marker_sizes(df)
+
+    total_eur = df["funding_numeric"].sum()
+    title_amount = _format_amount(df["funding_numeric"].sum())
+
+    fig = go.Figure()
+    _add_traces(fig, df, present)
+    _add_threshold_lines(fig, df)
+    _apply_layout(fig, present, title_amount)
 
     return wrap_card(fig.to_html(**DIV_ARGS))

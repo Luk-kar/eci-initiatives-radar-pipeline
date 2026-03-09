@@ -30,6 +30,7 @@ def generate_chart_ecis_year(df: pd.DataFrame) -> str:
     df["current_status"] = df["current_status"].replace(_LABEL_ALIASES)
 
     years = sorted(df["registration_year"].dropna().unique())
+    year_start, year_end = int(years[0]), int(years[-1])
 
     fig = go.Figure()
 
@@ -69,7 +70,7 @@ def generate_chart_ecis_year(df: pd.DataFrame) -> str:
 
     fig.update_layout(
         title=dict(
-            text="ECI Outcomes by Registration Year",
+            text=f"ECI Outcomes by Registration Year ({year_start} – {year_end})",
             x=0.015,
             xanchor="left",
         ),
