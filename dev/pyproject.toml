@@ -1,0 +1,33 @@
+[project]
+name = "eci-pipeline"
+version = "0.1.0"
+requires-python = ">=3.12"
+
+[project.optional-dependencies]
+dev = [
+    "pylint>=3.0",
+]
+
+[tool.pylint.main]
+py-version = "3.12"
+ignore = [".git", ".venv", "__pycache__"]
+recursive = true
+
+[tool.pylint.format]
+max-line-length = 88
+
+[tool.pylint."messages control"]
+disable = [
+    "too-few-public-methods",     # common in dataclass-like structures
+    "logging-fstring-interpolation", # f-strings in logging are fine
+    "wrong-import-position", # not always the case when fiddling with project root
+]
+
+[tool.pylint.basic]
+good-names = ["df"]  # common short names in data code
+
+[tool.pylint.design]
+max-args = 8
+max-locals = 20
+max-returns = 5
+max-branches = 12

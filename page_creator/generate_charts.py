@@ -1,13 +1,17 @@
-#!/usr/bin/env python3
+"""Render all dashboard partials from ECI data and write them to ``page_to_export/partials/``."""
+
+# Python
 import re
 import sys
 from pathlib import Path
 
+# Third
+import pandas as pd
 
+# Ensure the project root is on sys.path regardless of the working directory
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-
-import pandas as pd
+# local
 from page_creator.partials.charts import (
     generate_chart_outcomes,
     generate_chart_signatures_cohorts,
