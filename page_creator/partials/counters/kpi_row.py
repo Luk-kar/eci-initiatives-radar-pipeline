@@ -48,7 +48,7 @@ def generate_kpi_row(df: pd.DataFrame) -> str:
         f"""      <div class="kpi-card"
            role="button"
            tabindex="0"
-           title="Scroll to {m['label']} list"
+           title="Scroll to {m['label'].rstrip(':')} list"
            style="cursor:pointer;"
            onclick="scrollToSection('{m['target_id']}')"
            onkeydown="if(event.key==='Enter'||event.key===' ')scrollToSection('{m['target_id']}')">
