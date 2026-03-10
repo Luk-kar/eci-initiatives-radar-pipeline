@@ -1,7 +1,23 @@
+"""Renders the KPI summary strip — a row of clickable headline metric cards."""
+
+# Third party
 import pandas as pd
 
 
 def generate_kpi_row(df: pd.DataFrame) -> str:
+    """Return an HTML ``kpi-row`` div containing one clickable card per headline metric.
+
+    Each card displays an icon, label, and computed value derived from ``df``,
+    and scrolls the page to the corresponding list section when clicked.
+
+    Args:
+        df: The full ECI initiatives DataFrame. Must contain ``current_status``
+            and ``signatures_collected`` columns.
+
+    Returns:
+        An HTML string containing the ``kpi-row`` div with all metric cards.
+    """
+
     metrics = [
         {
             "label": "Total Initiatives:",

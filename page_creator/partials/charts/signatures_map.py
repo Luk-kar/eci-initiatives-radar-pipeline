@@ -1,8 +1,13 @@
+"""Renders a choropleth map of total ECI signatures collected per EU member state."""
+
+# Python
 import json
 
+# Third Party
 import pandas as pd
 import plotly.graph_objects as go
 
+# Local
 from page_creator.config import DIV_ARGS
 from page_creator.utils import wrap_card
 
@@ -43,6 +48,8 @@ _COUNTRIES: dict[str, tuple[str, str, float, float]] = {
 
 
 def _format_sigs(n: int) -> str:
+    """Format a raw signature count into a compact human-readable string (e.g. 1200000 → '1.2M')."""
+
     if n >= 1_000_000:
         return f"{n / 1_000_000:.1f}M"
     if n >= 1_000:
@@ -66,6 +73,12 @@ def _parse_count(raw_value: str | int | dict) -> int:
 
 
 def _build_country_df(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Aggregate per-country signature totals,
+    threshold-met counts, and
+    top ECI lists from the raw JSON breakdown column.
+    """
+
     totals: dict[str, int] = {}
     threshold_met: dict[str, int] = {}  # ← new: count of ECIs where country hit ≥100%
     top_ecis: dict[str, list[tuple[int, str]]] = {}
@@ -125,6 +138,25 @@ def _build_country_df(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def generate_chart_signatures_map(df: pd.DataFrame) -> str:
+    """
+    Return an HTML card containing a choropleth map of ECI signatures by EU member state.
+
+    Renders a Viridis-scaled choropleth fill layer with white signature-count
+    labels (outlined in dark purple for legibility) positioned at each country's
+    centroid. The map is clipped to Europe and has zoom and toolbar controls
+    disabled. Each country's hover tooltip shows total signatures, how many ECIs
+    met the national threshold, and a ranked list of top contributing initiatives.
+
+    Args:
+        df: The full ECI initiatives DataFrame. Must contain a
+            ``signatures_collected_by_country`` column with JSON-encoded
+            per-country breakdowns and a ``title`` column.
+
+    Returns:
+        An HTML string wrapping the Plotly map in a ``card`` div, or a card
+        containing a fallback message if no country-level data is available.
+    """
+
     cdf = _build_country_df(df)
     if cdf.empty:
         return wrap_card("<p>No country-level signature data available.</p>")

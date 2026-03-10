@@ -1,8 +1,14 @@
+"""Renders a log-scale bubble chart of ECI initiative funding amounts grouped by outcome status."""
+
+# Python
+import textwrap
+
+# Third party
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-import textwrap
 
+# Local
 from page_creator.config import DIV_ARGS, HEIGHT, MARGIN
 from page_creator.partials.charts.outcomes import STATUS_COLORS
 from page_creator.utils import wrap_card
@@ -159,13 +165,16 @@ def _add_threshold_lines(fig: go.Figure, df: pd.DataFrame) -> None:
     max_display = df["funding_display"].max()
 
     for threshold in [1_000, 10_000, 50_000, 100_000, 500_000, 1_000_000]:
+
         if not (min_display <= threshold <= max_display):
             continue
+
         label = (
             f"€{threshold / 1_000_000:.0f}M"
             if threshold >= 1_000_000
             else f"€{threshold / 1_000:.0f}k"
         )
+
         fig.add_vline(
             x=threshold,
             line_dash="dash",
@@ -258,6 +267,23 @@ def _format_amount(value: float) -> str:
 
 # ── Public entry point ────────────────────────────────────────────────────────
 def generate_chart_bubble_finance_plot(df: pd.DataFrame) -> str:
+    """Return an HTML card containing a log-scale bubble chart of ECI funding by outcome.
+
+    Each bubble represents one initiative, positioned on a log x-axis by funding
+    amount and on a jittered y-axis by outcome category. Bubble size is
+    log-normalised across the full funding range. Clicking a bubble opens the
+    initiative's page in a new tab via an injected JS click handler.
+
+    Args:
+        df: The full ECI initiatives DataFrame. Must contain ``current_status``,
+            ``funding_total``, ``objective``, ``commission_answer_text``, and
+            ``url`` columns.
+
+    Returns:
+        An HTML string wrapping the Plotly chart and its click handler script
+        in a ``card`` div.
+    """
+
     df = _prepare_dataframe(df)
     present = _present_categories(df)
     df = _add_jitter(df, present)

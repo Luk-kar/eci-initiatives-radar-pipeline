@@ -10,7 +10,7 @@ dev = [
 
 [tool.pylint.main]
 py-version = "3.12"
-ignore = [".git", ".venv", "__pycache__"]
+ignore = [".git", ".venv.dev", "__pycache__"]
 recursive = true
 
 [tool.pylint.format]
@@ -21,6 +21,9 @@ disable = [
     "too-few-public-methods",     # common in dataclass-like structures
     "logging-fstring-interpolation", # f-strings in logging are fine
     "wrong-import-position", # not always the case when fiddling with project root
+    "too-few-public-methods", # data-holding classes don't need many methods
+    "superfluous-parens", # better readability
+    "invalid-name", # too strict
 ]
 
 [tool.pylint.basic]

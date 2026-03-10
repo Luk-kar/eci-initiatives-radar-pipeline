@@ -132,6 +132,8 @@ def generate_partials_a_map_html_name_function(df):
 
 
 def main() -> None:
+    """Load the CSV, render all partials, and write HTML files and the JS slot map."""
+
     df = pd.read_csv(CSV_PATH)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     GENERATED_JS.parent.mkdir(parents=True, exist_ok=True)

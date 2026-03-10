@@ -1,3 +1,5 @@
+"""Shared Plotly layout constants used across all chart generators."""
+
 import plotly.express as px
 
 COLORS = px.colors.qualitative.Plotly
