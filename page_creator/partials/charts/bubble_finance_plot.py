@@ -26,6 +26,8 @@ _STATUS_ALIASES: dict[str, str] = {
 
 _LOG_ZERO_DISPLAY = 200
 
+_BUBBLE_DIV_ID = "bubble-finance-chart"
+
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def _parse_funding(value) -> float:
@@ -88,7 +90,9 @@ def _build_hover(row: pd.Series) -> str:
     return (
         f"<b>{str(row['title'])[:65]}</b><br>"
         f"Funding: {funding_label}<br>"
-        f"Status: {row['current_status']}"
+        f"Status: {row['current_status']}<br>"
+        "<br>"
+        "<i>🔗 Click to open initiative page</i>"
     )
 
 
@@ -111,6 +115,7 @@ def _add_traces(fig: go.Figure, df: pd.DataFrame, present: list[str]) -> None:
                     opacity=0.7,
                     line=dict(width=1, color="white"),
                 ),
+                customdata=cat_df["url"].tolist(),  # ← carries the URL per bubble
                 hovertemplate="%{text}<extra></extra>",
                 text=hover_texts,
             )
@@ -228,7 +233,6 @@ def generate_chart_bubble_finance_plot(df: pd.DataFrame) -> str:
     df = _add_jitter(df, present)
     df = _compute_marker_sizes(df)
 
-    total_eur = df["funding_numeric"].sum()
     title_amount = _format_amount(df["funding_numeric"].sum())
 
     fig = go.Figure()
@@ -236,4 +240,36 @@ def generate_chart_bubble_finance_plot(df: pd.DataFrame) -> str:
     _add_threshold_lines(fig, df)
     _apply_layout(fig, present, title_amount)
 
-    return wrap_card(fig.to_html(**DIV_ARGS))
+    # Override/add div_id so the click handler below can locate this exact element
+    chart_html = fig.to_html(**{**DIV_ARGS, "div_id": _BUBBLE_DIV_ID})
+
+    click_script = f"""
+<script>
+(function () {{
+    var el = document.getElementById("{_BUBBLE_DIV_ID}");
+    if (!el) return;
+
+    function getDragLayer() {{
+        return el.querySelector(".nsewdrag");
+    }}
+
+    el.on("plotly_hover", function () {{
+        var drag = getDragLayer();
+        if (drag) drag.style.cursor = "pointer";
+    }});
+
+    el.on("plotly_unhover", function () {{
+        var drag = getDragLayer();
+        if (drag) drag.style.cursor = "";
+    }});
+
+    el.on("plotly_click", function (data) {{
+        var pt = data.points[0];
+        if (pt && pt.customdata) {{
+            window.open(pt.customdata, "_blank", "noopener,noreferrer");
+        }}
+    }});
+}})();
+</script>"""
+
+    return wrap_card(chart_html + click_script)
