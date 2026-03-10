@@ -214,6 +214,7 @@ def _apply_layout(fig: go.Figure, present: list[str], title_amount: str) -> None
             ticktext=present,
             gridcolor="rgba(128,128,128,0.1)",
             showgrid=True,
+            zeroline=False,
             range=[-0.5, len(present) - 0.5],
             domain=[0, 0.9],
         ),
