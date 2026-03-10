@@ -1,3 +1,5 @@
+"""Renders a stacked bar chart of ECI registration counts per year broken down by outcome status."""
+
 import pandas as pd
 import plotly.graph_objects as go
 
@@ -15,6 +17,8 @@ _CATEGORIES = [
 
 
 def _eci_hover_list(titles: list[str]) -> str:
+    """Return a ``<br>``-joined bullet list of ECI titles, truncated to ``MAX_HOVER_ITEMS``."""
+
     if not titles:
         return "None"
     items = [f"• {t}" for t in titles[:MAX_HOVER_ITEMS]]
@@ -25,6 +29,21 @@ def _eci_hover_list(titles: list[str]) -> str:
 
 
 def generate_chart_ecis_year(df: pd.DataFrame) -> str:
+    """
+    Return an HTML card containing a stacked bar chart of ECIs per registration year by outcome.
+
+    Each bar represents one registration year, stacked by outcome category in the
+    order defined by ``_CATEGORIES``. Each segment's hover tooltip shows the
+    category, year, count, and a bullet list of contributing initiative titles.
+
+    Args:
+        df: The full ECI initiatives DataFrame. Must contain ``current_status``,
+            ``registration_year``, and ``title`` columns.
+
+    Returns:
+        An HTML string wrapping the Plotly chart in a ``card`` div.
+    """
+
     # Normalise raw CSV labels to match STATUS_COLORS keys.
     df = df.copy()
     df["current_status"] = df["current_status"].replace(_LABEL_ALIASES)

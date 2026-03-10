@@ -9,9 +9,7 @@ __all__ = [
     "generate_chart_outcomes",
     "generate_chart_top_10_signatures",
     "generate_chart_ecis_year",
-    "generate_chart_signatures_year",
     "generate_chart_signatures_cohorts",
     "generate_chart_signatures_map",
-    "generate_chart_bubble_plot",
     "generate_chart_bubble_finance_plot",
 ]

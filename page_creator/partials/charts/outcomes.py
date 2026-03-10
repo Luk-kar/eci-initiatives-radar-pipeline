@@ -1,6 +1,12 @@
+"""
+Renders a donut chart of ECI initiative counts broken down by current outcome status.
+"""
+
+# Python
 import pandas as pd
 import plotly.graph_objects as go
 
+# Local
 from page_creator.config import MARGIN, HEIGHT, DIV_ARGS
 from page_creator.utils import wrap_card
 
@@ -34,10 +40,17 @@ MAX_HOVER_ITEMS = 5
 
 
 def _truncate_title(title: str, max_len: int = MAX_TITLE_LEN) -> str:
+    """Truncate a title to ``max_len`` characters, appending '…' if cut."""
+
     return title if len(title) <= max_len else title[: max_len - 1] + "…"
 
 
 def _eci_list_for_hover(titles: list[str]) -> str:
+    """
+    Return a ``<br>``-joined bullet list of truncated ECI titles,
+    capped at ``MAX_HOVER_ITEMS``.
+    """
+
     if not titles:
         return "No ECIs"
     items = [f"• {_truncate_title(t)}" for t in titles[:MAX_HOVER_ITEMS]]
@@ -53,8 +66,35 @@ def _eci_list_for_hover(titles: list[str]) -> str:
 
 
 def generate_chart_outcomes(df: pd.DataFrame) -> str:
+    """
+    Return an HTML card containing a donut chart of initiatives grouped by outcome status.
+
+    Slices follow the order defined in ``STATUS_COLORS``; statuses not present
+    in ``STATUS_COLORS`` after alias normalisation raise a ``ValueError``.
+    Each slice's hover tooltip shows count, percentage, and a bullet list of
+    up to ``MAX_HOVER_ITEMS`` contributing initiative titles.
+
+    Args:
+        df: The full ECI initiatives DataFrame. Must contain ``current_status``
+            and ``title`` columns. All ``current_status`` values must be present
+            in ``STATUS_COLORS`` after ``_LABEL_ALIASES`` normalisation.
+
+    Returns:
+        An HTML string wrapping the Plotly chart in a ``card bottom-col`` div.
+
+    Raises:
+        ValueError: If any ``current_status`` value is not found in ``STATUS_COLORS``.
+    """
+
     df = df.copy()
     df["current_status"] = df["current_status"].replace(_LABEL_ALIASES)
+
+    unknown = set(df["current_status"].unique()) - STATUS_COLORS.keys()
+    if unknown:
+        raise ValueError(
+            f"Unrecognised status values found in 'current_status': {sorted(unknown)}. "
+            f"Add them to STATUS_COLORS or _LABEL_ALIASES."
+        )
 
     counts = df["current_status"].value_counts().reset_index()
     counts.columns = ["current_status", "count"]
