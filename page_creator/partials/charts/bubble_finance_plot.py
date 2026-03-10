@@ -1,8 +1,5 @@
 """Renders a log-scale bubble chart of ECI initiative funding amounts grouped by outcome status."""
 
-# Python
-import textwrap
-
 # Third party
 import numpy as np
 import pandas as pd
@@ -12,7 +9,7 @@ import plotly.graph_objects as go
 from page_creator.config import DIV_ARGS, HEIGHT, MARGIN
 from page_creator.partials.charts.outcomes import STATUS_COLORS
 from page_creator.utils import wrap_card
-
+from page_creator.partials.charts.utils import hover_wrap
 
 # ── Colour scheme & category order ───────────────────────────────────────────
 BUBBLE_COLORS: dict[str, str] = {
@@ -34,22 +31,6 @@ _STATUS_ALIASES: dict[str, str] = {
 _LOG_ZERO_DISPLAY = 200
 
 _BUBBLE_DIV_ID = "bubble-finance-chart"
-
-_WRAP_WIDTH = 60
-_MAX_LINES = 6
-
-
-def _hover_wrap(text: str) -> str:
-    """Break long text into <br>-separated lines for Plotly hover tooltips.
-    Truncates to max_lines and appends '…' if the text exceeds the limit."""
-
-    lines = textwrap.wrap(str(text), width=_WRAP_WIDTH)
-
-    if len(lines) > _MAX_LINES:
-        lines = lines[:_MAX_LINES]
-        lines[-1] = lines[-1].rstrip() + "…"
-
-    return "<br>".join(lines)
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -131,9 +112,9 @@ def _add_traces(fig: go.Figure, df: pd.DataFrame, present: list[str]) -> None:
 
     for category in present:
         cat_df = df[df["bubble_category"] == category].copy()
-        cat_df["objective"] = cat_df["objective"].apply(_hover_wrap)
+        cat_df["objective"] = cat_df["objective"].apply(hover_wrap)
         cat_df["commission_answer_text"] = cat_df["commission_answer_text"].apply(
-            _hover_wrap
+            hover_wrap
         )
 
         hover_texts = [_build_hover(row) for _, row in cat_df.iterrows()]

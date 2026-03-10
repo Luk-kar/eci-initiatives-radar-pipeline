@@ -7,7 +7,6 @@
 (function () {
   var el = document.getElementById("chart-top10-signatures");
   var drag = el.querySelector(".nsewdrag");
-
   el.on("plotly_hover", function () {
     if (drag) drag.style.cursor = "pointer";
   });
@@ -20,5 +19,4 @@
   });
 })();
 </script>
-
 </div>
