@@ -194,7 +194,7 @@ def _apply_layout(fig: go.Figure, present: list[str], title_amount: str) -> None
         ),
         hovermode="closest",
         margin=MARGIN,
-        height=HEIGHT,
+        height=HEIGHT / 4 * 5,
         showlegend=True,
         legend=dict(
             orientation="h",
