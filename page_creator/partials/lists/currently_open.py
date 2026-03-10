@@ -1,3 +1,9 @@
+"""
+Renders a scrollable table of ECI initiatives
+currently open for signature collection.
+"""
+
+# Third party
 import pandas as pd
 
 from page_creator.utils import wrap_card
@@ -12,13 +18,32 @@ _HEADERS = ["Initiative", "Objective", "Signatures", "Countries Threshold"]
 
 
 def generate_currently_open(df: pd.DataFrame) -> str:
+    """
+    Return an HTML card containing a table of all currently open ECI initiatives.
+
+    Filters for rows with ``current_status == 'Collection Ongoing'``, sorted by
+    signature count descending. Each row shows the initiative title (linked to its
+    page), a truncated objective, a signature progress bar towards the 1M target,
+    and a country-threshold progress bar out of ``_COUNTRIES_THRESHOLD``. The table
+    gains a scroll wrapper when the row count exceeds ``_SCROLL_THRESHOLD``.
+
+    Args:
+        df: The full ECI initiatives DataFrame. Must contain ``current_status``,
+            ``title``, ``url``, ``objective``, ``signatures_collected``, and
+            ``signatures_threshold_met`` columns.
+
+    Returns:
+        An HTML string wrapping the table in a ``card`` div, or a card with a
+        fallback message if no initiatives are currently open.
+    """
+
     open_df = (
         df[df["current_status"] == _STATUS]
         .sort_values("signatures_collected", ascending=False)
         .reset_index(drop=True)
     )
 
-    title = f'<h3 class="card__title">🗳️ Currently Open: <span class="card__count">{len(open_df)}</span></h3>'
+    title = '<h3 class="card__title">🗳️ Currently Open: <span class="card__count">{len(open_df)}</span></h3>'
 
     if open_df.empty:
         body = '<p class="list-empty">No initiatives currently open for signature collection.</p>'

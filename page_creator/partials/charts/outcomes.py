@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 # Local
 from page_creator.config import MARGIN, HEIGHT, DIV_ARGS
 from page_creator.utils import wrap_card
+from page_creator.partials.charts.utils import hover_item_list
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -31,7 +32,6 @@ _LABEL_ALIASES: dict[str, str] = {
 DEFAULT_COLOR = "#757575"
 
 MAX_TITLE_LEN = 40
-MAX_HOVER_ITEMS = 5
 
 
 # ------------------------------------------------------------------------------
@@ -43,21 +43,6 @@ def _truncate_title(title: str, max_len: int = MAX_TITLE_LEN) -> str:
     """Truncate a title to ``max_len`` characters, appending '…' if cut."""
 
     return title if len(title) <= max_len else title[: max_len - 1] + "…"
-
-
-def _eci_list_for_hover(titles: list[str]) -> str:
-    """
-    Return a ``<br>``-joined bullet list of truncated ECI titles,
-    capped at ``MAX_HOVER_ITEMS``.
-    """
-
-    if not titles:
-        return "No ECIs"
-    items = [f"• {_truncate_title(t)}" for t in titles[:MAX_HOVER_ITEMS]]
-    result = "<br>".join(items)
-    if len(titles) > MAX_HOVER_ITEMS:
-        result += f"<br><i>… (and {len(titles) - MAX_HOVER_ITEMS} more)</i>"
-    return result
 
 
 def _normalise_statuses(df: pd.DataFrame) -> pd.DataFrame:
@@ -92,7 +77,7 @@ def _build_counts(df: pd.DataFrame) -> pd.DataFrame:
         lambda s: STATUS_COLORS.get(s, DEFAULT_COLOR)
     )
     counts["eci_list"] = counts["current_status"].apply(
-        lambda s: _eci_list_for_hover(df[df["current_status"] == s]["title"].tolist())
+        lambda s: hover_item_list(df[df["current_status"] == s]["title"].tolist())
     )
     return counts
 

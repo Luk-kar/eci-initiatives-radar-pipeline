@@ -6,26 +6,13 @@ import plotly.graph_objects as go
 from page_creator.config import MARGIN, HEIGHT, DIV_ARGS
 from page_creator.utils import wrap_card
 from page_creator.partials.charts.outcomes import STATUS_COLORS, _LABEL_ALIASES
-
-MAX_HOVER_ITEMS = 10
+from page_creator.partials.charts.utils import hover_item_list
 
 # One category per STATUS_COLORS entry — order controls stacking order (bottom → top).
 _CATEGORIES = [
     {"name": name, "statuses": {name}, "color": color}
     for name, color in reversed(STATUS_COLORS.items())
 ]
-
-
-def _eci_hover_list(titles: list[str]) -> str:
-    """Return a ``<br>``-joined bullet list of ECI titles, truncated to ``MAX_HOVER_ITEMS``."""
-
-    if not titles:
-        return "None"
-    items = [f"• {t}" for t in titles[:MAX_HOVER_ITEMS]]
-    result = "<br>".join(items)
-    if len(titles) > MAX_HOVER_ITEMS:
-        result += f"<br><i>… (and {len(titles) - MAX_HOVER_ITEMS} more)</i>"
-    return result
 
 
 def generate_chart_ecis_year(df: pd.DataFrame) -> str:
@@ -64,7 +51,7 @@ def generate_chart_ecis_year(df: pd.DataFrame) -> str:
         )
 
         hover = [
-            _eci_hover_list(
+            hover_item_list(
                 cat_df[cat_df["registration_year"] == year]["title"].tolist()
             )
             for year in years
