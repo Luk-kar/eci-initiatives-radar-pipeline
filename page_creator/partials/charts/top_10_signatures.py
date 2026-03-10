@@ -10,6 +10,9 @@ ECI_THRESHOLD = 1_000_000
 _WRAP_WIDTH = 60
 _CHART_DIV_ID = "chart-top10-signatures"
 
+_WRAP_WIDTH = 60
+_MAX_LINES = 6
+
 
 def _bar_color(signatures: float, max_signatures: float) -> str:
     """Gradient color per bar: dark-red→light-yellow below 1M, light-green→dark-green above."""
@@ -28,9 +31,16 @@ def _bar_color(signatures: float, max_signatures: float) -> str:
     return f"rgb({r},{g},{b})"
 
 
-def _hover_wrap(text: str, width: int = _WRAP_WIDTH) -> str:
-    """Break long text into <br>-separated lines for Plotly hover tooltips."""
-    lines = textwrap.wrap(str(text), width=width)
+def _hover_wrap(text: str) -> str:
+    """Break long text into <br>-separated lines for Plotly hover tooltips.
+    Truncates to max_lines and appends '…' if the text exceeds the limit."""
+
+    lines = textwrap.wrap(str(text), width=_WRAP_WIDTH)
+
+    if len(lines) > _MAX_LINES:
+        lines = lines[:_MAX_LINES]
+        lines[-1] = lines[-1].rstrip() + "…"
+
     return "<br>".join(lines)
 
 

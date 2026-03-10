@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+import textwrap
 
 from page_creator.config import DIV_ARGS, HEIGHT, MARGIN
 from page_creator.partials.charts.outcomes import STATUS_COLORS
@@ -27,6 +28,22 @@ _STATUS_ALIASES: dict[str, str] = {
 _LOG_ZERO_DISPLAY = 200
 
 _BUBBLE_DIV_ID = "bubble-finance-chart"
+
+_WRAP_WIDTH = 60
+_MAX_LINES = 6
+
+
+def _hover_wrap(text: str) -> str:
+    """Break long text into <br>-separated lines for Plotly hover tooltips.
+    Truncates to max_lines and appends '…' if the text exceeds the limit."""
+
+    lines = textwrap.wrap(str(text), width=_WRAP_WIDTH)
+
+    if len(lines) > _MAX_LINES:
+        lines = lines[:_MAX_LINES]
+        lines[-1] = lines[-1].rstrip() + "…"
+
+    return "<br>".join(lines)
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -80,7 +97,8 @@ def _compute_marker_sizes(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _build_hover(row: pd.Series) -> str:
-    """Format a single bubble's hover tooltip with title, funding, and status."""
+    """Build the pre-computed portion of the hover tooltip (title, funding, status).
+    Objective and commission response are injected via hovertemplate + customdata."""
 
     funding_label = (
         "€0 (No funding data)"
@@ -90,18 +108,30 @@ def _build_hover(row: pd.Series) -> str:
     return (
         f"<b>{str(row['title'])[:65]}</b><br>"
         f"Funding: {funding_label}<br>"
-        f"Status: {row['current_status']}<br>"
-        "<br>"
-        "<i>🔗 Click to open initiative page</i>"
+        f"Status: {row['current_status']}<br><br>"
     )
 
 
 def _add_traces(fig: go.Figure, df: pd.DataFrame, present: list[str]) -> None:
     """Add one Scatter trace per category, sized and coloured by funding amount."""
 
+    _HOVERTEMPLATE = (
+        "%{text}"
+        "<b>Objective:</b><br>%{customdata[1]}<br><br>"
+        "<b>Commission Response:</b><br>%{customdata[2]}<br><br>"
+        "<i>🔗 Click to open initiative page</i>"
+        "<extra></extra>"
+    )
+
     for category in present:
-        cat_df = df[df["bubble_category"] == category]
+        cat_df = df[df["bubble_category"] == category].copy()
+        cat_df["objective"] = cat_df["objective"].apply(_hover_wrap)
+        cat_df["commission_answer_text"] = cat_df["commission_answer_text"].apply(
+            _hover_wrap
+        )
+
         hover_texts = [_build_hover(row) for _, row in cat_df.iterrows()]
+        customdata = cat_df[["url", "objective", "commission_answer_text"]].values
 
         fig.add_trace(
             go.Scatter(
@@ -115,8 +145,8 @@ def _add_traces(fig: go.Figure, df: pd.DataFrame, present: list[str]) -> None:
                     opacity=0.7,
                     line=dict(width=1, color="white"),
                 ),
-                customdata=cat_df["url"].tolist(),  # ← carries the URL per bubble
-                hovertemplate="%{text}<extra></extra>",
+                customdata=customdata,
+                hovertemplate=_HOVERTEMPLATE,
                 text=hover_texts,
             )
         )
@@ -266,7 +296,7 @@ def generate_chart_bubble_finance_plot(df: pd.DataFrame) -> str:
     el.on("plotly_click", function (data) {{
         var pt = data.points[0];
         if (pt && pt.customdata) {{
-            window.open(pt.customdata, "_blank", "noopener,noreferrer");
+            window.open(pt.customdata[0], "_blank", "noopener,noreferrer");
         }}
     }});
 }})();
