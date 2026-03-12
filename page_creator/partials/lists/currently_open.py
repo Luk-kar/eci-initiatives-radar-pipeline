@@ -79,5 +79,11 @@ def generate_currently_open(df: pd.DataFrame) -> str:
         </tr>"""
 
     return wrap_card(
-        title + build_table(_HEADERS, rows, scrollable=len(open_df) > _SCROLL_THRESHOLD)
+        title
+        + build_table(
+            _HEADERS,
+            rows,
+            scrollable=len(open_df) > _SCROLL_THRESHOLD,
+            scrollbar_color=colors.currently_open,
+        )
     )

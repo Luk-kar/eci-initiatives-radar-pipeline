@@ -65,5 +65,10 @@ def generate_total_initiatives(df: pd.DataFrame) -> str:
 
     return wrap_card(
         title
-        + build_table(_HEADERS, rows, scrollable=len(sorted_df) > _SCROLL_THRESHOLD)
+        + build_table(
+            _HEADERS,
+            rows,
+            scrollable=len(sorted_df) > _SCROLL_THRESHOLD,
+            scrollbar_color=colors.total_initiatives,
+        )
     )

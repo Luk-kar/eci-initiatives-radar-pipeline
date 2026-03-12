@@ -67,5 +67,10 @@ def generate_reached_signatures(df: pd.DataFrame) -> str:
 
     return wrap_card(
         title
-        + build_table(_HEADERS, rows, scrollable=len(filtered_df) > _SCROLL_THRESHOLD)
+        + build_table(
+            _HEADERS,
+            rows,
+            scrollable=len(filtered_df) > _SCROLL_THRESHOLD,
+            scrollbar_color=colors.reached_signatures,
+        )
     )

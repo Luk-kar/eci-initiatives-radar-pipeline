@@ -6,7 +6,7 @@ from typing import NamedTuple
 
 
 class KpiColors(NamedTuple):
-    total_initiatives: str = "#333"
+    total_initiatives: str = "#2A3F69"
     currently_open: str = "#1069c0"
     reached_signatures: str = "#557B2D"
     got_response: str = "#006064"

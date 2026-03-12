@@ -51,7 +51,7 @@
 @supports (scrollbar-width: auto) {
   .data-table__scroll-wrapper {
     scrollbar-width: thin;
-    scrollbar-color: #003399 #f0f4fa;
+    scrollbar-color: color-mix(in srgb, var(--scrollbar-color, #003399) 80%, transparent) #f0f4fa;
   }
 }
 
@@ -62,11 +62,11 @@
     border-radius: 0 6px 6px 0;
   }
   .data-table__scroll-wrapper::-webkit-scrollbar-thumb {
-    background-color: #0d6efd;
+    background-color: color-mix(in srgb, var(--scrollbar-color, #0d6efd) 80%, transparent);
     border-radius: 6px;
   }
   .data-table__scroll-wrapper::-webkit-scrollbar-thumb:hover {
-    background-color: #0d6efd;
+    background-color: var(--scrollbar-color, #0d6efd);
   }
 }
 
