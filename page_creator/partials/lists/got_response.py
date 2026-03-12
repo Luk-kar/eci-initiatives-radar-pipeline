@@ -12,19 +12,21 @@ _RESPONSE_STATUSES = frozenset(
 )
 _SCROLL_THRESHOLD = 5
 
-_HEADERS = ["Initiative", "Objective", "Response"]
+_HEADERS = ["Initiative", "Registration", "Objective", "Response"]
 
 
 def generate_got_response(df: pd.DataFrame) -> str:
     """Return an HTML card containing a table of ECIs that received a Commission response.
 
     Filters for rows with ``current_status`` in ``_RESPONSE_STATUSES``, sorted by
-    signature count descending. Each row shows the initiative title (linked to
-    its page), a truncated objective, and the truncated commission response text.
+    registration date descending. Each row shows the initiative title (linked to
+    its page), the registration date, a truncated objective, and the truncated
+    commission response text.
 
     Args:
         df: The full ECI initiatives DataFrame. Must contain ``current_status``,
-            ``title``, ``url``, ``objective``, and ``commission_answer_text`` columns.
+            ``title``, ``url``, ``objective``, ``registration_date``, and
+            ``commission_answer_text`` columns.
 
     Returns:
         An HTML string wrapping the table in a ``card`` div, or a card with a
@@ -33,7 +35,7 @@ def generate_got_response(df: pd.DataFrame) -> str:
 
     filtered_df = (
         df[df["current_status"].isin(_RESPONSE_STATUSES)]
-        .sort_values("signatures_collected", ascending=False)
+        .sort_values("registration_date", ascending=False)
         .reset_index(drop=True)
     )
 
@@ -48,10 +50,15 @@ def generate_got_response(df: pd.DataFrame) -> str:
         url = row.get("url") or "#"
         objective = truncate(row.get("objective", ""))
         response = truncate(row.get("commission_answer_text", ""), max_len=200)
+        registration = pd.to_datetime(row["registration_date"])
+        registration = (
+            registration.strftime("%d %b %Y") if pd.notna(registration) else "N/A"
+        )
 
         rows += f"""
         <tr>
           <td><a href="{url}" target="_blank" rel="noopener noreferrer">{row["title"]}</a></td>
+          <td>{registration}</td>
           <td>{objective}</td>
           <td>{response}</td>
         </tr>"""

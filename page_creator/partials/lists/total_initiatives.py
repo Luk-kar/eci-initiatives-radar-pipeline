@@ -35,7 +35,7 @@ def generate_total_initiatives(df: pd.DataFrame) -> str:
         An HTML string wrapping the table in a ``card`` div.
     """
 
-    sorted_df = df.sort_values("signatures_collected", ascending=False).reset_index(
+    sorted_df = df.sort_values("registration_date", ascending=False).reset_index(
         drop=True
     )
 

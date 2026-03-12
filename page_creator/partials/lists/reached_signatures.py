@@ -11,20 +11,27 @@ _SIG_TARGET = 1_000_000
 _SCROLL_THRESHOLD = 5
 _COUNTRIES_THRESHOLD = 7
 
-_HEADERS = ["Initiative", "Objective", "Signatures", "Countries Threshold"]
+_HEADERS = [
+    "Initiative",
+    "Registration",
+    "Objective",
+    "Signatures",
+    "Countries Threshold",
+]
 
 
 def generate_reached_signatures(df: pd.DataFrame) -> str:
     """Return an HTML card containing a table of ECIs that reached 1M signatures.
 
     Filters for rows where ``signatures_collected >= 1_000_000``, sorted by
-    signature count descending. Each row shows the initiative title (linked to
-    its page), a truncated objective, a signature progress bar, and a
-    country-threshold progress bar.
+    registration date descending. Each row shows the initiative title (linked to
+    its page), the registration date, a truncated objective, a signature progress
+    bar, and a country-threshold progress bar.
 
     Args:
         df: The full ECI initiatives DataFrame. Must contain ``signatures_collected``,
-            ``title``, ``url``, ``objective``, and ``signatures_threshold_met`` columns.
+            ``title``, ``url``, ``objective``, ``registration_date``, and
+            ``signatures_threshold_met`` columns.
 
     Returns:
         An HTML string wrapping the table in a ``card`` div, or a card with a
@@ -33,7 +40,7 @@ def generate_reached_signatures(df: pd.DataFrame) -> str:
 
     filtered_df = (
         df[df["signatures_collected"] >= _SIG_TARGET]
-        .sort_values("signatures_collected", ascending=False)
+        .sort_values("registration_date", ascending=False)
         .reset_index(drop=True)
     )
 
@@ -47,6 +54,10 @@ def generate_reached_signatures(df: pd.DataFrame) -> str:
     for _, row in filtered_df.iterrows():
         url = row.get("url") or "#"
         objective = truncate(row.get("objective", ""))
+        registration = pd.to_datetime(row["registration_date"])
+        registration = (
+            registration.strftime("%d %b %Y") if pd.notna(registration) else "N/A"
+        )
 
         sig_val = int(row["signatures_collected"])
         sigs = f"{sig_val:,}{progress_bar(sig_val / _SIG_TARGET * 100, 'signatures')}"
@@ -60,6 +71,7 @@ def generate_reached_signatures(df: pd.DataFrame) -> str:
         rows += f"""
         <tr>
           <td><a href="{url}" target="_blank" rel="noopener noreferrer">{row["title"]}</a></td>
+          <td>{registration}</td>
           <td>{objective}</td>
           <td>{sigs}</td>
           <td>{threshold}</td>
