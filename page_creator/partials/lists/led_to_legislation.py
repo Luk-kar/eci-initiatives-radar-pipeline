@@ -4,7 +4,7 @@ import pandas as pd
 
 from page_creator.utils import wrap_card
 from page_creator.partials.lists.utils import build_table, truncate
-
+from page_creator.partials.styles.colors import kpi_colors as colors
 
 _STATUS = "Law Passed"
 _SCROLL_THRESHOLD = 5
@@ -34,7 +34,7 @@ def generate_led_to_legislation(df: pd.DataFrame) -> str:
         .reset_index(drop=True)
     )
 
-    title = f'<h3 class="card__title">⚖️ Led to Legislation: <span class="card__count">{len(filtered_df)}</span></h3>'
+    title = f'<h3 class="card__title">⚖️ Led to Legislation: <span class="card__count" style="color:{colors.led_to_legislation}">{len(filtered_df)}</span></h3>'
 
     if filtered_df.empty:
         body = '<p class="list-empty">No initiatives have led to legislation yet.</p>'

@@ -6,8 +6,10 @@ currently open for signature collection.
 # Third party
 import pandas as pd
 
+# Local
 from page_creator.utils import wrap_card
 from page_creator.partials.lists.utils import build_table, progress_bar, truncate
+from page_creator.partials.styles.colors import kpi_colors as colors
 
 _STATUS = "Collection Ongoing"
 _SCROLL_THRESHOLD = 5
@@ -43,7 +45,7 @@ def generate_currently_open(df: pd.DataFrame) -> str:
         .reset_index(drop=True)
     )
 
-    title = f'<h3 class="card__title">🗳️ Currently Open: <span class="card__count">{len(open_df)}</span></h3>'
+    title = f'<h3 class="card__title">🗳️ Currently Open: <span class="card__count" style="color:{colors.currently_open}">{len(open_df)}</span></h3>'
 
     if open_df.empty:
         body = '<p class="list-empty">No initiatives currently open for signature collection.</p>'

@@ -4,6 +4,7 @@ import pandas as pd
 
 from page_creator.utils import wrap_card
 from page_creator.partials.lists.utils import build_table, truncate
+from page_creator.partials.styles.colors import kpi_colors as colors
 
 
 _RESPONSE_STATUSES = frozenset(
@@ -36,7 +37,7 @@ def generate_got_response(df: pd.DataFrame) -> str:
         .reset_index(drop=True)
     )
 
-    title = f'<h3 class="card__title">📬 Got EU Response: <span class="card__count">{len(filtered_df)}</span></h3>'
+    title = f'<h3 class="card__title">📬 Got EU Response: <span class="card__count" style="color:{colors.got_response}">{len(filtered_df)}</span></h3>'
 
     if filtered_df.empty:
         body = '<p class="list-empty">No initiatives have received an EU Commission response.</p>'

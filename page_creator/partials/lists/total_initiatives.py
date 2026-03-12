@@ -4,6 +4,7 @@ import pandas as pd
 
 from page_creator.utils import wrap_card
 from page_creator.partials.lists.utils import build_table, progress_bar, truncate
+from page_creator.partials.styles.colors import kpi_colors as colors
 
 
 _SCROLL_THRESHOLD = 5
@@ -27,11 +28,12 @@ def generate_total_initiatives(df: pd.DataFrame) -> str:
     Returns:
         An HTML string wrapping the table in a ``card`` div.
     """
+
     sorted_df = df.sort_values("signatures_collected", ascending=False).reset_index(
         drop=True
     )
 
-    title = f'<h3 class="card__title">📋 Total Initiatives: <span class="card__count">{len(sorted_df)}</span></h3>'
+    title = f'<h3 class="card__title">📋 Total Initiatives: <span class="card__count" style="color:{colors.total_initiatives}">{len(sorted_df)}</span></h3>'
 
     rows = ""
     for _, row in sorted_df.iterrows():

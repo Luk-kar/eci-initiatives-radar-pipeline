@@ -3,6 +3,9 @@
 # Third party
 import pandas as pd
 
+# Local
+from page_creator.partials.styles.colors import kpi_colors as colors
+
 
 def generate_kpi_row(df: pd.DataFrame) -> str:
     """Return an HTML ``kpi-row`` div containing one clickable card per headline metric.
@@ -22,21 +25,21 @@ def generate_kpi_row(df: pd.DataFrame) -> str:
         {
             "label": "Total Initiatives:",
             "value": len(df),
-            "color": "#333",
+            "color": colors.total_initiatives,
             "icon": "📋",
             "target_id": "total-initiatives-list-slot",
         },
         {
             "label": "Currently Open:",
             "value": int((df["current_status"] == "Collection Ongoing").sum()),
-            "color": "#1069c0",
+            "color": colors.currently_open,
             "icon": "🗳️",
             "target_id": "currently-open-list-slot",
         },
         {
             "label": "Reached 1M Signatures:",
             "value": int((df["signatures_collected"] >= 1_000_000).sum()),
-            "color": "#557B2D",
+            "color": colors.reached_signatures,
             "icon": "✅",
             "target_id": "reached-signatures-list-slot",
         },
@@ -47,14 +50,14 @@ def generate_kpi_row(df: pd.DataFrame) -> str:
                 .isin(["Commission Engaged", "Law Passed", "Rejected Legislation"])
                 .sum()
             ),
-            "color": "#006064",
+            "color": colors.got_response,
             "icon": "📬",
             "target_id": "got-response-list-slot",
         },
         {
             "label": "Led to Legislation:",
             "value": int((df["current_status"] == "Law Passed").sum()),
-            "color": "#6a1b9a",
+            "color": colors.led_to_legislation,
             "icon": "⚖️",
             "target_id": "led-to-legislation-list-slot",
         },
