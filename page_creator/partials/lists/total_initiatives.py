@@ -11,7 +11,13 @@ _SCROLL_THRESHOLD = 5
 _COUNTRIES_THRESHOLD = 7
 _SIG_TARGET = 1_000_000
 
-_HEADERS = ["Initiative", "Objective", "Signatures", "Countries Threshold"]
+_HEADERS = [
+    "Initiative",
+    "Registration",
+    "Objective",
+    "Signatures",
+    "Countries Threshold",
+]
 
 
 def generate_total_initiatives(df: pd.DataFrame) -> str:
@@ -40,6 +46,10 @@ def generate_total_initiatives(df: pd.DataFrame) -> str:
 
         url = row.get("url") or "#"
         objective = truncate(row.get("objective", ""))
+        registration = pd.to_datetime(row["registration_date"])
+        registration = (
+            registration.strftime("%d %b %Y") if pd.notna(registration) else "N/A"
+        )
 
         if pd.notna(row["signatures_collected"]):
             sig_val = int(row["signatures_collected"])
@@ -58,6 +68,7 @@ def generate_total_initiatives(df: pd.DataFrame) -> str:
         rows += f"""
         <tr>
           <td><a href="{url}" target="_blank" rel="noopener noreferrer">{row["title"]}</a></td>
+          <td>{registration}</td>
           <td>{objective}</td>
           <td>{sigs}</td>
           <td>{threshold}</td>
