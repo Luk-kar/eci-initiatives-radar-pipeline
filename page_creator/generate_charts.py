@@ -21,7 +21,13 @@ from page_creator.partials.charts import (
     generate_chart_bubble_finance_plot,
 )
 from page_creator.partials.counters import generate_kpi_row
-from page_creator.partials.lists import generate_currently_open
+from page_creator.partials.lists import (
+    generate_currently_open,
+    generate_got_response,
+    generate_led_to_legislation,
+    generate_reached_signatures,
+    generate_total_initiatives,
+)
 
 
 CSV_PATH = Path(__file__).parent / "data" / "initiatives.csv"
@@ -54,6 +60,10 @@ _GENERATORS = [
     generate_chart_signatures_map,
     generate_chart_top_10_signatures,
     generate_chart_bubble_finance_plot,
+    generate_got_response,
+    generate_led_to_legislation,
+    generate_reached_signatures,
+    generate_total_initiatives,
 ]
 
 _PATTERN = re.compile(r"^generate_(.+)$")

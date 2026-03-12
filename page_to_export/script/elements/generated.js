@@ -8,4 +8,8 @@ const GENERATED_PARTIALS = [
     ["partials/chart_signatures_cohorts.html", "chart-signatures-cohorts-slot"],
     ["partials/chart_signatures_map.html", "chart-signatures-map-slot"],
     ["partials/chart_top_10_signatures.html", "chart-top-10-signatures-slot"],
+    ["partials/list_got_response.html", "list-got-response-slot"],
+    ["partials/list_led_to_legislation.html", "list-led-to-legislation-slot"],
+    ["partials/list_reached_signatures.html", "list-reached-signatures-slot"],
+    ["partials/list_total_initiatives.html", "list-total-initiatives-slot"],
 ];

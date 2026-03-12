@@ -43,7 +43,7 @@ def generate_currently_open(df: pd.DataFrame) -> str:
         .reset_index(drop=True)
     )
 
-    title = '<h3 class="card__title">🗳️ Currently Open: <span class="card__count">{len(open_df)}</span></h3>'
+    title = f'<h3 class="card__title">🗳️ Currently Open: <span class="card__count">{len(open_df)}</span></h3>'
 
     if open_df.empty:
         body = '<p class="list-empty">No initiatives currently open for signature collection.</p>'
