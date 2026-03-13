@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // start "04/02/2026" → deadline 2027-02-04 (Thu) → next Sunday 2027-02-07
 
-function runTests() {
+function runDaysLeftLabelTests() {
     const failures = [];
 
     // --- existing cases (no closed date) ---
@@ -81,8 +81,8 @@ function runTests() {
     test(failures, "29 seconds", "04/02/2026", "", new Date("2027-02-03T23:59:31"), "29 seconds");
     test(failures, "1 hour", "04/02/2026", "", new Date("2027-02-03T23:00:00"), "1 hour");
 
-    // --- data-closed empty, deadline passed, before Sunday refresh ---
-    test(failures, "deadline passed, awaiting refresh to next sunday", "04/02/2026", "", new Date("2027-02-05"), "closed");
+    // --- data-closed empty, deadline passed, before Sunday refresh, it assumed that collection is still ongoing ---
+    test(failures, "deadline passed, awaiting refresh to next sunday", "04/02/2026", "", new Date("2027-02-04T06:00:00"), "closed");
 
     // --- data-closed empty, past next Sunday → extended ---
     test(failures, "extended, no closed collecting after deadline and refresh", "04/02/2026", "", new Date("2027-02-08"), "extended");
@@ -92,6 +92,26 @@ function runTests() {
 
     // --- data-closed set and passed → closed ---
     test(failures, "closed by date", "04/02/2026", "01/06/2026", new Date("2026-07-01"), "closed");
+
+    // --- diffMs < 0 branch: closed N days ago ---
+    test(failures, "closed 1 day ago", "04/02/2026", "", new Date("2027-02-05T12:00:00"), "closed 1 day ago");
+    test(failures, "closed 3 days ago", "04/02/2026", "", new Date("2027-02-07T00:00:00"), "closed 3 days ago");
+    test(failures, "closed 0 days ago (rounds to zero)", "04/02/2026", "", new Date("2027-02-04T00:30:00"), "closed");
+
+    // --- boundary: exactly 1 minute left ---
+    test(failures, "exactly 1 min", "04/02/2026", "", new Date("2027-02-03T23:59:00"), "1 min");
+
+    // --- boundary: a few minutes left ---
+    test(failures, "45 mins left", "04/02/2026", "", new Date("2027-02-03T23:15:00"), "45 mins");
+
+    // --- boundary: exactly 1 hour left ---
+    test(failures, "exactly 1 hour", "04/02/2026", "", new Date("2027-02-03T23:00:00"), "1 hour");
+
+    // --- boundary: several hours left (same day as deadline) ---
+    test(failures, "3 hours left (rounds to 0 days)", "04/02/2026", "", new Date("2027-02-03T21:00:00"), "3 hours");
+
+    // --- boundary: exactly 1 second left ---
+    test(failures, "1 second left", "04/02/2026", "", new Date("2027-02-03T23:59:59"), "1 second");
 
     // ← NEW: throw once at the end summarising all failures, or confirm all passed
     if (failures.length > 0) {
