@@ -51,7 +51,7 @@ function getDaysLeftLabel(startStr, closedStr = "", now = new Date()) {
     const diffHours = Math.floor(diffMs / MS_PER_HOUR);
     const diffDays = Math.round(diffMs / MS_PER_DAY);
 
-    if (diffMs < 0) return "closed";
+    if (diffMs < 0) return diffDays !== 0 ? `closed ${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? "s" : ""} ago` : "closed";
     if (diffMs < MS_PER_MINUTE) return `${diffSecs} second${diffSecs !== 1 ? "s" : ""}`;
     if (diffMins === 1) return "1 min";
     if (diffHours < 1) return `${diffMins} mins`;
