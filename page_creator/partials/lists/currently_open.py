@@ -39,9 +39,19 @@ def generate_currently_open(df: pd.DataFrame) -> str:
         An HTML string wrapping the table in a ``card`` div, or a card with a
         fallback message if no initiatives are currently open.
     """
+
+    open_df = df[df["current_status"] == _STATUS].copy()
+
+    open_df["_start_dt"] = pd.to_datetime(
+        open_df["timeline_collection_start"], dayfirst=True, errors="raise"
+    )
+    open_df["_has_closed"] = open_df["timeline_collection_closed"].notna() & (
+        open_df["timeline_collection_closed"].str.strip() != ""
+    )
+
     open_df = (
-        df[df["current_status"] == _STATUS]
-        .sort_values("signatures_collected", ascending=False)
+        open_df.sort_values(["_has_closed", "_start_dt"], ascending=[True, True])
+        .drop(columns=["_start_dt", "_has_closed"])
         .reset_index(drop=True)
     )
 
