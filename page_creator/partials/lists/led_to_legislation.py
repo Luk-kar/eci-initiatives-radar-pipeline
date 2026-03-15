@@ -12,8 +12,7 @@ from page_creator.partials.lists.utils import (
 from page_creator.partials.styles.colors import kpi_colors as colors
 
 _STATUS = "Law Passed"
-_LEGISLATION_FALLBACK = "Legislation details not yet available."
-_HEADERS = ["Initiative", "Registration", "Objective", "Legislation"]
+_HEADERS = ["Initiative", "Registration", "Objective", "Legislation Example"]
 
 
 def _filter_and_sort(df: pd.DataFrame) -> pd.DataFrame:
@@ -43,7 +42,7 @@ def _build_row(row: pd.Series) -> str:
         A ``<tr>...</tr>`` HTML string.
     """
     # TODO: replace fallback once legislation column is added to the dataset
-    legislation = truncate(row.get("legislation", _LEGISLATION_FALLBACK))
+    legislation = truncate(row["legislation"])
     return build_initiative_row(row, f"\n          <td>{legislation}</td>")
 
 
