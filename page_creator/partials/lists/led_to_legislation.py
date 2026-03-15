@@ -41,14 +41,16 @@ def generate_led_to_legislation(df: pd.DataFrame) -> str:
         body = '<p class="list-empty">No initiatives have led to legislation yet.</p>'
         return wrap_card(title + body)
 
+    df["registration_date"] = pd.to_datetime(
+        df["registration_date"], format="%d/%m/%Y"
+    ).dt.date
+
     rows = ""
     for _, row in filtered_df.iterrows():
-        url = row.get("url") or "#"
-        objective = truncate(row.get("objective", ""))
-        registration = pd.to_datetime(row["registration_date"])
-        registration = (
-            registration.strftime("%d %b %Y") if pd.notna(registration) else "N/A"
-        )
+        url = row["url"]
+        registration = row["registration_date"]
+        objective = truncate(row["objective"])
+
         # TODO: replace fallback once legislation column is added to the dataset
         legislation = truncate(row.get("legislation", _LEGISLATION_FALLBACK))
 

@@ -50,14 +50,15 @@ def generate_reached_signatures(df: pd.DataFrame) -> str:
         body = '<p class="list-empty">No initiatives have reached 1M signatures.</p>'
         return wrap_card(title + body)
 
+    df["registration_date"] = pd.to_datetime(
+        df["registration_date"], format="%d/%m/%Y"
+    ).dt.date
+
     rows = ""
     for _, row in filtered_df.iterrows():
-        url = row.get("url") or "#"
-        objective = truncate(row.get("objective", ""))
-        registration = pd.to_datetime(row["registration_date"])
-        registration = (
-            registration.strftime("%d %b %Y") if pd.notna(registration) else "N/A"
-        )
+        url = row["url"]
+        registration = row["registration_date"]
+        objective = truncate(row["objective"])
 
         sig_val = int(row["signatures_collected"])
         sigs = f"{sig_val:,}{progress_bar(sig_val / _SIG_TARGET * 100, 'signatures')}"

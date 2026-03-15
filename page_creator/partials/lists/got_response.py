@@ -45,15 +45,17 @@ def generate_got_response(df: pd.DataFrame) -> str:
         body = '<p class="list-empty">No initiatives have received an EU Commission response.</p>'
         return wrap_card(title + body)
 
+    df["registration_date"] = pd.to_datetime(
+        df["registration_date"], format="%d/%m/%Y"
+    ).dt.date
+
     rows = ""
     for _, row in filtered_df.iterrows():
-        url = row.get("url") or "#"
-        objective = truncate(row.get("objective", ""))
-        response = truncate(row.get("commission_answer_text", ""), max_len=200)
-        registration = pd.to_datetime(row["registration_date"])
-        registration = (
-            registration.strftime("%d %b %Y") if pd.notna(registration) else "N/A"
-        )
+
+        url = row["url"]
+        registration = row["registration_date"]
+        objective = truncate(row["objective"])
+        response = truncate(row["commission_answer_text"], max_len=200)
 
         rows += f"""
         <tr>

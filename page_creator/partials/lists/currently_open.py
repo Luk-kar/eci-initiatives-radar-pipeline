@@ -61,15 +61,33 @@ def generate_currently_open(df: pd.DataFrame) -> str:
 
     rows = ""
     for _, row in open_df.iterrows():
-        url = row.get("url") or "#"
-        objective = truncate(row.get("objective", ""))
+        url = row["url"]
+        objective = truncate(row["objective"])
 
         # --- Days Left cell ---
         date_start = row.get("timeline_collection_start", "")
         date_closed = row.get("timeline_collection_closed", "")
-        date_start = "" if pd.isna(date_start) else str(date_start)
-        date_closed = "" if pd.isna(date_closed) else str(date_closed)
-        days_left = f"""<td class="days-left-cell" data-start="{date_start}" data-closed="{date_closed}"></td>"""
+        date_start = "" if pd.isna(date_start) else str(date_start).strip()
+        date_closed = "" if pd.isna(date_closed) else str(date_closed).strip()
+
+        # Compute elapsed % of the 12-month window for the static progress bar
+        if date_start:
+            start_dt = pd.to_datetime(date_start, dayfirst=True, errors="coerce")
+            deadline_dt = start_dt + pd.DateOffset(months=12)
+            now_dt = pd.Timestamp.now()
+            total_ms = (deadline_dt - start_dt).total_seconds()
+            elapsed_ms = (now_dt - start_dt).total_seconds()
+            pct = min(max(elapsed_ms / total_ms * 100, 0), 100)
+            bar = progress_bar(pct, "days-left")
+        else:
+            bar = ""
+
+        days_left = (
+            f'<td class="days-left-cell" data-start="{date_start}" data-closed="{date_closed}">'
+            f'<span class="days-left-cell__label"></span>'
+            f"{bar}"
+            f"</td>"
+        )
 
         # --- Signatures cell ---
         if pd.notna(row["signatures_collected"]):

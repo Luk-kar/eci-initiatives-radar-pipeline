@@ -42,14 +42,16 @@ def generate_total_initiatives(df: pd.DataFrame) -> str:
     title = f'<h3 class="card__title">📋 Total Initiatives: <span class="card__count" style="color:{colors.total_initiatives}">{len(sorted_df)}</span></h3>'
 
     rows = ""
+
+    df["registration_date"] = pd.to_datetime(
+        df["registration_date"], format="%d/%m/%Y"
+    ).dt.date
+
     for _, row in sorted_df.iterrows():
 
-        url = row.get("url") or "#"
-        objective = truncate(row.get("objective", ""))
-        registration = pd.to_datetime(row["registration_date"])
-        registration = (
-            registration.strftime("%d %b %Y") if pd.notna(registration) else "N/A"
-        )
+        url = row["url"]
+        registration = row["registration_date"]
+        objective = truncate(row["objective"])
 
         if pd.notna(row["signatures_collected"]):
             sig_val = int(row["signatures_collected"])

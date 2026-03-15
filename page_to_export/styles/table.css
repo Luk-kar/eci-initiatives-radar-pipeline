@@ -146,3 +146,11 @@
   background-color: #FFCC00 !important;
   box-shadow: 0 0 4px rgba(255, 204, 0, 0.5);
 }
+
+/* --- Days Left progress bar --- */
+.progress-bar__fill--days-left { background-color: #2e7d32; }
+
+.days-left-cell {
+    white-space: nowrap;
+    min-width: 90px;
+}
