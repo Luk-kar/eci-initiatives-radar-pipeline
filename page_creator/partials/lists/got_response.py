@@ -39,7 +39,12 @@ def generate_got_response(df: pd.DataFrame) -> str:
         .reset_index(drop=True)
     )
 
-    title = f'<h3 class="card__title">📬 Got EU Response: <span class="card__count" style="color:{colors.got_response}">{len(filtered_df)}</span></h3>'
+    title = (
+        '<h3 class="card__title">'
+        "📬 Got EU Response: "
+        f'<span class="card__count" style="color:{colors.got_response}">{len(filtered_df)}</span>'
+        "</h3>"
+    )
 
     if filtered_df.empty:
         body = '<p class="list-empty">No initiatives have received an EU Commission response.</p>'

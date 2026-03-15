@@ -6,7 +6,6 @@ import pandas as pd
 # Local
 from page_creator.utils import wrap_card
 from page_creator.partials.lists.utils import build_table, progress_bar, truncate
-from page_creator.partials.styles.colors import kpi_colors as colors
 
 _STATUS = "Collection Ongoing"
 _SCROLL_THRESHOLD = 5
@@ -56,7 +55,7 @@ def generate_currently_open(df: pd.DataFrame) -> str:
     )
 
     if open_df.empty:
-        title = f"""\n\nNo initiatives currently open for signature collection.\n\n"""
+        title = """\n\nNo initiatives currently open for signature collection.\n\n"""
         return wrap_card(title)
 
     rows = ""
@@ -101,7 +100,11 @@ def generate_currently_open(df: pd.DataFrame) -> str:
         # --- Countries threshold cell ---
         if pd.notna(row["signatures_threshold_met"]):
             thr_val = int(row["signatures_threshold_met"])
-            threshold = f"{thr_val} / {_COUNTRIES_THRESHOLD}{progress_bar(thr_val / _COUNTRIES_THRESHOLD * 100, 'threshold')}"
+            threshold = (
+                f"{thr_val}"
+                " / "
+                f"{_COUNTRIES_THRESHOLD}{progress_bar(thr_val / _COUNTRIES_THRESHOLD * 100, 'threshold')}"
+            )
         else:
             threshold = "N/A"
 

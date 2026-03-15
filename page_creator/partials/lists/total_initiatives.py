@@ -39,7 +39,11 @@ def generate_total_initiatives(df: pd.DataFrame) -> str:
         drop=True
     )
 
-    title = f'<h3 class="card__title">📋 Total Initiatives: <span class="card__count" style="color:{colors.total_initiatives}">{len(sorted_df)}</span></h3>'
+    title = (
+        '<h3 class="card__title">📋 Total Initiatives: '
+        f'<span class="card__count" style="color:{colors.total_initiatives}">{len(sorted_df)}</span>'
+        "</h3>"
+    )
 
     rows = ""
 
@@ -63,7 +67,11 @@ def generate_total_initiatives(df: pd.DataFrame) -> str:
 
         if pd.notna(row["signatures_threshold_met"]):
             thr_val = int(row["signatures_threshold_met"])
-            threshold = f"{thr_val} / {_COUNTRIES_THRESHOLD}{progress_bar(thr_val / _COUNTRIES_THRESHOLD * 100, 'threshold')}"
+            threshold = (
+                f"{thr_val}"
+                " / "
+                f"{_COUNTRIES_THRESHOLD}{progress_bar(thr_val / _COUNTRIES_THRESHOLD * 100, 'threshold')}"
+            )
         else:
             threshold = "N/A"
 

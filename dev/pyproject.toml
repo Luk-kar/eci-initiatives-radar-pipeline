@@ -27,7 +27,7 @@ disable = [
 ]
 
 [tool.pylint.basic]
-good-names = ["df"]  # common short names in data code
+good-names = ["df", "bar", "pct"]  # short names acceptable in data/UI code
 
 [tool.pylint.design]
 max-args = 8

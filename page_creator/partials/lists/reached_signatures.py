@@ -44,7 +44,12 @@ def generate_reached_signatures(df: pd.DataFrame) -> str:
         .reset_index(drop=True)
     )
 
-    title = f'<h3 class="card__title">✅ Reached 1M Signatures: <span class="card__count" style="color:{colors.reached_signatures}">{len(filtered_df)}</span></h3>'
+    title = (
+        '<h3 class="card__title">'
+        "✅ Reached 1M Signatures: "
+        f'<span class="card__count" style="color:{colors.reached_signatures}">{len(filtered_df)}</span>'
+        "</h3>"
+    )
 
     if filtered_df.empty:
         body = '<p class="list-empty">No initiatives have reached 1M signatures.</p>'
