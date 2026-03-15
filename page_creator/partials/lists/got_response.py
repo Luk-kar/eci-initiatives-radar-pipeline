@@ -17,19 +17,29 @@ _RESPONSE_STATUSES = frozenset(
 _HEADERS = ["Initiative", "Registration", "Objective", "Response"]
 
 
-def _filter_and_sort(df: pd.DataFrame) -> pd.DataFrame:
-    """Filter for initiatives that received a Commission response, sorted by registration date.
+def _filter(df: pd.DataFrame) -> pd.DataFrame:
+    """Filter for initiatives that received a Commission response.
 
     Args:
         df: The full ECI initiatives DataFrame.
 
     Returns:
-        Filtered and sorted DataFrame containing only ``_RESPONSE_STATUSES`` rows.
+        Filtered DataFrame containing only ``_RESPONSE_STATUSES`` rows.
+    """
+    return df[df["current_status"].isin(_RESPONSE_STATUSES)]
+
+
+def _sort(df: pd.DataFrame) -> pd.DataFrame:
+    """Normalise dates and sort by registration date descending.
+
+    Args:
+        df: Filtered DataFrame of initiatives with a Commission response.
+
+    Returns:
+        Sorted and date-normalised DataFrame.
     """
     return normalise_registration_date(
-        df[df["current_status"].isin(_RESPONSE_STATUSES)]
-        .sort_values("registration_date", ascending=False)
-        .reset_index(drop=True)
+        df.sort_values("registration_date", ascending=False).reset_index(drop=True)
     )
 
 
@@ -76,19 +86,20 @@ def generate_got_response(df: pd.DataFrame) -> str:
         An HTML string wrapping the table in a ``card`` div, or a card with a
         fallback message if no initiatives received a response.
     """
-    filtered_df = _filter_and_sort(df)
+    df_sorted = _filter(df)
+    df_filtered = _sort(df_sorted)
 
     title = (
         '<h3 class="card__title">'
         "📬 Got EU Response: "
-        f'<span class="card__count" style="color:{colors.got_response}">{len(filtered_df)}</span>'
+        f'<span class="card__count" style="color:{colors.got_response}">{len(df_filtered)}</span>'
         "</h3>"
     )
 
-    if filtered_df.empty:
+    if df_filtered.empty:
         body = '<p class="list-empty">No initiatives have received an EU Commission response.</p>'
         return wrap_card(title + body)
 
     return wrap_table_card(
-        title, _build_rows(filtered_df), filtered_df, _HEADERS, colors.got_response
+        title, _build_rows(df_filtered), df_filtered, _HEADERS, colors.got_response
     )

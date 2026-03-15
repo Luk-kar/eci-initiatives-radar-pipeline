@@ -15,19 +15,29 @@ _STATUS = "Law Passed"
 _HEADERS = ["Initiative", "Registration", "Objective", "Legislation Example"]
 
 
-def _filter_and_sort(df: pd.DataFrame) -> pd.DataFrame:
-    """Filter for initiatives with ``Law Passed`` status, sorted by registration date.
+def _filter(df: pd.DataFrame) -> pd.DataFrame:
+    """Filter for initiatives with ``Law Passed`` status.
 
     Args:
         df: The full ECI initiatives DataFrame.
 
     Returns:
-        Filtered and sorted DataFrame containing only ``_STATUS`` rows.
+        Filtered DataFrame containing only ``_STATUS`` rows.
+    """
+    return df[df["current_status"] == _STATUS]
+
+
+def _sort(df: pd.DataFrame) -> pd.DataFrame:
+    """Normalise dates and sort by registration date descending.
+
+    Args:
+        df: Filtered DataFrame of ``Law Passed`` initiatives.
+
+    Returns:
+        Sorted and date-normalised DataFrame.
     """
     return normalise_registration_date(
-        df[df["current_status"] == _STATUS]
-        .sort_values("registration_date", ascending=False)
-        .reset_index(drop=True)
+        df.sort_values("registration_date", ascending=False).reset_index(drop=True)
     )
 
 
@@ -36,12 +46,11 @@ def _build_row(row: pd.Series) -> str:
 
     Args:
         row: A DataFrame row. Must contain ``title``, ``url``, ``registration_date``,
-             ``objective``, and optionally ``legislation``.
+             ``objective``, and ``legislation``.
 
     Returns:
         A ``<tr>...</tr>`` HTML string.
     """
-    # TODO: replace fallback once legislation column is added to the dataset
     legislation = truncate(row["legislation"])
     return build_initiative_row(row, f"\n          <td>{legislation}</td>")
 
@@ -62,35 +71,36 @@ def generate_led_to_legislation(df: pd.DataFrame) -> str:
     """Return an HTML card containing a table of ECIs that led to passed legislation.
 
     Filters for rows with ``current_status == 'Law Passed'``, sorted by
-    registration date descending. The Legislation column uses a fallback
-    placeholder until real legislative reference data is added to the dataset.
+    registration date descending.
 
     Args:
         df: The full ECI initiatives DataFrame. Must contain ``current_status``,
-            ``title``, ``url``, ``objective``, and ``registration_date`` columns.
+            ``title``, ``url``, ``objective``, ``registration_date``, and
+            ``legislation`` columns.
 
     Returns:
         An HTML string wrapping the table in a ``card`` div, or a card with a
         fallback message if no initiatives led to legislation.
     """
-    filtered_df = _filter_and_sort(df)
+    df_filtered = _filter(df)
+    df_sorted = _sort(df_filtered)
 
     title = (
         '<h3 class="card__title">⚖️ Led to Legislation: '
         "<span "
-        f'class="card__count" style="color:{colors.led_to_legislation}">{len(filtered_df)}'
+        f'class="card__count" style="color:{colors.led_to_legislation}">{len(df_sorted)}'
         "</span>"
         "</h3>"
     )
 
-    if filtered_df.empty:
+    if df_sorted.empty:
         body = '<p class="list-empty">No initiatives have led to legislation yet.</p>'
         return wrap_card(title + body)
 
     return wrap_table_card(
         title,
-        _build_rows(filtered_df),
-        filtered_df,
+        _build_rows(df_sorted),
+        df_sorted,
         _HEADERS,
         colors.led_to_legislation,
     )

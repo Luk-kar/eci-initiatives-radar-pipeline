@@ -11,19 +11,29 @@ from page_creator.partials.lists.utils import (
 from page_creator.partials.styles.colors import kpi_colors as colors
 
 
-def _filter_and_sort(df: pd.DataFrame) -> pd.DataFrame:
-    """Filter for initiatives that reached 1M signatures, sorted by registration date.
+def _filter(df: pd.DataFrame) -> pd.DataFrame:
+    """Filter for initiatives that reached 1M signatures.
 
     Args:
         df: The full ECI initiatives DataFrame.
 
     Returns:
-        Filtered and sorted DataFrame where ``signatures_collected >= 1_000_000``.
+        Filtered DataFrame where ``signatures_collected >= 1_000_000``.
+    """
+    return df[df["signatures_collected"] >= SIG_TARGET]
+
+
+def _sort(df: pd.DataFrame) -> pd.DataFrame:
+    """Normalise dates and sort by registration date descending.
+
+    Args:
+        df: Filtered DataFrame of initiatives that reached 1M signatures.
+
+    Returns:
+        Sorted and date-normalised DataFrame.
     """
     return normalise_registration_date(
-        df[df["signatures_collected"] >= SIG_TARGET]
-        .sort_values("registration_date", ascending=False)
-        .reset_index(drop=True)
+        df.sort_values("registration_date", ascending=False).reset_index(drop=True)
     )
 
 
@@ -44,17 +54,20 @@ def generate_reached_signatures(df: pd.DataFrame) -> str:
         An HTML string wrapping the table in a ``card`` div, or a card with a
         fallback message if no initiatives reached the threshold.
     """
-    filtered_df = _filter_and_sort(df)
+    df_filtered = _filter(df)
+    df_sorted = _sort(df_filtered)
 
     title = (
         '<h3 class="card__title">'
         "✅ Reached 1M Signatures: "
-        f'<span class="card__count" style="color:{colors.reached_signatures}">{len(filtered_df)}</span>'
+        "<span "
+        f'class="card__count" style="color:{colors.reached_signatures}">{len(df_sorted)}'
+        "</span>"
         "</h3>"
     )
 
-    if filtered_df.empty:
+    if df_sorted.empty:
         body = '<p class="list-empty">No initiatives have reached 1M signatures.</p>'
         return wrap_card(title + body)
 
-    return wrap_sig_threshold_card(title, filtered_df, colors.reached_signatures)
+    return wrap_sig_threshold_card(title, df_sorted, colors.reached_signatures)

@@ -3,7 +3,7 @@
 import pandas as pd
 
 from page_creator.partials.lists.utils.signatures import sig_cell, threshold_cell
-from page_creator.partials.lists.utils.table import build_table, wrap_table_card
+from page_creator.partials.lists.utils.table import wrap_table_card
 from page_creator.partials.lists.utils.text import truncate
 
 

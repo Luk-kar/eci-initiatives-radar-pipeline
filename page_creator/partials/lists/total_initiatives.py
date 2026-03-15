@@ -45,7 +45,9 @@ def generate_total_initiatives(df: pd.DataFrame) -> str:
 
     title = (
         '<h3 class="card__title">📋 Total Initiatives: '
-        f'<span class="card__count" style="color:{colors.total_initiatives}">{len(sorted_df)}</span>'
+        "<span "
+        f'class="card__count" style="color:{colors.total_initiatives}">{len(sorted_df)}'
+        "</span>"
         "</h3>"
     )
 

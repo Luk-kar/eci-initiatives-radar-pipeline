@@ -18,27 +18,36 @@ _STATUS = "Collection Ongoing"
 _HEADERS = ["Initiative", "Objective", "Days Left", "Signatures", "Countries Threshold"]
 
 
-def _filter_and_sort(df: pd.DataFrame) -> pd.DataFrame:
-    """Filter for open initiatives and sort by start date, closed ones last.
+def _filter(df: pd.DataFrame) -> pd.DataFrame:
+    """Filter for initiatives with ``_STATUS`` status.
 
     Args:
         df: The full ECI initiatives DataFrame.
 
     Returns:
-        Filtered and sorted DataFrame containing only ``_STATUS`` rows.
+        Filtered DataFrame containing only ``_STATUS`` rows.
     """
+    return df[df["current_status"] == _STATUS].copy()
 
-    open_df = df[df["current_status"] == _STATUS].copy()
 
-    open_df["_start_dt"] = pd.to_datetime(
-        open_df["timeline_collection_start"], dayfirst=True, errors="raise"
+def _sort(df: pd.DataFrame) -> pd.DataFrame:
+    """Sort open initiatives by start date ascending, with closed ones pushed last.
+
+    Args:
+        df: Filtered DataFrame of open initiatives.
+
+    Returns:
+        Sorted DataFrame with temporary helper columns dropped.
+    """
+    df["_start_dt"] = pd.to_datetime(
+        df["timeline_collection_start"], dayfirst=True, errors="raise"
     )
-    open_df["_has_closed"] = open_df["timeline_collection_closed"].notna() & (
-        open_df["timeline_collection_closed"].str.strip() != ""
+    df["_has_closed"] = df["timeline_collection_closed"].notna() & (
+        df["timeline_collection_closed"].str.strip() != ""
     )
 
     return (
-        open_df.sort_values(["_has_closed", "_start_dt"], ascending=[True, True])
+        df.sort_values(["_has_closed", "_start_dt"], ascending=[True, True])
         .drop(columns=["_start_dt", "_has_closed"])
         .reset_index(drop=True)
     )
@@ -55,7 +64,6 @@ def _days_left_cell(date_start: str, date_closed: str) -> str:
         A ``<td class="days-left-cell">`` HTML string.
     """
     if date_start:
-
         start_dt = pd.to_datetime(date_start, dayfirst=True, errors="coerce")
         deadline_dt = start_dt + pd.DateOffset(months=12)
         now_dt = pd.Timestamp.now()
@@ -78,10 +86,6 @@ def _days_left_cell(date_start: str, date_closed: str) -> str:
 
 def _build_row(row: pd.Series) -> str:
     """Return a fully assembled ``<tr>`` for a single open initiative.
-
-    The ``sig_cell`` and ``threshold_cell`` from ``utils`` return content-only strings
-    (no ``<td>`` tags), so they are wrapped here. The days-left cell is unique to this
-    module and built via ``_days_left_cell``.
 
     Args:
         row: A DataFrame row. Must contain ``title``, ``url``, ``objective``,
@@ -140,16 +144,17 @@ def generate_currently_open(df: pd.DataFrame) -> str:
         An HTML string wrapping the table in a ``card`` div, or a card with a
         fallback message if no initiatives are currently open.
     """
-    open_df = _filter_and_sort(df)
+    df_filter = _filter(df)
+    df_open = _sort(df_filter)
 
-    if open_df.empty:
+    if df_open.empty:
         return wrap_card(
             "\n\nNo initiatives currently open for signature collection.\n\n"
         )
 
-    title = f"\n\nCurrently Open ({len(open_df)})\n\n"
+    title = f"\n\nCurrently Open ({len(df_open)})\n\n"
     body = build_table(
-        _HEADERS, _build_rows(open_df), scrollable=len(open_df) > SCROLL_THRESHOLD
+        _HEADERS, _build_rows(df_open), scrollable=len(df_open) > SCROLL_THRESHOLD
     )
 
     return wrap_card(title + body)
