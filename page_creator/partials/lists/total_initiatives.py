@@ -5,10 +5,9 @@ import pandas as pd
 from page_creator.partials.lists.utils import (
     build_initiative_row,
     normalise_registration_date,
-    progress_bar,
+    sig_cell,
+    threshold_cell,
     wrap_table_card,
-    _SIG_TARGET,
-    _COUNTRIES_THRESHOLD,
 )
 from page_creator.partials.styles.colors import kpi_colors as colors
 
@@ -37,39 +36,6 @@ def _sort(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def _sig_cell(value) -> str:
-    """Return formatted signatures cell content with progress bar, or ``N/A``.
-
-    Args:
-        value: Raw ``signatures_collected`` value from the DataFrame row.
-
-    Returns:
-        An HTML string for the signatures table cell content (without ``<td>`` tags).
-    """
-    if pd.notna(value):
-        sig_val = int(value)
-        return f"{sig_val:,}{progress_bar(sig_val / _SIG_TARGET * 100, 'signatures')}"
-    return "N/A"
-
-
-def _threshold_cell(value) -> str:
-    """Return formatted countries-threshold cell content with progress bar, or ``N/A``.
-
-    Args:
-        value: Raw ``signatures_threshold_met`` value from the DataFrame row.
-
-    Returns:
-        An HTML string for the threshold table cell content (without ``<td>`` tags).
-    """
-    if pd.notna(value):
-        thr_val = int(value)
-        return (
-            f"{thr_val} / {_COUNTRIES_THRESHOLD}"
-            f"{progress_bar(thr_val / _COUNTRIES_THRESHOLD * 100, 'threshold')}"
-        )
-    return "N/A"
-
-
 def _build_row(row: pd.Series) -> str:
     """Return a ``<tr>`` for a single initiative.
 
@@ -81,8 +47,8 @@ def _build_row(row: pd.Series) -> str:
         A ``<tr>...</tr>`` HTML string.
     """
     extra = (
-        f"\n          <td>{_sig_cell(row['signatures_collected'])}</td>"
-        f"\n          <td>{_threshold_cell(row['signatures_threshold_met'])}</td>"
+        f"\n          <td>{sig_cell(row['signatures_collected'])}</td>"
+        f"\n          <td>{threshold_cell(row['signatures_threshold_met'])}</td>"
     )
     return build_initiative_row(row, extra)
 

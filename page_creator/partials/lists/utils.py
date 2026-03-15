@@ -3,6 +3,10 @@
 # Third-party
 import pandas as pd
 
+# Local
+from page_creator.utils import (
+    wrap_card,
+)
 
 _DEFAULT_TRUNCATE = 100
 _SCROLL_THRESHOLD = 5
@@ -132,9 +136,6 @@ def wrap_table_card(
     Returns:
         An HTML string wrapping everything in a ``card`` div.
     """
-    from page_creator.utils import (
-        wrap_card,
-    )  # local import to avoid circular dependency
 
     return wrap_card(
         title
@@ -145,3 +146,36 @@ def wrap_table_card(
             scrollbar_color=scrollbar_color,
         )
     )
+
+
+def sig_cell(value) -> str:
+    """Return formatted signatures cell content with progress bar, or ``N/A``.
+
+    Args:
+        value: Raw ``signatures_collected`` value from a DataFrame row.
+
+    Returns:
+        An HTML string for the signatures table cell content (without ``<td>`` tags).
+    """
+    if pd.notna(value):
+        sig_val = int(value)
+        return f"{sig_val:,}{progress_bar(sig_val / _SIG_TARGET * 100, 'signatures')}"
+    return "N/A"
+
+
+def threshold_cell(value) -> str:
+    """Return formatted countries-threshold cell content with progress bar, or ``N/A``.
+
+    Args:
+        value: Raw ``signatures_threshold_met`` value from a DataFrame row.
+
+    Returns:
+        An HTML string for the threshold table cell content (without ``<td>`` tags).
+    """
+    if pd.notna(value):
+        thr_val = int(value)
+        return (
+            f"{thr_val} / {_COUNTRIES_THRESHOLD}"
+            f"{progress_bar(thr_val / _COUNTRIES_THRESHOLD * 100, 'threshold')}"
+        )
+    return "N/A"

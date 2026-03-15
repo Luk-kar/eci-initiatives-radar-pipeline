@@ -78,7 +78,9 @@ def generate_led_to_legislation(df: pd.DataFrame) -> str:
 
     title = (
         '<h3 class="card__title">⚖️ Led to Legislation: '
-        f'<span class="card__count" style="color:{colors.led_to_legislation}">{len(filtered_df)}</span>'
+        "<span "
+        f'class="card__count" style="color:{colors.led_to_legislation}">{len(filtered_df)}'
+        "</span>"
         "</h3>"
     )
 

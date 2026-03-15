@@ -9,6 +9,8 @@ from page_creator.partials.lists.utils import (
     build_table,
     normalise_registration_date,
     progress_bar,
+    sig_cell,
+    threshold_cell,
     truncate,
     _SIG_TARGET,
     _COUNTRIES_THRESHOLD,
@@ -28,13 +30,16 @@ def _filter_and_sort(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Filtered and sorted DataFrame containing only ``_STATUS`` rows.
     """
+
     open_df = df[df["current_status"] == _STATUS].copy()
+
     open_df["_start_dt"] = pd.to_datetime(
         open_df["timeline_collection_start"], dayfirst=True, errors="raise"
     )
     open_df["_has_closed"] = open_df["timeline_collection_closed"].notna() & (
         open_df["timeline_collection_closed"].str.strip() != ""
     )
+
     return (
         open_df.sort_values(["_has_closed", "_start_dt"], ascending=[True, True])
         .drop(columns=["_start_dt", "_has_closed"])
@@ -53,11 +58,14 @@ def _days_left_cell(date_start: str, date_closed: str) -> str:
         A ``<td class="days-left-cell">`` HTML string.
     """
     if date_start:
+
         start_dt = pd.to_datetime(date_start, dayfirst=True, errors="coerce")
         deadline_dt = start_dt + pd.DateOffset(months=12)
         now_dt = pd.Timestamp.now()
+
         total_secs = (deadline_dt - start_dt).total_seconds()
         elapsed_secs = (now_dt - start_dt).total_seconds()
+
         pct = min(max(elapsed_secs / total_secs * 100, 0), 100)
         bar = progress_bar(pct, "days-left")
     else:
@@ -71,41 +79,12 @@ def _days_left_cell(date_start: str, date_closed: str) -> str:
     )
 
 
-def _sig_cell(value) -> str:
-    """Return a formatted signatures ``<td>`` with progress bar, or ``N/A``.
-
-    Args:
-        value: Raw ``signatures_collected`` value from the DataFrame row.
-
-    Returns:
-        An HTML string for the signatures table cell.
-    """
-    if pd.notna(value):
-        sig_val = int(value)
-        return f"<td>{sig_val:,}{progress_bar(sig_val / _SIG_TARGET * 100, 'signatures')}</td>"
-    return "<td>N/A</td>"
-
-
-def _threshold_cell(value) -> str:
-    """Return a formatted countries-threshold ``<td>`` with progress bar, or ``N/A``.
-
-    Args:
-        value: Raw ``signatures_threshold_met`` value from the DataFrame row.
-
-    Returns:
-        An HTML string for the countries threshold table cell.
-    """
-    if pd.notna(value):
-        thr_val = int(value)
-        return (
-            f"<td>{thr_val} / {_COUNTRIES_THRESHOLD}"
-            f"{progress_bar(thr_val / _COUNTRIES_THRESHOLD * 100, 'threshold')}</td>"
-        )
-    return "<td>N/A</td>"
-
-
 def _build_row(row: pd.Series) -> str:
     """Return a fully assembled ``<tr>`` for a single open initiative.
+
+    The ``sig_cell`` and ``threshold_cell`` from ``utils`` return content-only strings
+    (no ``<td>`` tags), so they are wrapped here. The days-left cell is unique to this
+    module and built via ``_days_left_cell``.
 
     Args:
         row: A DataFrame row. Must contain ``title``, ``url``, ``objective``,
@@ -128,8 +107,8 @@ def _build_row(row: pd.Series) -> str:
           <td><a href="{url}" target="_blank" rel="noopener noreferrer">{row["title"]}</a></td>
           <td>{objective}</td>
           {_days_left_cell(date_start, date_closed)}
-          {_sig_cell(row["signatures_collected"])}
-          {_threshold_cell(row["signatures_threshold_met"])}
+          <td>{sig_cell(row["signatures_collected"])}</td>
+          <td>{threshold_cell(row["signatures_threshold_met"])}</td>
         </tr>"""
 
 
@@ -172,6 +151,8 @@ def generate_currently_open(df: pd.DataFrame) -> str:
         )
 
     title = f"\n\nCurrently Open ({len(open_df)})\n\n"
-    rows = _build_rows(open_df)
-    body = build_table(_HEADERS, rows, scrollable=len(open_df) > _SCROLL_THRESHOLD)
+    body = build_table(
+        _HEADERS, _build_rows(open_df), scrollable=len(open_df) > _SCROLL_THRESHOLD
+    )
+
     return wrap_card(title + body)
