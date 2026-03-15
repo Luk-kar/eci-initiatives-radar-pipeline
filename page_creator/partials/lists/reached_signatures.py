@@ -4,22 +4,11 @@ import pandas as pd
 
 from page_creator.utils import wrap_card
 from page_creator.partials.lists.utils import (
-    build_initiative_row,
     normalise_registration_date,
-    sig_cell,
-    threshold_cell,
-    wrap_table_card,
-    _SIG_TARGET,
+    wrap_sig_threshold_card,
+    SIG_TARGET,
 )
 from page_creator.partials.styles.colors import kpi_colors as colors
-
-_HEADERS = [
-    "Initiative",
-    "Registration",
-    "Objective",
-    "Signatures",
-    "Countries Threshold",
-]
 
 
 def _filter_and_sort(df: pd.DataFrame) -> pd.DataFrame:
@@ -32,39 +21,10 @@ def _filter_and_sort(df: pd.DataFrame) -> pd.DataFrame:
         Filtered and sorted DataFrame where ``signatures_collected >= 1_000_000``.
     """
     return normalise_registration_date(
-        df[df["signatures_collected"] >= _SIG_TARGET]
+        df[df["signatures_collected"] >= SIG_TARGET]
         .sort_values("registration_date", ascending=False)
         .reset_index(drop=True)
     )
-
-
-def _build_row(row: pd.Series) -> str:
-    """Return a ``<tr>`` for a single initiative that reached 1M signatures.
-
-    Args:
-        row: A DataFrame row. Must contain ``title``, ``url``, ``registration_date``,
-             ``objective``, ``signatures_collected``, and ``signatures_threshold_met``.
-
-    Returns:
-        A ``<tr>...</tr>`` HTML string.
-    """
-    extra = (
-        f"\n          <td>{sig_cell(row['signatures_collected'])}</td>"
-        f"\n          <td>{threshold_cell(row['signatures_threshold_met'])}</td>"
-    )
-    return build_initiative_row(row, extra)
-
-
-def _build_rows(filtered_df: pd.DataFrame) -> str:
-    """Iterate over all matching initiatives and concatenate their row HTML.
-
-    Args:
-        filtered_df: Filtered and sorted DataFrame.
-
-    Returns:
-        Concatenated ``<tr>`` HTML string for all rows.
-    """
-    return "".join(_build_row(row) for _, row in filtered_df.iterrows())
 
 
 def generate_reached_signatures(df: pd.DataFrame) -> str:
@@ -97,10 +57,4 @@ def generate_reached_signatures(df: pd.DataFrame) -> str:
         body = '<p class="list-empty">No initiatives have reached 1M signatures.</p>'
         return wrap_card(title + body)
 
-    return wrap_table_card(
-        title,
-        _build_rows(filtered_df),
-        filtered_df,
-        _HEADERS,
-        colors.reached_signatures,
-    )
+    return wrap_sig_threshold_card(title, filtered_df, colors.reached_signatures)

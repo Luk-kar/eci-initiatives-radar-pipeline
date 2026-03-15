@@ -7,14 +7,11 @@ import pandas as pd
 from page_creator.utils import wrap_card
 from page_creator.partials.lists.utils import (
     build_table,
-    normalise_registration_date,
     progress_bar,
     sig_cell,
     threshold_cell,
     truncate,
-    _SIG_TARGET,
-    _COUNTRIES_THRESHOLD,
-    _SCROLL_THRESHOLD,
+    SCROLL_THRESHOLD,
 )
 
 _STATUS = "Collection Ongoing"
@@ -152,7 +149,7 @@ def generate_currently_open(df: pd.DataFrame) -> str:
 
     title = f"\n\nCurrently Open ({len(open_df)})\n\n"
     body = build_table(
-        _HEADERS, _build_rows(open_df), scrollable=len(open_df) > _SCROLL_THRESHOLD
+        _HEADERS, _build_rows(open_df), scrollable=len(open_df) > SCROLL_THRESHOLD
     )
 
     return wrap_card(title + body)

@@ -3,21 +3,10 @@
 import pandas as pd
 
 from page_creator.partials.lists.utils import (
-    build_initiative_row,
     normalise_registration_date,
-    sig_cell,
-    threshold_cell,
-    wrap_table_card,
+    wrap_sig_threshold_card,
 )
 from page_creator.partials.styles.colors import kpi_colors as colors
-
-_HEADERS = [
-    "Initiative",
-    "Registration",
-    "Objective",
-    "Signatures",
-    "Countries Threshold",
-]
 
 
 def _sort(df: pd.DataFrame) -> pd.DataFrame:
@@ -36,42 +25,13 @@ def _sort(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def _build_row(row: pd.Series) -> str:
-    """Return a ``<tr>`` for a single initiative.
-
-    Args:
-        row: A DataFrame row. Must contain ``title``, ``url``, ``registration_date``,
-             ``objective``, ``signatures_collected``, and ``signatures_threshold_met``.
-
-    Returns:
-        A ``<tr>...</tr>`` HTML string.
-    """
-    extra = (
-        f"\n          <td>{sig_cell(row['signatures_collected'])}</td>"
-        f"\n          <td>{threshold_cell(row['signatures_threshold_met'])}</td>"
-    )
-    return build_initiative_row(row, extra)
-
-
-def _build_rows(sorted_df: pd.DataFrame) -> str:
-    """Iterate over all initiatives and concatenate their row HTML.
-
-    Args:
-        sorted_df: Sorted DataFrame of all initiatives.
-
-    Returns:
-        Concatenated ``<tr>`` HTML string for all rows.
-    """
-    return "".join(_build_row(row) for _, row in sorted_df.iterrows())
-
-
 def generate_total_initiatives(df: pd.DataFrame) -> str:
     """Return an HTML card containing a table of all registered ECI initiatives.
 
     Sorted by registration date descending. Each row shows the initiative title
     (linked to its page), the registration date, a truncated objective, a signature
     progress bar towards the 1M target, and a country-threshold progress bar out of
-    ``_COUNTRIES_THRESHOLD``.
+    ``COUNTRIES_THRESHOLD``.
 
     Args:
         df: The full ECI initiatives DataFrame. Must contain ``title``, ``url``,
@@ -89,6 +49,4 @@ def generate_total_initiatives(df: pd.DataFrame) -> str:
         "</h3>"
     )
 
-    return wrap_table_card(
-        title, _build_rows(sorted_df), sorted_df, _HEADERS, colors.total_initiatives
-    )
+    return wrap_sig_threshold_card(title, sorted_df, colors.total_initiatives)
