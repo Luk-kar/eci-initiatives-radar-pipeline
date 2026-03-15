@@ -1,0 +1,7 @@
+README.md
+pyproject.toml
+eci_pipeline.egg-info/PKG-INFO
+eci_pipeline.egg-info/SOURCES.txt
+eci_pipeline.egg-info/dependency_links.txt
+eci_pipeline.egg-info/requires.txt
+eci_pipeline.egg-info/top_level.txt

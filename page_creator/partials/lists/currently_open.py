@@ -64,6 +64,7 @@ def _days_left_cell(date_start: str, date_closed: str) -> str:
         A ``<td class="days-left-cell">`` HTML string.
     """
     if date_start:
+
         start_dt = pd.to_datetime(date_start, dayfirst=True, errors="coerce")
         deadline_dt = start_dt + pd.DateOffset(months=12)
         now_dt = pd.Timestamp.now()

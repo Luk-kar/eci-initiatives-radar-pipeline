@@ -10,7 +10,7 @@ from page_creator.partials.lists.utils.progress import progress_bar
 
 
 def sig_cell(value) -> str:
-    """Return formatted signatures cell content with progress bar, or ``N/A``.
+    """Return formatted signatures cell content with progress bar, or ``Collection not started``.
 
     Args:
         value: Raw ``signatures_collected`` value from a DataFrame row.
@@ -21,11 +21,11 @@ def sig_cell(value) -> str:
     if pd.notna(value):
         sig_val = int(value)
         return f"{sig_val:,}{progress_bar(sig_val / SIG_TARGET * 100, 'signatures')}"
-    return "N/A"
+    return "Collection not started"
 
 
 def threshold_cell(value) -> str:
-    """Return formatted countries-threshold cell content with progress bar, or ``N/A``.
+    """Return formatted countries-threshold cell content with progress bar, or ``Collection not started``.
 
     Args:
         value: Raw ``signatures_threshold_met`` value from a DataFrame row.
@@ -39,4 +39,4 @@ def threshold_cell(value) -> str:
             f"{thr_val} / {COUNTRIES_THRESHOLD}"
             f"{progress_bar(thr_val / COUNTRIES_THRESHOLD * 100, 'threshold')}"
         )
-    return "N/A"
+    return "Collection not started"

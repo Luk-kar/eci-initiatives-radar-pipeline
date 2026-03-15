@@ -38,8 +38,10 @@ def _sort(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Sorted and date-normalised DataFrame.
     """
-    return normalise_registration_date(
-        df.sort_values("registration_date", ascending=False).reset_index(drop=True)
+    return (
+        normalise_registration_date(df)  # parse dates FIRST
+        .sort_values("registration_date", ascending=False)
+        .reset_index(drop=True)
     )
 
 

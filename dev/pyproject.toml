@@ -3,34 +3,52 @@ name = "eci-pipeline"
 version = "0.1.0"
 requires-python = ">=3.12"
 
+
 [project.optional-dependencies]
 dev = [
     "pylint>=3.0",
 ]
+test = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "page-creator @ file:///${PROJECT_ROOT}/../page_creator",
+]
+
 
 [tool.pylint.main]
 py-version = "3.12"
 ignore = [".git", ".venv.dev", "__pycache__"]
 recursive = true
 
+
 [tool.pylint.format]
 max-line-length = 88
 
+
 [tool.pylint."messages control"]
 disable = [
-    "too-few-public-methods",     # common in dataclass-like structures
-    "logging-fstring-interpolation", # f-strings in logging are fine
-    "wrong-import-position", # not always the case when fiddling with project root
-    "too-few-public-methods", # data-holding classes don't need many methods
-    "superfluous-parens", # better readability
-    "invalid-name", # too strict
+    "too-few-public-methods",            # common in dataclass-like structures
+    "logging-fstring-interpolation",     # f-strings in logging are fine
+    "wrong-import-position",             # not always the case when fiddling with project root
+    "superfluous-parens",                # better readability
+    "invalid-name",                      # too strict
 ]
+
 
 [tool.pylint.basic]
 good-names = ["df", "bar", "pct"]  # short names acceptable in data/UI code
+
 
 [tool.pylint.design]
 max-args = 8
 max-locals = 20
 max-returns = 5
 max-branches = 12
+
+
+[tool.pytest.ini_options]
+testpaths = ["page_creator"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--tb=short -q"
