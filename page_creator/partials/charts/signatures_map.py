@@ -132,6 +132,21 @@ def _build_country_df(df: pd.DataFrame) -> pd.DataFrame:
             }
         )
 
+    if not rows:
+        return pd.DataFrame(
+            columns=[
+                "alpha2",
+                "alpha3",
+                "name",
+                "lat",
+                "lon",
+                "total",
+                "threshold_met_count",
+                "label",
+                "eci_list",
+            ]
+        )
+
     return (
         pd.DataFrame(rows).sort_values("total", ascending=False).reset_index(drop=True)
     )
