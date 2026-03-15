@@ -2,14 +2,15 @@
 
 import pandas as pd
 
-from page_creator.utils import wrap_card
-from page_creator.partials.lists.utils import build_table, progress_bar, truncate
+from page_creator.partials.lists.utils import (
+    build_initiative_row,
+    normalise_registration_date,
+    progress_bar,
+    wrap_table_card,
+    _SIG_TARGET,
+    _COUNTRIES_THRESHOLD,
+)
 from page_creator.partials.styles.colors import kpi_colors as colors
-
-
-_SCROLL_THRESHOLD = 5
-_COUNTRIES_THRESHOLD = 7
-_SIG_TARGET = 1_000_000
 
 _HEADERS = [
     "Initiative",
@@ -20,24 +21,101 @@ _HEADERS = [
 ]
 
 
+def _sort(df: pd.DataFrame) -> pd.DataFrame:
+    """Normalise dates and sort all initiatives by registration date descending.
+
+    Args:
+        df: The full ECI initiatives DataFrame.
+
+    Returns:
+        Full DataFrame sorted by ``registration_date`` descending.
+    """
+    return (
+        normalise_registration_date(df)
+        .sort_values("registration_date", ascending=False)
+        .reset_index(drop=True)
+    )
+
+
+def _sig_cell(value) -> str:
+    """Return formatted signatures cell content with progress bar, or ``N/A``.
+
+    Args:
+        value: Raw ``signatures_collected`` value from the DataFrame row.
+
+    Returns:
+        An HTML string for the signatures table cell content (without ``<td>`` tags).
+    """
+    if pd.notna(value):
+        sig_val = int(value)
+        return f"{sig_val:,}{progress_bar(sig_val / _SIG_TARGET * 100, 'signatures')}"
+    return "N/A"
+
+
+def _threshold_cell(value) -> str:
+    """Return formatted countries-threshold cell content with progress bar, or ``N/A``.
+
+    Args:
+        value: Raw ``signatures_threshold_met`` value from the DataFrame row.
+
+    Returns:
+        An HTML string for the threshold table cell content (without ``<td>`` tags).
+    """
+    if pd.notna(value):
+        thr_val = int(value)
+        return (
+            f"{thr_val} / {_COUNTRIES_THRESHOLD}"
+            f"{progress_bar(thr_val / _COUNTRIES_THRESHOLD * 100, 'threshold')}"
+        )
+    return "N/A"
+
+
+def _build_row(row: pd.Series) -> str:
+    """Return a ``<tr>`` for a single initiative.
+
+    Args:
+        row: A DataFrame row. Must contain ``title``, ``url``, ``registration_date``,
+             ``objective``, ``signatures_collected``, and ``signatures_threshold_met``.
+
+    Returns:
+        A ``<tr>...</tr>`` HTML string.
+    """
+    extra = (
+        f"\n          <td>{_sig_cell(row['signatures_collected'])}</td>"
+        f"\n          <td>{_threshold_cell(row['signatures_threshold_met'])}</td>"
+    )
+    return build_initiative_row(row, extra)
+
+
+def _build_rows(sorted_df: pd.DataFrame) -> str:
+    """Iterate over all initiatives and concatenate their row HTML.
+
+    Args:
+        sorted_df: Sorted DataFrame of all initiatives.
+
+    Returns:
+        Concatenated ``<tr>`` HTML string for all rows.
+    """
+    return "".join(_build_row(row) for _, row in sorted_df.iterrows())
+
+
 def generate_total_initiatives(df: pd.DataFrame) -> str:
     """Return an HTML card containing a table of all registered ECI initiatives.
 
-    Sorted by signature count descending. Each row shows the initiative title
-    (linked to its page), a truncated objective, a signature progress bar towards
-    the 1M target, and a country-threshold progress bar out of ``_COUNTRIES_THRESHOLD``.
+    Sorted by registration date descending. Each row shows the initiative title
+    (linked to its page), the registration date, a truncated objective, a signature
+    progress bar towards the 1M target, and a country-threshold progress bar out of
+    ``_COUNTRIES_THRESHOLD``.
 
     Args:
         df: The full ECI initiatives DataFrame. Must contain ``title``, ``url``,
-            ``objective``, ``signatures_collected``, and ``signatures_threshold_met`` columns.
+            ``objective``, ``registration_date``, ``signatures_collected``, and
+            ``signatures_threshold_met`` columns.
 
     Returns:
         An HTML string wrapping the table in a ``card`` div.
     """
-
-    sorted_df = df.sort_values("registration_date", ascending=False).reset_index(
-        drop=True
-    )
+    sorted_df = _sort(df)
 
     title = (
         '<h3 class="card__title">📋 Total Initiatives: '
@@ -45,51 +123,6 @@ def generate_total_initiatives(df: pd.DataFrame) -> str:
         "</h3>"
     )
 
-    rows = ""
-
-    df["registration_date"] = pd.to_datetime(
-        df["registration_date"], format="%d/%m/%Y"
-    ).dt.date
-
-    for _, row in sorted_df.iterrows():
-
-        url = row["url"]
-        registration = row["registration_date"]
-        objective = truncate(row["objective"])
-
-        if pd.notna(row["signatures_collected"]):
-            sig_val = int(row["signatures_collected"])
-            sigs = (
-                f"{sig_val:,}{progress_bar(sig_val / _SIG_TARGET * 100, 'signatures')}"
-            )
-        else:
-            sigs = "N/A"
-
-        if pd.notna(row["signatures_threshold_met"]):
-            thr_val = int(row["signatures_threshold_met"])
-            threshold = (
-                f"{thr_val}"
-                " / "
-                f"{_COUNTRIES_THRESHOLD}{progress_bar(thr_val / _COUNTRIES_THRESHOLD * 100, 'threshold')}"
-            )
-        else:
-            threshold = "N/A"
-
-        rows += f"""
-        <tr>
-          <td><a href="{url}" target="_blank" rel="noopener noreferrer">{row["title"]}</a></td>
-          <td>{registration}</td>
-          <td>{objective}</td>
-          <td>{sigs}</td>
-          <td>{threshold}</td>
-        </tr>"""
-
-    return wrap_card(
-        title
-        + build_table(
-            _HEADERS,
-            rows,
-            scrollable=len(sorted_df) > _SCROLL_THRESHOLD,
-            scrollbar_color=colors.total_initiatives,
-        )
+    return wrap_table_card(
+        title, _build_rows(sorted_df), sorted_df, _HEADERS, colors.total_initiatives
     )

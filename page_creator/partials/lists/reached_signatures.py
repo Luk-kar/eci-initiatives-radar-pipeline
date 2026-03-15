@@ -3,13 +3,15 @@
 import pandas as pd
 
 from page_creator.utils import wrap_card
-from page_creator.partials.lists.utils import build_table, progress_bar, truncate
+from page_creator.partials.lists.utils import (
+    build_initiative_row,
+    normalise_registration_date,
+    progress_bar,
+    wrap_table_card,
+    _SIG_TARGET,
+    _COUNTRIES_THRESHOLD,
+)
 from page_creator.partials.styles.colors import kpi_colors as colors
-
-
-_SIG_TARGET = 1_000_000
-_SCROLL_THRESHOLD = 5
-_COUNTRIES_THRESHOLD = 7
 
 _HEADERS = [
     "Initiative",
@@ -18,6 +20,85 @@ _HEADERS = [
     "Signatures",
     "Countries Threshold",
 ]
+
+
+def _filter_and_sort(df: pd.DataFrame) -> pd.DataFrame:
+    """Filter for initiatives that reached 1M signatures, sorted by registration date.
+
+    Args:
+        df: The full ECI initiatives DataFrame.
+
+    Returns:
+        Filtered and sorted DataFrame where ``signatures_collected >= 1_000_000``.
+    """
+    return normalise_registration_date(
+        df[df["signatures_collected"] >= _SIG_TARGET]
+        .sort_values("registration_date", ascending=False)
+        .reset_index(drop=True)
+    )
+
+
+def _sig_cell(value) -> str:
+    """Return a formatted signatures cell content with progress bar.
+
+    Unlike ``currently_open``, this filter guarantees ``signatures_collected``
+    is always >= 1M, so no ``N/A`` fallback is needed here.
+
+    Args:
+        value: Raw ``signatures_collected`` value from the DataFrame row.
+
+    Returns:
+        An HTML string for the signatures table cell content (without ``<td>`` tags).
+    """
+    sig_val = int(value)
+    return f"{sig_val:,}{progress_bar(sig_val / _SIG_TARGET * 100, 'signatures')}"
+
+
+def _threshold_cell(value) -> str:
+    """Return a formatted countries-threshold cell content with progress bar, or ``N/A``.
+
+    Args:
+        value: Raw ``signatures_threshold_met`` value from the DataFrame row.
+
+    Returns:
+        An HTML string for the threshold table cell content (without ``<td>`` tags).
+    """
+    if pd.notna(value):
+        thr_val = int(value)
+        return (
+            f"{thr_val} / {_COUNTRIES_THRESHOLD}"
+            f"{progress_bar(thr_val / _COUNTRIES_THRESHOLD * 100, 'threshold')}"
+        )
+    return "N/A"
+
+
+def _build_row(row: pd.Series) -> str:
+    """Return a ``<tr>`` for a single initiative that reached 1M signatures.
+
+    Args:
+        row: A DataFrame row. Must contain ``title``, ``url``, ``registration_date``,
+             ``objective``, ``signatures_collected``, and ``signatures_threshold_met``.
+
+    Returns:
+        A ``<tr>...</tr>`` HTML string.
+    """
+    extra = (
+        f"\n          <td>{_sig_cell(row['signatures_collected'])}</td>"
+        f"\n          <td>{_threshold_cell(row['signatures_threshold_met'])}</td>"
+    )
+    return build_initiative_row(row, extra)
+
+
+def _build_rows(filtered_df: pd.DataFrame) -> str:
+    """Iterate over all matching initiatives and concatenate their row HTML.
+
+    Args:
+        filtered_df: Filtered and sorted DataFrame.
+
+    Returns:
+        Concatenated ``<tr>`` HTML string for all rows.
+    """
+    return "".join(_build_row(row) for _, row in filtered_df.iterrows())
 
 
 def generate_reached_signatures(df: pd.DataFrame) -> str:
@@ -37,12 +118,7 @@ def generate_reached_signatures(df: pd.DataFrame) -> str:
         An HTML string wrapping the table in a ``card`` div, or a card with a
         fallback message if no initiatives reached the threshold.
     """
-
-    filtered_df = (
-        df[df["signatures_collected"] >= _SIG_TARGET]
-        .sort_values("registration_date", ascending=False)
-        .reset_index(drop=True)
-    )
+    filtered_df = _filter_and_sort(df)
 
     title = (
         '<h3 class="card__title">'
@@ -55,40 +131,10 @@ def generate_reached_signatures(df: pd.DataFrame) -> str:
         body = '<p class="list-empty">No initiatives have reached 1M signatures.</p>'
         return wrap_card(title + body)
 
-    df["registration_date"] = pd.to_datetime(
-        df["registration_date"], format="%d/%m/%Y"
-    ).dt.date
-
-    rows = ""
-    for _, row in filtered_df.iterrows():
-        url = row["url"]
-        registration = row["registration_date"]
-        objective = truncate(row["objective"])
-
-        sig_val = int(row["signatures_collected"])
-        sigs = f"{sig_val:,}{progress_bar(sig_val / _SIG_TARGET * 100, 'signatures')}"
-
-        if pd.notna(row["signatures_threshold_met"]):
-            thr_val = int(row["signatures_threshold_met"])
-            threshold = f"{thr_val} / {_COUNTRIES_THRESHOLD}{progress_bar(thr_val / _COUNTRIES_THRESHOLD * 100, 'threshold')}"
-        else:
-            threshold = "N/A"
-
-        rows += f"""
-        <tr>
-          <td><a href="{url}" target="_blank" rel="noopener noreferrer">{row["title"]}</a></td>
-          <td>{registration}</td>
-          <td>{objective}</td>
-          <td>{sigs}</td>
-          <td>{threshold}</td>
-        </tr>"""
-
-    return wrap_card(
-        title
-        + build_table(
-            _HEADERS,
-            rows,
-            scrollable=len(filtered_df) > _SCROLL_THRESHOLD,
-            scrollbar_color=colors.reached_signatures,
-        )
+    return wrap_table_card(
+        title,
+        _build_rows(filtered_df),
+        filtered_df,
+        _HEADERS,
+        colors.reached_signatures,
     )

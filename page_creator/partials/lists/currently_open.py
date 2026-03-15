@@ -1,32 +1,158 @@
 """Renders a scrollable table of ECI initiatives currently open for signature collection."""
 
-# Third party
+# Third-party
 import pandas as pd
 
 # Local
 from page_creator.utils import wrap_card
-from page_creator.partials.lists.utils import build_table, progress_bar, truncate
+from page_creator.partials.lists.utils import (
+    build_table,
+    normalise_registration_date,
+    progress_bar,
+    truncate,
+    _SIG_TARGET,
+    _COUNTRIES_THRESHOLD,
+    _SCROLL_THRESHOLD,
+)
 
 _STATUS = "Collection Ongoing"
-_SCROLL_THRESHOLD = 5
-_COUNTRIES_THRESHOLD = 7
-_SIG_TARGET = 1_000_000
-
 _HEADERS = ["Initiative", "Objective", "Days Left", "Signatures", "Countries Threshold"]
 
 
-def generate_currently_open(df: pd.DataFrame) -> str:
+def _filter_and_sort(df: pd.DataFrame) -> pd.DataFrame:
+    """Filter for open initiatives and sort by start date, closed ones last.
+
+    Args:
+        df: The full ECI initiatives DataFrame.
+
+    Returns:
+        Filtered and sorted DataFrame containing only ``_STATUS`` rows.
     """
-    Return an HTML card containing a table of all currently open ECI initiatives.
+    open_df = df[df["current_status"] == _STATUS].copy()
+    open_df["_start_dt"] = pd.to_datetime(
+        open_df["timeline_collection_start"], dayfirst=True, errors="raise"
+    )
+    open_df["_has_closed"] = open_df["timeline_collection_closed"].notna() & (
+        open_df["timeline_collection_closed"].str.strip() != ""
+    )
+    return (
+        open_df.sort_values(["_has_closed", "_start_dt"], ascending=[True, True])
+        .drop(columns=["_start_dt", "_has_closed"])
+        .reset_index(drop=True)
+    )
+
+
+def _days_left_cell(date_start: str, date_closed: str) -> str:
+    """Return a ``<td>`` element containing the JS-rendered days-left label and progress bar.
+
+    Args:
+        date_start:  Collection start date string (DD/MM/YYYY), or empty string.
+        date_closed: Collection closed date string (DD/MM/YYYY), or empty string.
+
+    Returns:
+        A ``<td class="days-left-cell">`` HTML string.
+    """
+    if date_start:
+        start_dt = pd.to_datetime(date_start, dayfirst=True, errors="coerce")
+        deadline_dt = start_dt + pd.DateOffset(months=12)
+        now_dt = pd.Timestamp.now()
+        total_secs = (deadline_dt - start_dt).total_seconds()
+        elapsed_secs = (now_dt - start_dt).total_seconds()
+        pct = min(max(elapsed_secs / total_secs * 100, 0), 100)
+        bar = progress_bar(pct, "days-left")
+    else:
+        bar = ""
+
+    return (
+        f'<td class="days-left-cell" data-start="{date_start}" data-closed="{date_closed}">'
+        f'<span class="days-left-cell__label"></span>'
+        f"{bar}"
+        f"</td>"
+    )
+
+
+def _sig_cell(value) -> str:
+    """Return a formatted signatures ``<td>`` with progress bar, or ``N/A``.
+
+    Args:
+        value: Raw ``signatures_collected`` value from the DataFrame row.
+
+    Returns:
+        An HTML string for the signatures table cell.
+    """
+    if pd.notna(value):
+        sig_val = int(value)
+        return f"<td>{sig_val:,}{progress_bar(sig_val / _SIG_TARGET * 100, 'signatures')}</td>"
+    return "<td>N/A</td>"
+
+
+def _threshold_cell(value) -> str:
+    """Return a formatted countries-threshold ``<td>`` with progress bar, or ``N/A``.
+
+    Args:
+        value: Raw ``signatures_threshold_met`` value from the DataFrame row.
+
+    Returns:
+        An HTML string for the countries threshold table cell.
+    """
+    if pd.notna(value):
+        thr_val = int(value)
+        return (
+            f"<td>{thr_val} / {_COUNTRIES_THRESHOLD}"
+            f"{progress_bar(thr_val / _COUNTRIES_THRESHOLD * 100, 'threshold')}</td>"
+        )
+    return "<td>N/A</td>"
+
+
+def _build_row(row: pd.Series) -> str:
+    """Return a fully assembled ``<tr>`` for a single open initiative.
+
+    Args:
+        row: A DataFrame row. Must contain ``title``, ``url``, ``objective``,
+             ``timeline_collection_start``, ``timeline_collection_closed``,
+             ``signatures_collected``, and ``signatures_threshold_met``.
+
+    Returns:
+        A ``<tr>...</tr>`` HTML string.
+    """
+    url = row.get("url") or "#"
+    objective = truncate(row.get("objective", ""))
+
+    date_start = row.get("timeline_collection_start", "")
+    date_closed = row.get("timeline_collection_closed", "")
+    date_start = "" if pd.isna(date_start) else str(date_start).strip()
+    date_closed = "" if pd.isna(date_closed) else str(date_closed).strip()
+
+    return f"""
+        <tr>
+          <td><a href="{url}" target="_blank" rel="noopener noreferrer">{row["title"]}</a></td>
+          <td>{objective}</td>
+          {_days_left_cell(date_start, date_closed)}
+          {_sig_cell(row["signatures_collected"])}
+          {_threshold_cell(row["signatures_threshold_met"])}
+        </tr>"""
+
+
+def _build_rows(open_df: pd.DataFrame) -> str:
+    """Iterate over all open initiatives and concatenate their row HTML.
+
+    Args:
+        open_df: Filtered and sorted DataFrame of open initiatives.
+
+    Returns:
+        Concatenated ``<tr>`` HTML string for all rows.
+    """
+    return "".join(_build_row(row) for _, row in open_df.iterrows())
+
+
+def generate_currently_open(df: pd.DataFrame) -> str:
+    """Return an HTML card containing a table of all currently open ECI initiatives.
 
     Filters for rows with ``current_status == 'Collection Ongoing'``, sorted by
-    signature count descending. Each row shows the initiative title (linked to its
-    page), a truncated objective, a days-left cell (JavaScript-rendered from
-    ``timeline_collection_start`` and ``timeline_collection_closed``), a signature
-    progress bar towards the 1M target, and a country-threshold progress bar out of
-    ``_COUNTRIES_THRESHOLD``.
-
-    The table gains a scroll wrapper when the row count exceeds ``_SCROLL_THRESHOLD``.
+    collection start date ascending, with closed initiatives pushed to the bottom.
+    Each row shows the initiative title (linked to its page), a truncated objective,
+    a JavaScript-rendered days-left cell, a signature progress bar, and a
+    country-threshold progress bar.
 
     Args:
         df: The full ECI initiatives DataFrame. Must contain ``current_status``,
@@ -38,85 +164,14 @@ def generate_currently_open(df: pd.DataFrame) -> str:
         An HTML string wrapping the table in a ``card`` div, or a card with a
         fallback message if no initiatives are currently open.
     """
-
-    open_df = df[df["current_status"] == _STATUS].copy()
-
-    open_df["_start_dt"] = pd.to_datetime(
-        open_df["timeline_collection_start"], dayfirst=True, errors="raise"
-    )
-    open_df["_has_closed"] = open_df["timeline_collection_closed"].notna() & (
-        open_df["timeline_collection_closed"].str.strip() != ""
-    )
-
-    open_df = (
-        open_df.sort_values(["_has_closed", "_start_dt"], ascending=[True, True])
-        .drop(columns=["_start_dt", "_has_closed"])
-        .reset_index(drop=True)
-    )
+    open_df = _filter_and_sort(df)
 
     if open_df.empty:
-        title = """\n\nNo initiatives currently open for signature collection.\n\n"""
-        return wrap_card(title)
-
-    rows = ""
-    for _, row in open_df.iterrows():
-        url = row["url"]
-        objective = truncate(row["objective"])
-
-        # --- Days Left cell ---
-        date_start = row.get("timeline_collection_start", "")
-        date_closed = row.get("timeline_collection_closed", "")
-        date_start = "" if pd.isna(date_start) else str(date_start).strip()
-        date_closed = "" if pd.isna(date_closed) else str(date_closed).strip()
-
-        # Compute elapsed % of the 12-month window for the static progress bar
-        if date_start:
-            start_dt = pd.to_datetime(date_start, dayfirst=True, errors="coerce")
-            deadline_dt = start_dt + pd.DateOffset(months=12)
-            now_dt = pd.Timestamp.now()
-            total_ms = (deadline_dt - start_dt).total_seconds()
-            elapsed_ms = (now_dt - start_dt).total_seconds()
-            pct = min(max(elapsed_ms / total_ms * 100, 0), 100)
-            bar = progress_bar(pct, "days-left")
-        else:
-            bar = ""
-
-        days_left = (
-            f'<td class="days-left-cell" data-start="{date_start}" data-closed="{date_closed}">'
-            f'<span class="days-left-cell__label"></span>'
-            f"{bar}"
-            f"</td>"
+        return wrap_card(
+            "\n\nNo initiatives currently open for signature collection.\n\n"
         )
 
-        # --- Signatures cell ---
-        if pd.notna(row["signatures_collected"]):
-            sig_val = int(row["signatures_collected"])
-            sigs = (
-                f"{sig_val:,}{progress_bar(sig_val / _SIG_TARGET * 100, 'signatures')}"
-            )
-        else:
-            sigs = "N/A"
-
-        # --- Countries threshold cell ---
-        if pd.notna(row["signatures_threshold_met"]):
-            thr_val = int(row["signatures_threshold_met"])
-            threshold = (
-                f"{thr_val}"
-                " / "
-                f"{_COUNTRIES_THRESHOLD}{progress_bar(thr_val / _COUNTRIES_THRESHOLD * 100, 'threshold')}"
-            )
-        else:
-            threshold = "N/A"
-
-        rows += f"""
-        <tr>
-            <td><a href="{url}" target="_blank">{row.get('title', '')}</a></td>
-            <td>{objective}</td>
-            {days_left}
-            <td>{sigs}</td>
-            <td>{threshold}</td>
-        </tr>"""
-
+    title = f"\n\nCurrently Open ({len(open_df)})\n\n"
+    rows = _build_rows(open_df)
     body = build_table(_HEADERS, rows, scrollable=len(open_df) > _SCROLL_THRESHOLD)
-    title = f"""\n\nCurrently Open ({len(open_df)})\n\n"""
     return wrap_card(title + body)
