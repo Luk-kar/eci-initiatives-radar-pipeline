@@ -70,6 +70,13 @@ STATUS_MARKERS = {
     },
 }
 
+_COMMISSION_ANSWER_FALLBACK = {
+    "Collection Unsuccessful": "<i>Did not reach the required signatures.</i>",
+    "Withdrawn": "<i>Withdrawn by the organisers.</i>",
+    "Waiting for Response": "<i>Commission response pending.</i>",
+    "Collection Ongoing": "<i>Signatures still being collected.</i>",
+}
+
 
 def _bar_color(signatures: float, max_signatures: float) -> str:
     """Gradient color per bar: dark-red→light-yellow below 1M, light-green→dark-green above."""
@@ -91,7 +98,6 @@ def _bar_color(signatures: float, max_signatures: float) -> str:
 
 def _aggregate_top10(df: pd.DataFrame) -> pd.DataFrame:
     """Aggregate by title, select the top 10 by signatures, and wrap long text fields for hover."""
-
     agg = (
         df.groupby("title", as_index=False)
         .agg(
@@ -107,7 +113,14 @@ def _aggregate_top10(df: pd.DataFrame) -> pd.DataFrame:
         .sort_values("signatures_collected", ascending=True)
     )
     agg["objective"] = agg["objective"].apply(hover_wrap)
-    agg["commission_answer_text"] = agg["commission_answer_text"].apply(hover_wrap)
+    agg["commission_answer_text"] = agg.apply(
+        lambda row: hover_wrap(
+            row["commission_answer_text"]
+            if pd.notna(row["commission_answer_text"])
+            else _COMMISSION_ANSWER_FALLBACK.get(row["current_status"])
+        ),
+        axis=1,
+    )
     return agg
 
 
