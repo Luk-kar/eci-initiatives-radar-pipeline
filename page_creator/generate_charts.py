@@ -27,6 +27,11 @@ from page_creator.partials.lists import (
     generate_led_to_legislation,
     generate_reached_signatures,
     generate_total_initiatives,
+    generate_awaiting_response,
+    generate_collection_unsuccessful,
+    generate_commission_engaged,
+    generate_rejected_legislation,
+    generate_withdrawn,
 )
 
 
@@ -64,6 +69,11 @@ _GENERATORS = [
     generate_led_to_legislation,
     generate_reached_signatures,
     generate_total_initiatives,
+    generate_awaiting_response,
+    generate_collection_unsuccessful,
+    generate_commission_engaged,
+    generate_rejected_legislation,
+    generate_withdrawn,
 ]
 
 _PATTERN = re.compile(r"^generate_(.+)$")
