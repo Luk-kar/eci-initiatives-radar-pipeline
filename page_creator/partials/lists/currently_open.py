@@ -13,6 +13,7 @@ from page_creator.partials.lists.utils import (
     truncate,
     SCROLL_THRESHOLD,
 )
+from page_creator.partials.styles.colors import kpi_colors as colors
 
 _STATUS = "Collection Ongoing"
 _HEADERS = ["Initiative", "Objective", "Days Left", "Signatures", "Countries Threshold"]
@@ -153,7 +154,14 @@ def generate_currently_open(df: pd.DataFrame) -> str:
             "\n\nNo initiatives currently open for signature collection.\n\n"
         )
 
-    title = f"\n\nCurrently Open ({len(df_open)})\n\n"
+    title = (
+        '<h3 class="card__title">🗳️ Currently Open: :'
+        "<span "
+        f'class="card__count" style="color:{colors.currently_open}">{len(df_open)}'
+        "</span>"
+        "</h3>"
+    )
+
     body = build_table(
         _HEADERS, _build_rows(df_open), scrollable=len(df_open) > SCROLL_THRESHOLD
     )
