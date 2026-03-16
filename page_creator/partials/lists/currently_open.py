@@ -155,7 +155,7 @@ def generate_currently_open(df: pd.DataFrame) -> str:
         )
 
     title = (
-        '<h3 class="card__title">🗳️ Currently Open: :'
+        '<h3 class="card__title">🗳️ Currently Open:'
         "<span "
         f'class="card__count" style="color:{colors.currently_open}">{len(df_open)}'
         "</span>"
