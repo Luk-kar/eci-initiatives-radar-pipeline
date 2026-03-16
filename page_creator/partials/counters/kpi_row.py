@@ -30,7 +30,7 @@ def generate_kpi_row(df: pd.DataFrame) -> str:
             "target_id": "total-initiatives-list-slot",
         },
         {
-            "label": "Currently Open:",
+            "label": "Collection Ongoing:",
             "value": int((df["current_status"] == "Collection Ongoing").sum()),
             "color": colors.currently_open,
             "icon": "🗳️",
@@ -55,7 +55,7 @@ def generate_kpi_row(df: pd.DataFrame) -> str:
             "target_id": "got-response-list-slot",
         },
         {
-            "label": "Led to Legislation:",
+            "label": "Law Passed:",
             "value": int((df["current_status"] == "Law Passed").sum()),
             "color": colors.led_to_legislation,
             "icon": "⚖️",

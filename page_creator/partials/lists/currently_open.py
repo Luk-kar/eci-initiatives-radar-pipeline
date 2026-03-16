@@ -1,4 +1,4 @@
-"""Renders a scrollable table of ECI initiatives currently open for signature collection."""
+"""Renders a scrollable table of ECI initiatives Collection Ongoing for signature collection."""
 
 # Third-party
 import pandas as pd
@@ -128,7 +128,7 @@ def _build_rows(open_df: pd.DataFrame) -> str:
 
 
 def generate_currently_open(df: pd.DataFrame) -> str:
-    """Return an HTML card containing a table of all currently open ECI initiatives.
+    """Return an HTML card containing a table of all Collection Ongoing ECI initiatives.
 
     Filters for rows with ``current_status == 'Collection Ongoing'``, sorted by
     collection start date ascending, with closed initiatives pushed to the bottom.
@@ -144,18 +144,18 @@ def generate_currently_open(df: pd.DataFrame) -> str:
 
     Returns:
         An HTML string wrapping the table in a ``card`` div, or a card with a
-        fallback message if no initiatives are currently open.
+        fallback message if no initiatives are collection ongoing.
     """
     df_filter = _filter(df)
     df_open = _sort(df_filter)
 
     if df_open.empty:
         return wrap_card(
-            "\n\nNo initiatives currently open for signature collection.\n\n"
+            "\n\nNo initiatives collection ongoing for signature collection.\n\n"
         )
 
     title = (
-        '<h3 class="card__title">🗳️ Currently Open:'
+        '<h3 class="card__title">🗳️ Collection Ongoing:'
         "<span "
         f'class="card__count" style="color:{colors.currently_open}">{len(df_open)}'
         "</span>"

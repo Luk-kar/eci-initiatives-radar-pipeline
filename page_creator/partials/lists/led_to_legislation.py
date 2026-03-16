@@ -36,9 +36,12 @@ def _sort(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Sorted and date-normalised DataFrame.
     """
-    return normalise_registration_date(
-        df.sort_values("registration_date", ascending=False).reset_index(drop=True)
-    )
+
+    df = df.copy()
+    df["registration_date"] = pd.to_datetime(
+        df["registration_date"], dayfirst=True
+    ).dt.date  # ← keep as datetime.date, not string
+    return df.sort_values("registration_date", ascending=False).reset_index(drop=True)
 
 
 def _build_row(row: pd.Series) -> str:

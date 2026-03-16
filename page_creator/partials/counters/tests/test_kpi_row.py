@@ -14,15 +14,15 @@ def base_df():
     return pd.DataFrame(
         {
             "current_status": [
-                "Collection Ongoing",  # currently open
-                "Collection Ongoing",  # currently open
+                "Collection Ongoing",  # Collection Ongoing
+                "Collection Ongoing",  # Collection Ongoing
                 "Commission Engaged",  # got response
                 "Law Passed",  # got response + led to legislation
                 "Law Passed",  # got response + led to legislation
                 "Rejected Legislation",  # got response
                 "Collection Unsuccessful",
                 "Withdrawn",
-                "Collection Ongoing",  # currently open
+                "Collection Ongoing",  # Collection Ongoing
                 "Waiting for Response",
             ],
             "signatures_collected": [
