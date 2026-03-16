@@ -9,8 +9,13 @@ from page_creator.config import MARGIN, HEIGHT, DIV_ARGS
 from page_creator.utils import wrap_card
 from page_creator.partials.charts.utils import hover_wrap
 
+
+# ── Constants ──────────────────────────────────────────────────────────────
+
 ECI_THRESHOLD = 1_000_000
 _CHART_DIV_ID = "chart-top10-signatures"
+
+# ── Hover templates ────────────────────────────────────────────────────────
 
 _HOVER_BASE = (
     "<b>%{y}</b><br>"
@@ -31,6 +36,7 @@ _HOVERTEMPLATE_SYMBOL = (
     + _HOVER_FOOTER
 )
 
+# ── Status marker config ───────────────────────────────────────────────────
 
 STATUS_MARKERS = {
     "Commission Engaged": {
@@ -77,6 +83,8 @@ _COMMISSION_ANSWER_FALLBACK = {
     "Collection Ongoing": "<i>Signatures still being collected.</i>",
 }
 
+# ── Data preparation ───────────────────────────────────────────────────────
+
 
 def _bar_color(signatures: float, max_signatures: float) -> str:
     """Gradient color per bar: dark-red→light-yellow below 1M, light-green→dark-green above."""
@@ -97,7 +105,12 @@ def _bar_color(signatures: float, max_signatures: float) -> str:
 
 
 def _aggregate_top10(df: pd.DataFrame) -> pd.DataFrame:
-    """Aggregate by title, select the top 10 by signatures, and wrap long text fields for hover."""
+    """
+    Aggregate by title,
+    select the top 10 by signatures,
+    and wrap long text fields for hover.
+    """
+
     agg = (
         df.groupby("title", as_index=False)
         .agg(
@@ -112,7 +125,9 @@ def _aggregate_top10(df: pd.DataFrame) -> pd.DataFrame:
         .nlargest(10, "signatures_collected")
         .sort_values("signatures_collected", ascending=True)
     )
+
     agg["objective"] = agg["objective"].apply(hover_wrap)
+
     agg["commission_answer_text"] = agg.apply(
         lambda row: hover_wrap(
             row["commission_answer_text"]
@@ -121,7 +136,11 @@ def _aggregate_top10(df: pd.DataFrame) -> pd.DataFrame:
         ),
         axis=1,
     )
+
     return agg
+
+
+# ── Bar trace ──────────────────────────────────────────────────────────────
 
 
 def _build_bar_trace(agg: pd.DataFrame) -> go.Bar:
@@ -150,19 +169,31 @@ def _build_bar_trace(agg: pd.DataFrame) -> go.Bar:
     )
 
 
-def _apply_top10_layout(fig: go.Figure) -> None:
-    """Apply title, axis labels, sizing, and legend to the top-10 bar chart."""
+# ── Layout ─────────────────────────────────────────────────────────────────
 
+
+def _apply_top10_title(fig: go.Figure) -> None:
+    """Set the chart title."""
     fig.update_layout(
         title=dict(
             text="Top 10 Initiatives by Signatures (All-Time)",
             x=0.015,
             xanchor="left",
         ),
-        margin=MARGIN,
-        height=HEIGHT,
+    )
+
+
+def _apply_top10_axes(fig: go.Figure) -> None:
+    """Set axis labels and tick formatting."""
+    fig.update_layout(
         xaxis_title="Signatures",
         yaxis=dict(title="", ticksuffix=" "),
+    )
+
+
+def _apply_top10_legend(fig: go.Figure) -> None:
+    """Configure legend visibility and positioning."""
+    fig.update_layout(
         showlegend=True,
         legend=dict(
             orientation="v",
@@ -172,8 +203,22 @@ def _apply_top10_layout(fig: go.Figure) -> None:
             x=1.02,
             font=dict(size=11),
         ),
+    )
+
+
+def _apply_top10_layout(fig: go.Figure) -> None:
+    """Apply title, axes, sizing, legend, and interaction settings to the top-10 bar chart."""
+    _apply_top10_title(fig)
+    _apply_top10_axes(fig)
+    _apply_top10_legend(fig)
+    fig.update_layout(
+        margin=MARGIN,
+        height=HEIGHT,
         clickmode="event",
     )
+
+
+# ── Threshold line ─────────────────────────────────────────────────────────
 
 
 def _add_threshold_line(fig: go.Figure) -> None:
@@ -187,59 +232,85 @@ def _add_threshold_line(fig: go.Figure) -> None:
     )
 
 
-def _add_status_markers(fig: go.Figure, agg: pd.DataFrame) -> None:
-    """Add a scatter marker at the end of each bar indicating the initiative's current status."""
+# ── Status markers ─────────────────────────────────────────────────────────
+
+
+def _group_markers_by_status(agg: pd.DataFrame) -> dict[str, list[dict]]:
+    """Group aggregated rows by current_status for marker rendering."""
+
     groups: dict[str, list[dict]] = {status: [] for status in STATUS_MARKERS}
 
     for _, row in agg.iterrows():
         status = row.get("current_status")
+
         if status in groups:
+
             groups[status].append(
                 {
                     "x": row["signatures_collected"],
                     "y": row["title"],
                     "url": row["url"],
-                    "signatures_threshold_met": row[
-                        "signatures_threshold_met"
-                    ],  # ← [0]
-                    "commission_answer_text": row["commission_answer_text"],  # ← [2]
-                    "registration_year": row["registration_year"],  # ← [4]
+                    "signatures_threshold_met": row["signatures_threshold_met"],  # [0]
+                    "commission_answer_text": row["commission_answer_text"],  # [2]
+                    "registration_year": row["registration_year"],  # [4]
                 }
             )
 
+    return groups
+
+
+def _build_marker_customdata(data: list[dict], status: str) -> list[list]:
+    """Build the customdata array for a single status scatter trace."""
+
+    return [
+        [
+            d["signatures_threshold_met"],  # [0]
+            None,  # [1]
+            d["commission_answer_text"],  # [2]
+            d["url"],  # [3]
+            d["registration_year"],  # [4]
+            status,  # [5] ← status label for hover
+        ]
+        for d in data
+    ]
+
+
+def _build_status_scatter(status: str, data: list[dict]) -> go.Scatter:
+    """Construct a single Scatter trace for one status group."""
+
+    cfg = STATUS_MARKERS[status]
+    return go.Scatter(
+        x=[d["x"] for d in data],
+        y=[d["y"] for d in data],
+        mode="markers",
+        marker=dict(
+            symbol=cfg["symbol"],
+            size=14,
+            color=cfg["color"],
+            line=dict(width=2, color="white"),
+        ),
+        name=cfg["label"],
+        legendgroup=f"status_{status.lower().replace(' ', '_')}",
+        showlegend=True,
+        customdata=_build_marker_customdata(data, status),
+        hovertemplate=_HOVERTEMPLATE_SYMBOL,
+    )
+
+
+def _add_status_markers(fig: go.Figure, agg: pd.DataFrame) -> None:
+    """Add a scatter marker at the end of each bar indicating the initiative's current status."""
+
+    groups = _group_markers_by_status(agg)
+
     for status, data in groups.items():
+
         if not data:
             continue
 
-        cfg = STATUS_MARKERS[status]
-        fig.add_trace(
-            go.Scatter(
-                x=[d["x"] for d in data],
-                y=[d["y"] for d in data],
-                mode="markers",
-                marker=dict(
-                    symbol=cfg["symbol"],
-                    size=14,
-                    color=cfg["color"],
-                    line=dict(width=2, color="white"),
-                ),
-                name=cfg["label"],
-                legendgroup=f"status_{status.lower().replace(' ', '_')}",
-                showlegend=True,
-                customdata=[
-                    [
-                        d["signatures_threshold_met"],  # [0]
-                        None,  # [1]
-                        d["commission_answer_text"],  # [2]
-                        d["url"],  # [3]
-                        d["registration_year"],  # [4]
-                        status,  # [5] ← status label for hover
-                    ]
-                    for d in data
-                ],
-                hovertemplate=_HOVERTEMPLATE_SYMBOL,
-            )
-        )
+        fig.add_trace(_build_status_scatter(status, data))
+
+
+# ── Click JS ───────────────────────────────────────────────────────────────
 
 
 def _build_click_js() -> str:
@@ -265,6 +336,9 @@ def _build_click_js() -> str:
   }});
 }})();
 </script>"""
+
+
+# ── Entry point ────────────────────────────────────────────────────────────
 
 
 def generate_chart_top_10_signatures(df: pd.DataFrame) -> str:
