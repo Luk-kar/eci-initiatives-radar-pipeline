@@ -25,7 +25,9 @@ def sig_cell(value) -> str:
 
 
 def threshold_cell(value) -> str:
-    """Return formatted countries-threshold cell content with progress bar, or ``Collection not started``.
+    """
+    Return formatted countries-threshold cell content with progress bar,
+    or ``Collection not started``.
 
     Args:
         value: Raw ``signatures_threshold_met`` value from a DataFrame row.

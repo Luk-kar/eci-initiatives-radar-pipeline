@@ -1,7 +1,7 @@
 """Tests for build_table and wrap_table_card in utils/table.py."""
 
 import pandas as pd
-import pytest
+
 from page_creator.partials.lists.utils.table import build_table, wrap_table_card
 from page_creator.partials.lists.utils.constants import SCROLL_THRESHOLD
 

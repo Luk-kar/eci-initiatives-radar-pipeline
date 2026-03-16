@@ -4,12 +4,13 @@ import pandas as pd
 
 from page_creator.utils import wrap_card
 from page_creator.partials.lists.utils import (
-    build_initiative_row,
     normalise_registration_date,
+    build_initiative_row,
     truncate,
     wrap_table_card,
 )
 from page_creator.partials.styles.colors import kpi_colors as colors
+from page_creator.partials.lists.utils.sort import sort_by_registration_date
 
 _RESPONSE_STATUSES = frozenset(
     ["Commission Engaged", "Law Passed", "Rejected Legislation"]
@@ -39,11 +40,7 @@ def _sort(df: pd.DataFrame) -> pd.DataFrame:
         Sorted and date-normalised DataFrame.
     """
 
-    df = df.copy()
-    df["registration_date"] = pd.to_datetime(
-        df["registration_date"], dayfirst=True
-    ).dt.date  # ← keep as datetime.date, not string
-    return df.sort_values("registration_date", ascending=False).reset_index(drop=True)
+    return sort_by_registration_date(df)
 
 
 def _build_row(row: pd.Series) -> str:
@@ -89,20 +86,21 @@ def generate_got_response(df: pd.DataFrame) -> str:
         An HTML string wrapping the table in a ``card`` div, or a card with a
         fallback message if no initiatives received a response.
     """
-    df_sorted = _filter(df)
-    df_filtered = _sort(df_sorted)
+    df_filtered = _filter(df)
+    df_sorted = _sort(df_filtered)
+    df_final = normalise_registration_date(df_sorted)
 
     title = (
         '<h3 class="card__title">'
         "📬 Got EU Response: "
-        f'<span class="card__count" style="color:{colors.got_response}">{len(df_filtered)}</span>'
+        f'<span class="card__count" style="color:{colors.got_response}">{len(df_final)}</span>'
         "</h3>"
     )
 
-    if df_filtered.empty:
+    if df_final.empty:
         body = '<p class="list-empty">No initiatives have received an EU Commission response.</p>'
         return wrap_card(title + body)
 
     return wrap_table_card(
-        title, _build_rows(df_filtered), df_filtered, _HEADERS, colors.got_response
+        title, _build_rows(df_final), df_final, _HEADERS, colors.got_response
     )

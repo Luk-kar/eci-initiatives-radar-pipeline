@@ -1,6 +1,5 @@
 """Tests for sig_cell and threshold_cell in utils/signatures.py."""
 
-import pytest
 from page_creator.partials.lists.utils.signatures import sig_cell, threshold_cell
 from page_creator.partials.lists.utils.constants import SIG_TARGET, COUNTRIES_THRESHOLD
 
@@ -11,8 +10,6 @@ class TestSigCell:
         assert sig_cell(None) == "Collection not started"
 
     def test_nan_returns_collection_not_started(self):
-
-        import math
 
         assert sig_cell(float("nan")) == "Collection not started"
 

@@ -9,6 +9,7 @@ from page_creator.partials.lists.utils import (
     SIG_TARGET,
 )
 from page_creator.partials.styles.colors import kpi_colors as colors
+from page_creator.partials.lists.utils.sort import sort_by_registration_date
 
 
 def _filter(df: pd.DataFrame) -> pd.DataFrame:
@@ -33,13 +34,7 @@ def _sort(df: pd.DataFrame) -> pd.DataFrame:
         Sorted and date-normalised DataFrame.
     """
 
-    df = df.copy()
-
-    df["registration_date"] = pd.to_datetime(
-        df["registration_date"], dayfirst=True
-    ).dt.date  # ← keep as datetime.date, not string
-
-    return df.sort_values("registration_date", ascending=False).reset_index(drop=True)
+    return sort_by_registration_date(df)
 
 
 def generate_reached_signatures(df: pd.DataFrame) -> str:
@@ -61,18 +56,19 @@ def generate_reached_signatures(df: pd.DataFrame) -> str:
     """
     df_filtered = _filter(df)
     df_sorted = _sort(df_filtered)
+    df_final = normalise_registration_date(df_sorted)
 
     title = (
         '<h3 class="card__title">'
         "✅ Reached 1M Signatures: "
         "<span "
-        f'class="card__count" style="color:{colors.reached_signatures}">{len(df_sorted)}'
+        f'class="card__count" style="color:{colors.reached_signatures}">{len(df_final)}'
         "</span>"
         "</h3>"
     )
 
-    if df_sorted.empty:
+    if df_final.empty:
         body = '<p class="list-empty">No initiatives have reached 1M signatures.</p>'
         return wrap_card(title + body)
 
-    return wrap_sig_threshold_card(title, df_sorted, colors.reached_signatures)
+    return wrap_sig_threshold_card(title, df_final, colors.reached_signatures)

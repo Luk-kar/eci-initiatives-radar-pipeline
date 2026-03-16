@@ -1,6 +1,5 @@
 """Tests for progress_bar in utils/progress.py."""
 
-import pytest
 from page_creator.partials.lists.utils.progress import progress_bar
 
 

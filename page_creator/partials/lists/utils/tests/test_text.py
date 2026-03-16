@@ -1,7 +1,5 @@
 """Tests for truncate in utils/text.py."""
 
-import pytest
-import math
 from page_creator.partials.lists.utils.text import truncate
 from page_creator.partials.lists.utils.constants import DEFAULT_TRUNCATE
 

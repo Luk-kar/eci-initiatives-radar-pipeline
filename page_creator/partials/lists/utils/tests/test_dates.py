@@ -1,6 +1,5 @@
 """Tests for normalise_registration_date in utils/dates.py."""
 
-import datetime
 import pytest
 import pandas as pd
 

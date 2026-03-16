@@ -4,12 +4,13 @@ import pandas as pd
 
 from page_creator.utils import wrap_card
 from page_creator.partials.lists.utils import (
-    build_initiative_row,
     normalise_registration_date,
+    build_initiative_row,
     truncate,
     wrap_table_card,
 )
 from page_creator.partials.styles.colors import kpi_colors as colors
+from page_creator.partials.lists.utils.sort import sort_by_registration_date
 
 _STATUS = "Law Passed"
 _HEADERS = ["Initiative", "Registration", "Objective", "Legislation Example"]
@@ -37,11 +38,7 @@ def _sort(df: pd.DataFrame) -> pd.DataFrame:
         Sorted and date-normalised DataFrame.
     """
 
-    df = df.copy()
-    df["registration_date"] = pd.to_datetime(
-        df["registration_date"], dayfirst=True
-    ).dt.date  # ← keep as datetime.date, not string
-    return df.sort_values("registration_date", ascending=False).reset_index(drop=True)
+    return sort_by_registration_date(df)
 
 
 def _build_row(row: pd.Series) -> str:
@@ -87,23 +84,24 @@ def generate_led_to_legislation(df: pd.DataFrame) -> str:
     """
     df_filtered = _filter(df)
     df_sorted = _sort(df_filtered)
+    df_final = normalise_registration_date(df_sorted)
 
     title = (
         '<h3 class="card__title">⚖️ Led to Legislation: '
         "<span "
-        f'class="card__count" style="color:{colors.led_to_legislation}">{len(df_sorted)}'
+        f'class="card__count" style="color:{colors.led_to_legislation}">{len(df_final)}'
         "</span>"
         "</h3>"
     )
 
-    if df_sorted.empty:
+    if df_final.empty:
         body = '<p class="list-empty">No initiatives have led to legislation yet.</p>'
         return wrap_card(title + body)
 
     return wrap_table_card(
         title,
-        _build_rows(df_sorted),
-        df_sorted,
+        _build_rows(df_final),
+        df_final,
         _HEADERS,
         colors.led_to_legislation,
     )

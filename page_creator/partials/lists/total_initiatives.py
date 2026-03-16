@@ -7,6 +7,7 @@ from page_creator.partials.lists.utils import (
     wrap_sig_threshold_card,
 )
 from page_creator.partials.styles.colors import kpi_colors as colors
+from page_creator.partials.lists.utils.sort import sort_by_registration_date
 
 
 def _sort(df: pd.DataFrame) -> pd.DataFrame:
@@ -18,13 +19,8 @@ def _sort(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Full DataFrame sorted by ``registration_date`` descending.
     """
-    df = df.copy()
 
-    df["registration_date"] = pd.to_datetime(
-        df["registration_date"], dayfirst=True
-    ).dt.date  # ← keep as datetime.date, not string
-
-    return df.sort_values("registration_date", ascending=False).reset_index(drop=True)
+    return sort_by_registration_date(df)
 
 
 def generate_total_initiatives(df: pd.DataFrame) -> str:
@@ -43,14 +39,15 @@ def generate_total_initiatives(df: pd.DataFrame) -> str:
     Returns:
         An HTML string wrapping the table in a ``card`` div.
     """
-    sorted_df = _sort(df)
+    df_sorted = _sort(df)
+    df_final = normalise_registration_date(df_sorted)
 
     title = (
         '<h3 class="card__title">📋 Total Initiatives: '
         "<span "
-        f'class="card__count" style="color:{colors.total_initiatives}">{len(sorted_df)}'
+        f'class="card__count" style="color:{colors.total_initiatives}">{len(df_final)}'
         "</span>"
         "</h3>"
     )
 
-    return wrap_sig_threshold_card(title, sorted_df, colors.total_initiatives)
+    return wrap_sig_threshold_card(title, df_final, colors.total_initiatives)
