@@ -12,16 +12,25 @@ from page_creator.partials.charts.utils import hover_wrap
 ECI_THRESHOLD = 1_000_000
 _CHART_DIV_ID = "chart-top10-signatures"
 
-_HOVERTEMPLATE = (
+_HOVER_BASE = (
     "<b>%{y}</b><br>"
     "<b>Year:</b> %{customdata[4]}<br><br>"
     "<b>Signatures:</b> %{x:,.0f}<br>"
     "<b>Countries Threshold Met:</b> %{customdata[0]}/27<br><br>"
-    "<b>Objective:</b><br>%{customdata[1]}<br><br>"
-    "<b>Commission Response:</b><br>%{customdata[2]}<br><br>"
-    "<i>🔗 Click to open initiative page</i>"
-    "<extra></extra>"
 )
+
+_HOVER_FOOTER = "<i>🔗 Click to open initiative page</i>" "<extra></extra>"
+
+_HOVERTEMPLATE_BAR = (
+    _HOVER_BASE + "<b>🎯 Objective:</b><br>%{customdata[1]}<br><br>" + _HOVER_FOOTER
+)
+
+_HOVERTEMPLATE_SYMBOL = (
+    _HOVER_BASE
+    + "<b>📬 Commission Response (%{customdata[5]}):</b><br>%{customdata[2]}<br><br>"
+    + _HOVER_FOOTER
+)
+
 
 STATUS_MARKERS = {
     "Commission Engaged": {
@@ -64,6 +73,7 @@ STATUS_MARKERS = {
 
 def _bar_color(signatures: float, max_signatures: float) -> str:
     """Gradient color per bar: dark-red→light-yellow below 1M, light-green→dark-green above."""
+
     if signatures >= ECI_THRESHOLD:
         ratio = min(
             (signatures - ECI_THRESHOLD) / max(max_signatures - ECI_THRESHOLD, 1), 1.0
@@ -81,6 +91,7 @@ def _bar_color(signatures: float, max_signatures: float) -> str:
 
 def _aggregate_top10(df: pd.DataFrame) -> pd.DataFrame:
     """Aggregate by title, select the top 10 by signatures, and wrap long text fields for hover."""
+
     agg = (
         df.groupby("title", as_index=False)
         .agg(
@@ -102,6 +113,7 @@ def _aggregate_top10(df: pd.DataFrame) -> pd.DataFrame:
 
 def _build_bar_trace(agg: pd.DataFrame) -> go.Bar:
     """Construct the colour-graded horizontal Bar trace with customdata and hovertemplate."""
+
     max_sigs = agg["signatures_collected"].max()
     colors = [_bar_color(s, max_sigs) for s in agg["signatures_collected"]]
     customdata = agg[
@@ -120,13 +132,14 @@ def _build_bar_trace(agg: pd.DataFrame) -> go.Bar:
         orientation="h",
         marker=dict(color=colors, line=dict(color="white", width=0.5)),
         customdata=customdata,
-        hovertemplate=_HOVERTEMPLATE,
+        hovertemplate=_HOVERTEMPLATE_BAR,
         showlegend=False,
     )
 
 
 def _apply_top10_layout(fig: go.Figure) -> None:
     """Apply title, axis labels, sizing, and legend to the top-10 bar chart."""
+
     fig.update_layout(
         title=dict(
             text="Top 10 Initiatives by Signatures (All-Time)",
@@ -152,6 +165,7 @@ def _apply_top10_layout(fig: go.Figure) -> None:
 
 def _add_threshold_line(fig: go.Figure) -> None:
     """Draw a dashed green vertical line at the 1M signature threshold."""
+
     fig.add_vline(
         x=ECI_THRESHOLD,
         line_dash="dash",
@@ -172,6 +186,11 @@ def _add_status_markers(fig: go.Figure, agg: pd.DataFrame) -> None:
                     "x": row["signatures_collected"],
                     "y": row["title"],
                     "url": row["url"],
+                    "signatures_threshold_met": row[
+                        "signatures_threshold_met"
+                    ],  # ← [0]
+                    "commission_answer_text": row["commission_answer_text"],  # ← [2]
+                    "registration_year": row["registration_year"],  # ← [4]
                 }
             )
 
@@ -195,19 +214,24 @@ def _add_status_markers(fig: go.Figure, agg: pd.DataFrame) -> None:
                 legendgroup=f"status_{status.lower().replace(' ', '_')}",
                 showlegend=True,
                 customdata=[
-                    [None, None, None, d["url"]] for d in data
-                ],  # ← [3] matches bar's URL index
-                hovertemplate=(
-                    f"<b>%{{y}}</b><br>"
-                    f"Status: {status}<br>"
-                    f"Signatures: %{{x:,.0f}}<extra></extra>"
-                ),
+                    [
+                        d["signatures_threshold_met"],  # [0]
+                        None,  # [1]
+                        d["commission_answer_text"],  # [2]
+                        d["url"],  # [3]
+                        d["registration_year"],  # [4]
+                        status,  # [5] ← status label for hover
+                    ]
+                    for d in data
+                ],
+                hovertemplate=_HOVERTEMPLATE_SYMBOL,
             )
         )
 
 
 def _build_click_js() -> str:
     """Return the inline script and style that add pointer cursor and URL-open on bar click."""
+
     return f"""
 <style>
   #{_CHART_DIV_ID} .bars path {{ cursor: pointer !important; }}
@@ -232,6 +256,7 @@ def _build_click_js() -> str:
 
 def generate_chart_top_10_signatures(df: pd.DataFrame) -> str:
     """Build and return the top-10 signatures chart as an HTML div string."""
+
     agg = _aggregate_top10(df)
 
     fig = go.Figure(_build_bar_trace(agg))
