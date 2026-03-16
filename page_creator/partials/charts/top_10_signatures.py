@@ -9,7 +9,6 @@ from page_creator.config import MARGIN, HEIGHT, DIV_ARGS
 from page_creator.utils import wrap_card
 from page_creator.partials.charts.utils import hover_wrap
 
-
 ECI_THRESHOLD = 1_000_000
 _CHART_DIV_ID = "chart-top10-signatures"
 
@@ -23,6 +22,44 @@ _HOVERTEMPLATE = (
     "<i>🔗 Click to open initiative page</i>"
     "<extra></extra>"
 )
+
+STATUS_MARKERS = {
+    "Commission Engaged": {
+        "symbol": "triangle-right",
+        "color": "#9CCC65",
+        "label": "Commission Engaged",
+    },
+    "Rejected Legislation": {
+        "symbol": "x",
+        "color": "#F44336",
+        "label": "Rejected Legislation",
+    },
+    "Collection Unsuccessful": {
+        "symbol": "x",
+        "color": "#8B1111",
+        "label": "Collection Unsuccessful",
+    },
+    "Withdrawn": {
+        "symbol": "x",
+        "color": "#4B4B4B",
+        "label": "Withdrawn",
+    },
+    "Waiting for Response": {
+        "symbol": "hourglass",
+        "color": "#9E9E9E",
+        "label": "Waiting for Response",
+    },
+    "Law Passed": {
+        "symbol": "star",
+        "color": "#3CA371",
+        "label": "Law Passed",
+    },
+    "Collection Ongoing": {
+        "symbol": "triangle-right",
+        "color": "#F5A623",
+        "label": "Collection Ongoing",
+    },
+}
 
 
 def _bar_color(signatures: float, max_signatures: float) -> str:
@@ -53,6 +90,7 @@ def _aggregate_top10(df: pd.DataFrame) -> pd.DataFrame:
             commission_answer_text=("commission_answer_text", "first"),
             url=("url", "first"),
             registration_year=("registration_year", "first"),
+            current_status=("current_status", "first"),
         )
         .nlargest(10, "signatures_collected")
         .sort_values("signatures_collected", ascending=True)
@@ -83,11 +121,12 @@ def _build_bar_trace(agg: pd.DataFrame) -> go.Bar:
         marker=dict(color=colors, line=dict(color="white", width=0.5)),
         customdata=customdata,
         hovertemplate=_HOVERTEMPLATE,
+        showlegend=False,
     )
 
 
 def _apply_top10_layout(fig: go.Figure) -> None:
-    """Apply title, axis labels, and sizing to the top-10 bar chart."""
+    """Apply title, axis labels, sizing, and legend to the top-10 bar chart."""
     fig.update_layout(
         title=dict(
             text="Top 10 Initiatives by Signatures (All-Time)",
@@ -97,8 +136,16 @@ def _apply_top10_layout(fig: go.Figure) -> None:
         margin=MARGIN,
         height=HEIGHT,
         xaxis_title="Signatures",
-        yaxis=dict(title="", ticksuffix="   "),
-        showlegend=False,
+        yaxis=dict(title="", ticksuffix=" "),
+        showlegend=True,
+        legend=dict(
+            orientation="v",
+            yanchor="top",
+            y=1,
+            xanchor="left",
+            x=1.02,
+            font=dict(size=11),
+        ),
         clickmode="event",
     )
 
@@ -109,12 +156,54 @@ def _add_threshold_line(fig: go.Figure) -> None:
         x=ECI_THRESHOLD,
         line_dash="dash",
         line_color="#3AB23F",
-        line_width=2,
-        annotation_text="1M threshold",
-        annotation_position="top right",
-        annotation_font_color="#3AB23F",
-        annotation_font_size=13,
+        line_width=3,
     )
+
+
+def _add_status_markers(fig: go.Figure, agg: pd.DataFrame) -> None:
+    """Add a scatter marker at the end of each bar indicating the initiative's current status."""
+    groups: dict[str, list[dict]] = {status: [] for status in STATUS_MARKERS}
+
+    for _, row in agg.iterrows():
+        status = row.get("current_status")
+        if status in groups:
+            groups[status].append(
+                {
+                    "x": row["signatures_collected"],
+                    "y": row["title"],
+                    "url": row["url"],
+                }
+            )
+
+    for status, data in groups.items():
+        if not data:
+            continue
+
+        cfg = STATUS_MARKERS[status]
+        fig.add_trace(
+            go.Scatter(
+                x=[d["x"] for d in data],
+                y=[d["y"] for d in data],
+                mode="markers",
+                marker=dict(
+                    symbol=cfg["symbol"],
+                    size=14,
+                    color=cfg["color"],
+                    line=dict(width=2, color="white"),
+                ),
+                name=cfg["label"],
+                legendgroup=f"status_{status.lower().replace(' ', '_')}",
+                showlegend=True,
+                customdata=[
+                    [None, None, None, d["url"]] for d in data
+                ],  # ← [3] matches bar's URL index
+                hovertemplate=(
+                    f"<b>%{{y}}</b><br>"
+                    f"Status: {status}<br>"
+                    f"Signatures: %{{x:,.0f}}<extra></extra>"
+                ),
+            )
+        )
 
 
 def _build_click_js() -> str:
@@ -142,29 +231,13 @@ def _build_click_js() -> str:
 
 
 def generate_chart_top_10_signatures(df: pd.DataFrame) -> str:
-    """Return an HTML card containing a horizontal bar chart of the 10 highest-signature ECIs.
-
-    Aggregates signatures by title, selects the top 10, and applies a
-    red→yellow→green gradient based on distance from the 1M threshold. Each
-    bar's hover tooltip shows year, signature count, countries threshold met,
-    objective, and commission response. Clicking a bar opens the initiative's
-    page in a new tab via an injected JS click handler.
-
-    Args:
-        df: The full ECI initiatives DataFrame. Must contain ``title``,
-            ``signatures_collected``, ``signatures_threshold_met``,
-            ``objective``, ``commission_answer_text``, ``url``, and
-            ``registration_year`` columns.
-
-    Returns:
-        An HTML string wrapping the Plotly chart and its click handler script
-        in a ``card`` div.
-    """
+    """Build and return the top-10 signatures chart as an HTML div string."""
     agg = _aggregate_top10(df)
 
     fig = go.Figure(_build_bar_trace(agg))
     _apply_top10_layout(fig)
     _add_threshold_line(fig)
+    _add_status_markers(fig, agg)
 
     chart_html = fig.to_html(**{**DIV_ARGS, "div_id": _CHART_DIV_ID})
     return wrap_card(chart_html + _build_click_js())
