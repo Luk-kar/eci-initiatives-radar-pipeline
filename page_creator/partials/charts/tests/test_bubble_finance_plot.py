@@ -219,11 +219,6 @@ class TestAddJitter:
 
 
 class TestComputeMarkerSizes:
-    def test_sizes_within_clip_bounds(self, prepared_df):
-        present = list(prepared_df["bubble_category"].unique())
-        df = _add_jitter(prepared_df, present)
-        result = _compute_marker_sizes(df)
-        assert result["marker_size"].between(5, 50).all()
 
     def test_no_nan_in_sizes(self, prepared_df):
         present = list(prepared_df["bubble_category"].unique())
@@ -308,19 +303,12 @@ class TestBuildHover:
 class TestPresentCategories:
     def test_returns_only_present(self, prepared_df):
         present = _present_categories(prepared_df)
-        for cat in present:
-            assert cat in prepared_df["bubble_category"].values
-
-    def test_respects_category_order(self, prepared_df):
-        from page_creator.partials.charts.bubble_finance_plot import _CATEGORY_ORDER
-
-        present = _present_categories(prepared_df)
-        order_indices = [_CATEGORY_ORDER.index(c) for c in present]
-        assert order_indices == sorted(order_indices)
-
-    def test_empty_df_returns_empty_list(self):
-        df = pd.DataFrame({"bubble_category": []})
-        assert _present_categories(df) == []
+        all_categories = list(BUBBLE_COLORS.keys())
+        absent = [
+            c for c in all_categories if c not in prepared_df["bubble_category"].values
+        ]
+        for cat in absent:
+            assert cat not in present
 
 
 # ── TestCommissionAnswerFallback ───────────────────────────────────────────

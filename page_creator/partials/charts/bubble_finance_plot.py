@@ -111,8 +111,8 @@ def _build_hover(row: pd.Series) -> str:
     )
     return (
         f"<b>{str(row['title'])[:65]}</b><br>"
-        f"Funding: {funding_label}<br>"
-        f"Status: {row['current_status']}<br><br>"
+        f"<b>Funding:</b> {funding_label}<br>"
+        f"<b>Status:</b> {row['current_status']}<br><br>"
     )
 
 
