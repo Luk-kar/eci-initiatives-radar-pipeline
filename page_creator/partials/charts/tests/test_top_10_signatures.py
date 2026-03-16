@@ -7,7 +7,12 @@ from page_creator.partials.charts.top_10_signatures import (
     _bar_color,
     _aggregate_top10,
     ECI_THRESHOLD,
+    _COMMISSION_ANSWER_FALLBACK,
+    STATUS_MARKERS,
 )
+
+
+# ── Fixtures ───────────────────────────────────────────────────────────────
 
 
 @pytest.fixture
@@ -21,6 +26,7 @@ def base_df():
             "commission_answer_text": [f"ans {i}" for i in range(15)],
             "url": [f"https://example.com/{i}" for i in range(15)],
             "registration_year": [2012 + i for i in range(15)],
+            "current_status": ["Law Passed" for _ in range(15)],
         }
     )
 
@@ -37,7 +43,6 @@ class TestBarColor:
     def test_exact_threshold_is_above(self):
         color_at = _bar_color(ECI_THRESHOLD, 2_000_000)
         color_below = _bar_color(ECI_THRESHOLD - 1, 2_000_000)
-        # both return rgb — just verify they don't crash and differ
         assert color_at != color_below
 
     def test_zero_signatures_does_not_crash(self):
@@ -47,6 +52,15 @@ class TestBarColor:
     def test_max_equals_threshold_does_not_crash(self):
         color = _bar_color(ECI_THRESHOLD, ECI_THRESHOLD)
         assert color.startswith("rgb(")
+
+
+class TestBarColorGradient:
+    def test_higher_below_threshold_closer_to_yellow(self):
+        low = _bar_color(100_000, 2_000_000)
+        high = _bar_color(900_000, 2_000_000)
+        g_low = int(low.split(",")[1].strip())
+        g_high = int(high.split(",")[1].strip())
+        assert g_high > g_low
 
 
 class TestAggregateTop10:
@@ -75,6 +89,11 @@ class TestAggregateTop10:
                 "commission_answer_text": ["a", "a", "a"],
                 "url": ["u", "u", "u"],
                 "registration_year": [2020, 2021, 2022],
+                "current_status": [
+                    "Law Passed",
+                    "Commission Engaged",
+                    "Withdrawn",
+                ],
             }
         )
         result = _aggregate_top10(df)
@@ -84,12 +103,43 @@ class TestAggregateTop10:
         result = _aggregate_top10(base_df)
         assert "objective" in result.columns
 
+    def test_current_status_column_present(self, base_df):
+        result = _aggregate_top10(base_df)
+        assert "current_status" in result.columns
 
-class TestBarColorGradient:
-    def test_higher_below_threshold_closer_to_yellow(self):
-        low = _bar_color(100_000, 2_000_000)
-        high = _bar_color(900_000, 2_000_000)
-        # extract green channel — higher ratio → more green
-        g_low = int(low.split(",")[1].strip())
-        g_high = int(high.split(",")[1].strip())
-        assert g_high > g_low
+
+class TestCommissionAnswerFallback:
+    @pytest.mark.parametrize("status", _COMMISSION_ANSWER_FALLBACK.keys())
+    def test_fallback_applied_when_answer_is_nan(self, status):
+        df = pd.DataFrame(
+            {
+                "title": ["ECI X"],
+                "signatures_collected": [500_000],
+                "signatures_threshold_met": [0],
+                "objective": ["some objective"],
+                "commission_answer_text": [None],  # ← no answer
+                "url": ["https://example.com"],
+                "registration_year": [2020],
+                "current_status": [status],
+            }
+        )
+        result = _aggregate_top10(df)
+        answer = result["commission_answer_text"].iloc[0]
+        assert answer != "nan"
+        assert len(answer) > 0
+
+    def test_real_answer_not_overwritten(self):
+        df = pd.DataFrame(
+            {
+                "title": ["ECI Y"],
+                "signatures_collected": [500_000],
+                "signatures_threshold_met": [0],
+                "objective": ["obj"],
+                "commission_answer_text": ["The real answer"],
+                "url": ["https://example.com"],
+                "registration_year": [2021],
+                "current_status": ["Commission Engaged"],
+            }
+        )
+        result = _aggregate_top10(df)
+        assert "real answer" in result["commission_answer_text"].iloc[0]
