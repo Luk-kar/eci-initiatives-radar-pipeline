@@ -32,12 +32,12 @@ h1 {
   margin-bottom: 20px;
 }
 
-.row-top-10-graph {
+.chart-row-full {
   display: flex;
   flex-direction: column;
 }
 
-.bottom-row {
+.chart-row-split {
   display: flex;
   gap: 20px;
 }
@@ -48,7 +48,7 @@ h1 {
 }
 
 @media (max-width: 768px) {
-  .bottom-row {
+  .chart-row-split {
     flex-direction: column;
   }
 }
