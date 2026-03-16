@@ -32,6 +32,23 @@ _LOG_ZERO_DISPLAY = 200
 
 _BUBBLE_DIV_ID = "bubble-finance-chart"
 
+# ── Hover template ────────────────────────────────────────────────────────────
+
+_HOVERTEMPLATE = (
+    "%{text}"
+    "<b>🎯 Objective:</b><br>%{customdata[1]}<br><br>"
+    "<b>📬 Commission Response (%{customdata[5]}):</b><br>%{customdata[2]}<br><br>"
+    "<i>🔗 Click to open initiative page</i>"
+    "<extra></extra>"
+)
+
+_COMMISSION_ANSWER_FALLBACK = {
+    "Collection Unsuccessful": "<i>Did not reach the required signatures.</i>",
+    "Withdrawn": "<i>Withdrawn by the organisers.</i>",
+    "Awaiting Response": "<i>Commission response pending.</i>",
+    "Collection Ongoing": "<i>Signatures still being collected.</i>",
+}
+
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def _parse_funding(value) -> float:
@@ -102,23 +119,29 @@ def _build_hover(row: pd.Series) -> str:
 def _add_traces(fig: go.Figure, df: pd.DataFrame, present: list[str]) -> None:
     """Add one Scatter trace per category, sized and coloured by funding amount."""
 
-    _HOVERTEMPLATE = (
-        "%{text}"
-        "<b>Objective:</b><br>%{customdata[1]}<br><br>"
-        "<b>Commission Response:</b><br>%{customdata[2]}<br><br>"
-        "<i>🔗 Click to open initiative page</i>"
-        "<extra></extra>"
-    )
-
     for category in present:
         cat_df = df[df["bubble_category"] == category].copy()
         cat_df["objective"] = cat_df["objective"].apply(hover_wrap)
-        cat_df["commission_answer_text"] = cat_df["commission_answer_text"].apply(
-            hover_wrap
+        cat_df["commission_answer_text"] = cat_df.apply(
+            lambda row: hover_wrap(
+                row["commission_answer_text"]
+                if pd.notna(row["commission_answer_text"])
+                else _COMMISSION_ANSWER_FALLBACK.get(row["bubble_category"], "—")
+            ),
+            axis=1,
         )
 
         hover_texts = [_build_hover(row) for _, row in cat_df.iterrows()]
-        customdata = cat_df[["url", "objective", "commission_answer_text"]].values
+        customdata = cat_df[
+            [
+                "url",  # [0] ← click JS
+                "objective",  # [1]
+                "commission_answer_text",  # [2]
+            ]
+        ].copy()
+        customdata["_pad3"] = None  # [3]
+        customdata["_pad4"] = None  # [4]
+        customdata["current_status"] = cat_df["current_status"]  # [5] ← status label
 
         fig.add_trace(
             go.Scatter(
@@ -132,7 +155,7 @@ def _add_traces(fig: go.Figure, df: pd.DataFrame, present: list[str]) -> None:
                     opacity=0.7,
                     line=dict(width=1, color="white"),
                 ),
-                customdata=customdata,
+                customdata=customdata.values,
                 hovertemplate=_HOVERTEMPLATE,
                 text=hover_texts,
             )
