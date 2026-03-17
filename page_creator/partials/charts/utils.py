@@ -112,6 +112,6 @@ _plotDiv.on('plotly_click', function(data) {{
 }});
 
 var _style = document.createElement('style');
-_style.textContent = '#{{plot_id}} .nsewdrag, #{{plot_id}} .surface {{ cursor: pointer !important; }}';
+_style.textContent = '[id="{{plot_id}}"] .nsewdrag, [id="{{plot_id}}"] .surface {{ cursor: pointer !important; }}';
 document.head.appendChild(_style);
 """
