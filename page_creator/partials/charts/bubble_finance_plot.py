@@ -9,7 +9,7 @@ import plotly.graph_objects as go
 from page_creator.config import DIV_ARGS, HEIGHT, MARGIN
 from page_creator.partials.charts.outcomes import STATUS_COLORS
 from page_creator.utils import wrap_card
-from page_creator.partials.charts.utils import hover_wrap
+from page_creator.partials.charts.utils import hover_wrap, click_script_open_new_page
 
 # ── Colour scheme & category order ───────────────────────────────────────────
 BUBBLE_COLORS: dict[str, str] = {
@@ -304,33 +304,6 @@ def generate_chart_bubble_finance_plot(df: pd.DataFrame) -> str:
     # Override/add div_id so the click handler below can locate this exact element
     chart_html = fig.to_html(**{**DIV_ARGS, "div_id": _BUBBLE_DIV_ID})
 
-    click_script = f"""
-<script>
-(function () {{
-    var el = document.getElementById("{_BUBBLE_DIV_ID}");
-    if (!el) return;
-
-    function getDragLayer() {{
-        return el.querySelector(".nsewdrag");
-    }}
-
-    el.on("plotly_hover", function () {{
-        var drag = getDragLayer();
-        if (drag) drag.style.cursor = "pointer";
-    }});
-
-    el.on("plotly_unhover", function () {{
-        var drag = getDragLayer();
-        if (drag) drag.style.cursor = "";
-    }});
-
-    el.on("plotly_click", function (data) {{
-        var pt = data.points[0];
-        if (pt && pt.customdata) {{
-            window.open(pt.customdata[0], "_blank", "noopener,noreferrer");
-        }}
-    }});
-}})();
-</script>"""
+    click_script = click_script_open_new_page.format(_BUBBLE_DIV_ID)
 
     return wrap_card(chart_html + click_script)

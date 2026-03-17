@@ -13,7 +13,7 @@ from page_creator.partials.styles.colors import kpi_colors as colors
 from page_creator.partials.lists.utils.sort import sort_by_registration_date
 
 _STATUS = "Rejected Legislation"
-_HEADERS = ["Initiative", "Registration", "Objective", "Legislation Example"]
+_HEADERS = ["Initiative", "Registration", "Objective", "Response"]
 
 
 def _filter(df: pd.DataFrame) -> pd.DataFrame:
@@ -42,17 +42,17 @@ def _sort(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _build_row(row: pd.Series) -> str:
-    """Return a ``<tr>`` for a single initiative that led to legislation.
+    """Return a ``<tr>`` for a single initiative with a Commission response.
 
     Args:
         row: A DataFrame row. Must contain ``title``, ``url``, ``registration_date``,
-             ``objective``, and ``legislation``.
+             ``objective``, and ``commission_answer_text``.
 
     Returns:
         A ``<tr>...</tr>`` HTML string.
     """
-    legislation = truncate(row["legislation"])
-    return build_initiative_row(row, f"\n          <td>{legislation}</td>")
+    response = truncate(row["commission_answer_text"], max_len=200)
+    return build_initiative_row(row, f"\n          <td>{response}</td>")
 
 
 def _build_rows(filtered_df: pd.DataFrame) -> str:

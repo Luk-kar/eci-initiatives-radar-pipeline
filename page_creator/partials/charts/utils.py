@@ -33,3 +33,33 @@ def hover_wrap(text: str, width: int = _WRAP_WIDTH, max_lines: int = _MAX_LINES)
         lines[-1] = lines[-1].rstrip() + "…"
 
     return "<br>".join(lines)
+
+
+click_script_open_new_page = """
+<script>
+(function () {{
+    var el = document.getElementById("{}");
+    if (!el) return;
+
+    function getDragLayer() {{
+        return el.querySelector(".nsewdrag");
+    }}
+
+    el.on("plotly_hover", function () {{
+        var drag = getDragLayer();
+        if (drag) drag.style.cursor = "pointer";
+    }});
+
+    el.on("plotly_unhover", function () {{
+        var drag = getDragLayer();
+        if (drag) drag.style.cursor = "";
+    }});
+
+    el.on("plotly_click", function (data) {{
+        var pt = data.points[0];
+        if (pt && pt.customdata) {{
+            window.open(pt.customdata[0], "_blank", "noopener,noreferrer");
+        }}
+    }});
+}})();
+</script>"""
