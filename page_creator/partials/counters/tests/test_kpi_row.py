@@ -23,7 +23,7 @@ def base_df():
                 "Collection Unsuccessful",
                 "Withdrawn",
                 "Collection Ongoing",  # Collection Ongoing
-                "Waiting for Response",
+                "Awaiting Response",
             ],
             "signatures_collected": [
                 1_500_000,  # reached 1M
@@ -105,7 +105,7 @@ class TestGotResponse:
 
     def test_excludes_non_response_statuses(self, base_df):
         result = int(base_df["current_status"].isin(_RESPONSE_STATUSES).sum())
-        # Collection Unsuccessful, Withdrawn, Collection Ongoing, Waiting for Response excluded
+        # Collection Unsuccessful, Withdrawn, Collection Ongoing, Awaiting Response excluded
         assert result == 4
 
     def test_none_with_response_returns_zero(self):

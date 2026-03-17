@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 
 from page_creator.config import MARGIN, HEIGHT, DIV_ARGS
 from page_creator.utils import wrap_card
-from page_creator.partials.charts.outcomes import STATUS_COLORS, _LABEL_ALIASES
+from page_creator.partials.charts.outcomes import STATUS_COLORS
 from page_creator.partials.charts.utils import (
     hover_item_list,
     build_click_scroll_script,
@@ -38,7 +38,6 @@ def generate_chart_ecis_year(df: pd.DataFrame) -> str:
 
     # Normalise raw CSV labels to match STATUS_COLORS keys.
     df = df.copy()
-    df["current_status"] = df["current_status"].replace(_LABEL_ALIASES)
 
     years = sorted(df["registration_year"].dropna().unique())
     year_start, year_end = int(years[0]), int(years[-1])

@@ -21,7 +21,7 @@ def _filter(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Filtered DataFrame containing only ``_STATUS`` rows.
     """
-    return df[df["current_status"] == "Waiting for Response"]
+    return df[df["current_status"] == "Awaiting Response"]
 
 
 def _sort(df: pd.DataFrame) -> pd.DataFrame:

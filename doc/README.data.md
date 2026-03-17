@@ -37,7 +37,7 @@ Join key: `eci_initiatives.registration_number` → `eci_merger_responses_and_fo
 |---|---|---|---|
 | **Law Active / Passed** | `eci_merger_responses_and_followup` | `final_outcome_status` | value = `"Law Active"` |
 | **Commission Engaged** | `eci_merger_responses_and_followup` | `final_outcome_status` + `commission_promised_new_law` | value contains `"Proposal Made"` / `"Alternative Actions"` / `"Already Covered"`, OR `commission_promised_new_law = True` |
-| **Waiting for Response** | `eci_initiatives` | `current_status` | value = `"Valid initiative"` AND `response_commission_url` is null |
+| **Awaiting Response** | `eci_initiatives` | `current_status` | value = `"Valid initiative"` AND `response_commission_url` is null |
 | **Rejected** | `eci_merger_responses_and_followup` | `final_outcome_status` | value starts with `"Rejected - "` |
 
 ***
@@ -136,7 +136,7 @@ From **`eci_initiatives`** only:
 Add a **scroller** if row count exceeds a display threshold (127 rows expected).
 
 ```
-Waiting for Response
+Awaiting Response
 Collection Ongoing
 Commission Engaged
 Law Passed

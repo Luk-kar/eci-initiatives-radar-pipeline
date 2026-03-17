@@ -24,7 +24,6 @@ BUBBLE_COLORS: dict[str, str] = {
 _CATEGORY_ORDER = list(BUBBLE_COLORS.keys())
 
 _STATUS_ALIASES: dict[str, str] = {
-    "Waiting for Response": "Awaiting Response",
     "Withdrawn": "Collection Unsuccessful",
 }
 

@@ -60,10 +60,10 @@ STATUS_MARKERS = {
         "color": STATUS_COLORS["Withdrawn"],
         "label": "Withdrawn",
     },
-    "Waiting for Response": {
+    "Awaiting Response": {
         "symbol": "hourglass",
         "color": STATUS_COLORS["Awaiting Response"],
-        "label": "Waiting for Response",
+        "label": "Awaiting Response",
     },
     "Law Passed": {
         "symbol": "star",
@@ -79,7 +79,7 @@ STATUS_MARKERS = {
 _COMMISSION_ANSWER_FALLBACK = {
     "Collection Unsuccessful": "<i>Did not reach the required signatures.</i>",
     "Withdrawn": "<i>Withdrawn by the organisers.</i>",
-    "Waiting for Response": "<i>Commission response pending.</i>",
+    "Awaiting Response": "<i>Commission response pending.</i>",
     "Collection Ongoing": "<i>Signatures still being collected.</i>",
 }
 

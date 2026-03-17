@@ -8,7 +8,6 @@ from page_creator.partials.charts.outcomes import (
     _build_counts,
     _truncate_title,
     STATUS_COLORS,
-    _LABEL_ALIASES,
 )
 
 
@@ -23,7 +22,7 @@ def base_df():
                 "Rejected Legislation",
                 "Rejected Legislation",
                 "Rejected Legislation",
-                "Waiting for Response",  # aliased → Awaiting Response
+                "Awaiting Response",
                 "Collection Ongoing",
                 "Collection Unsuccessful",
                 "Withdrawn",
@@ -34,11 +33,6 @@ def base_df():
 
 
 class TestNormaliseStatuses:
-    def test_waiting_for_response_aliased(self, base_df):
-
-        result = _normalise_statuses(base_df)
-        assert "Waiting for Response" not in result["current_status"].values
-        assert "Awaiting Response" in result["current_status"].values
 
     def test_known_statuses_unchanged(self, base_df):
 
@@ -58,18 +52,6 @@ class TestNormaliseStatuses:
         original = base_df["current_status"].tolist()
         _normalise_statuses(base_df)
         assert base_df["current_status"].tolist() == original
-
-    def test_all_aliases_map_correctly(self):
-
-        df = pd.DataFrame(
-            {
-                "current_status": list(_LABEL_ALIASES.keys()),
-                "title": ["T"] * len(_LABEL_ALIASES),
-            }
-        )
-        result = _normalise_statuses(df)
-        for aliased in _LABEL_ALIASES.values():
-            assert aliased in result["current_status"].values
 
 
 class TestBuildCounts:

@@ -20,10 +20,6 @@ from page_creator.partials.styles.colors import STATUS_COLORS, kpi_colors
 # Constants
 # ------------------------------------------------------------------------------
 
-_LABEL_ALIASES: dict[str, str] = {
-    "Waiting for Response": "Awaiting Response",
-}
-
 DEFAULT_COLOR = kpi_colors.default_status
 
 MAX_TITLE_LEN = 40
@@ -43,12 +39,11 @@ def _truncate_title(title: str, max_len: int = MAX_TITLE_LEN) -> str:
 def _normalise_statuses(df: pd.DataFrame) -> pd.DataFrame:
     """Replace aliased status labels and raise if any unrecognised values remain."""
     df = df.copy()
-    df["current_status"] = df["current_status"].replace(_LABEL_ALIASES)
     unknown = set(df["current_status"].unique()) - STATUS_COLORS.keys()
     if unknown:
         raise ValueError(
             f"Unrecognised status values found in 'current_status': {sorted(unknown)}. "
-            f"Add them to STATUS_COLORS or _LABEL_ALIASES."
+            f"Add them to STATUS_COLORS."
         )
     return df
 
@@ -135,7 +130,7 @@ def generate_chart_outcomes(df: pd.DataFrame) -> str:
     Args:
         df: The full ECI initiatives DataFrame. Must contain ``current_status``
             and ``title`` columns. All ``current_status`` values must be present
-            in ``STATUS_COLORS`` after ``_LABEL_ALIASES`` normalisation.
+            in ``STATUS_COLORS``.
 
     Returns:
         An HTML string wrapping the Plotly chart in a ``card bottom-col`` div.
