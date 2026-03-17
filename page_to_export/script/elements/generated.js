@@ -17,4 +17,5 @@ const GENERATED_PARTIALS = [
     ["partials/chart_signatures_cohorts.html", "chart-signatures-cohorts-slot"],
     ["partials/chart_signatures_map.html", "chart-signatures-map-slot"],
     ["partials/chart_top_10_signatures.html", "chart-top-10-signatures-slot"],
+    ["partials/last_data_update.html", "last-data-update-slot"],
 ];

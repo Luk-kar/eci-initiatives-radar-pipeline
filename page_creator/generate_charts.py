@@ -33,10 +33,57 @@ from page_creator.partials.lists import (
     generate_rejected_legislation,
     generate_withdrawn,
 )
+from page_creator.partials.date_stamp.last_data_update import generate_last_data_update
 
-CSV_FILE = "initiatives_2026-02-09_13-24-41.csv"
+_TIMESTAMP_RE = re.compile(r"^initiatives_(\d{4}-\d{2}-\d{2})_\d{2}-\d{2}-\d{2}\.csv$")
+
+
+def _find_latest_csv(data_dir: Path) -> tuple[Path, str]:
+    """Return the path and date string of the most recent ``initiatives_*.csv`` file.
+
+    Args:
+        data_dir: Directory to search for CSV files.
+
+    Returns:
+        A ``(path, date_str)`` tuple where ``date_str`` is ``YYYY-MM-DD``.
+
+    Raises:
+        FileNotFoundError: If ``data_dir`` does not exist.
+        FileNotFoundError: If no matching ``initiatives_*.csv`` files are found.
+        ValueError:        If the winning filename has a malformed timestamp.
+        ValueError:        If the CSV file cannot be parsed (empty or corrupted).
+    """
+    if not data_dir.exists():
+        raise FileNotFoundError(f"Data directory not found: {data_dir}")
+
+    candidates = sorted(data_dir.glob("initiatives_*.csv"), reverse=True)
+
+    if not candidates:
+        raise FileNotFoundError(f"No 'initiatives_*.csv' files found in: {data_dir}")
+
+    for csv_path in candidates:
+        match = _TIMESTAMP_RE.fullmatch(csv_path.name)
+        if not match:
+            continue
+
+        # Validate the file is readable and non-empty
+        try:
+            pd.read_csv(csv_path, nrows=1)
+        except Exception as exc:
+            raise ValueError(
+                f"CSV file appears corrupted and cannot be read: {csv_path}"
+            ) from exc
+
+        return csv_path, match.group(1)
+
+    raise ValueError(
+        f"No 'initiatives_*.csv' files with a valid timestamp found in: {data_dir}. "
+        "Expected format: initiatives_YYYY-MM-DD_HH-MM-SS.csv"
+    )
+
+
 DATA_DIR = Path(__file__).parent / "data"
-CSV_PATH = DATA_DIR / CSV_FILE
+CSV_PATH, DATA_DATE = _find_latest_csv(DATA_DIR)
 PARTIALS_DIR = Path(__file__).parent / "partials"
 OUT_DIR = Path(__file__).parent.parent / "page_to_export" / "partials"
 
@@ -53,6 +100,7 @@ _PREFIX_MAP: dict[str, str] = {
     "counters": "",
     "lists": "list",
     "charts": "chart",
+    "date_stamp": "",
 }
 
 
@@ -163,6 +211,7 @@ def main() -> None:
     slot_map = _discover_slot_map()
 
     partials: dict[str, str] = generate_partials_a_map_html_name_function(df)
+    partials["last_data_update.html"] = generate_last_data_update(DATA_DATE)
 
     for filename, html in partials.items():
         path = OUT_DIR / filename
