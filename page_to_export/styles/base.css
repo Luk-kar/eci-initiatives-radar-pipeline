@@ -17,6 +17,22 @@ h1 {
   text-align: center;
   color: #2A3F5F;
   margin-bottom: 15px;
+  position: relative;   /* anchor for the absolute-positioned link */
+}
+
+.github-link {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #2A3F5F;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+  line-height: 0;       /* prevent extra height from inline SVG */
+}
+
+.github-link:hover {
+  opacity: 0.6;
 }
 
 .dashboard-container {
