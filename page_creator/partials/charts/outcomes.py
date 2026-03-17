@@ -3,14 +3,17 @@ Renders a donut chart of ECI initiative counts broken down by current outcome st
 """
 
 # Python
-import json
 import pandas as pd
 import plotly.graph_objects as go
 
 # Local
 from page_creator.config import MARGIN, HEIGHT, DIV_ARGS
 from page_creator.utils import wrap_card
-from page_creator.partials.charts.utils import hover_item_list
+from page_creator.partials.charts.utils import (
+    hover_item_list,
+    build_click_scroll_script,
+    STATUS_SECTION_MAP,
+)
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -26,15 +29,6 @@ STATUS_COLORS = {
     "Withdrawn": "#4B4B4B",
 }
 
-STATUS_SECTION_MAP: dict[str, str] = {
-    "LawPassed": "led-to-legislation-list-slot",
-    "CommissionEngaged": "commission-engaged-list-slot",
-    "RejectedLegislation": "rejected-legislation-list-slot",
-    "AwaitingResponse": "awaiting-response-list-slot",
-    "CollectionOngoing": "currently-open-list-slot",
-    "CollectionUnsuccessful": "collection-unsuccessful-list-slot",
-    "Withdrawn": "withdrawn-list-slot",
-}
 
 _LABEL_ALIASES: dict[str, str] = {
     "Waiting for Response": "Awaiting Response",
@@ -135,33 +129,6 @@ def _apply_outcomes_layout(fig: go.Figure) -> None:
     )
 
 
-def _build_click_post_script() -> str:
-    """Return a JS post_script that wires plotly_click to scrollToSection."""
-    mapping_json = json.dumps(STATUS_SECTION_MAP)
-    return f"""
-var _plotDiv = document.getElementById('{{plot_id}}');
-
-_plotDiv.on('plotly_click', function(data) {{
-    if (!data.points || !data.points.length) return;
-    var rawLabel = data.points[0].label;
-    var cleanLabel = rawLabel.replace(/<br>/gi, '');
-    var sectionId = _outcomesMap[cleanLabel];
-    if (sectionId && typeof scrollToSection === 'function') {{
-        scrollToSection(sectionId);
-    }}
-}});
-
-var _outcomesMap = {mapping_json};
-
-_plotDiv.on('plotly_hover', function() {{
-    _plotDiv.style.cursor = 'pointer';
-}});
-_plotDiv.on('plotly_unhover', function() {{
-    _plotDiv.style.cursor = 'default';
-}});
-"""
-
-
 # ------------------------------------------------------------------------------
 # Chart
 # ------------------------------------------------------------------------------
@@ -192,5 +159,13 @@ def generate_chart_outcomes(df: pd.DataFrame) -> str:
     fig = go.Figure(_build_pie_trace(counts))
     _apply_outcomes_layout(fig)
 
-    html_content = fig.to_html(**DIV_ARGS, post_script=_build_click_post_script())
+    html_content = fig.to_html(
+        **DIV_ARGS,
+        post_script=build_click_scroll_script(
+            STATUS_SECTION_MAP,
+            point_key="label",
+            strip_br=True,
+        ),
+    )
+
     return wrap_card(html_content, extra_class="bottom-col")

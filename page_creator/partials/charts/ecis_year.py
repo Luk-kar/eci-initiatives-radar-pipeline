@@ -6,7 +6,12 @@ import plotly.graph_objects as go
 from page_creator.config import MARGIN, HEIGHT, DIV_ARGS
 from page_creator.utils import wrap_card
 from page_creator.partials.charts.outcomes import STATUS_COLORS, _LABEL_ALIASES
-from page_creator.partials.charts.utils import hover_item_list
+from page_creator.partials.charts.utils import (
+    hover_item_list,
+    build_click_scroll_script,
+    STATUS_SECTION_MAP,
+)
+
 
 # One category per STATUS_COLORS entry — order controls stacking order (bottom → top).
 _CATEGORIES = [
@@ -99,4 +104,13 @@ def generate_chart_ecis_year(df: pd.DataFrame) -> str:
         ),
     )
 
-    return wrap_card(fig.to_html(**DIV_ARGS))
+    return wrap_card(
+        fig.to_html(
+            **DIV_ARGS,
+            post_script=build_click_scroll_script(
+                STATUS_SECTION_MAP,
+                point_key="data.name",  # trace name on the clicked bar segment
+                strip_spaces=True,  # "Law Passed" → "LawPassed" for map lookup
+            ),
+        )
+    )

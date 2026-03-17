@@ -1,11 +1,22 @@
 """Shared HTML-formatting helpers for Plotly hover tooltips across chart partials."""
 
+import json
 import textwrap
 
 
 _WRAP_WIDTH = 60
 _MAX_LINES = 6
 _MAX_HOVER_ITEMS = 10
+
+STATUS_SECTION_MAP: dict[str, str] = {
+    "LawPassed": "led-to-legislation-list-slot",
+    "CommissionEngaged": "commission-engaged-list-slot",
+    "RejectedLegislation": "rejected-legislation-list-slot",
+    "AwaitingResponse": "awaiting-response-list-slot",
+    "CollectionOngoing": "currently-open-list-slot",
+    "CollectionUnsuccessful": "collection-unsuccessful-list-slot",
+    "Withdrawn": "withdrawn-list-slot",
+}
 
 
 def hover_item_list(titles: list[str], max_items: int = _MAX_HOVER_ITEMS) -> str:
@@ -63,3 +74,44 @@ click_script_open_new_page = """
     }});
 }})();
 </script>"""
+
+
+def build_click_scroll_script(
+    section_map: dict[str, str],
+    point_key: str = "label",
+    strip_br: bool = False,
+    strip_spaces: bool = False,
+) -> str:
+    mapping_json = json.dumps(section_map)
+
+    normalizers = []
+
+    if strip_br:
+        normalizers.append("rawVal.replace(/<br>/gi, '')")
+
+    if strip_spaces:
+        normalizers.append("rawVal.replace(/ /g, '')")
+
+    clean_expr = "rawVal"
+
+    for norm in normalizers:
+        clean_expr = norm.replace("rawVal", clean_expr)
+
+    return f"""
+var _map = {mapping_json};
+var _plotDiv = document.getElementById('{{plot_id}}');
+
+_plotDiv.on('plotly_click', function(data) {{
+    if (!data.points || !data.points.length) return;
+    var rawVal = data.points[0].{point_key};
+    var cleanVal = {clean_expr};
+    var sectionId = _map[cleanVal];
+    if (sectionId && typeof scrollToSection === 'function') {{
+        scrollToSection(sectionId);
+    }}
+}});
+
+var _style = document.createElement('style');
+_style.textContent = '#{{plot_id}} .nsewdrag, #{{plot_id}} .surface {{ cursor: pointer !important; }}';
+document.head.appendChild(_style);
+"""
