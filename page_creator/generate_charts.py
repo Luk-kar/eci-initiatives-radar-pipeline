@@ -34,10 +34,12 @@ from page_creator.partials.lists import (
     generate_withdrawn,
 )
 
-
-CSV_PATH = Path(__file__).parent / "data" / "initiatives.csv"
+CSV_FILE = "initiatives_2026-02-09_13-24-41.csv"
+DATA_DIR = Path(__file__).parent / "data"
+CSV_PATH = DATA_DIR / CSV_FILE
 PARTIALS_DIR = Path(__file__).parent / "partials"
 OUT_DIR = Path(__file__).parent.parent / "page_to_export" / "partials"
+
 GENERATED_JS = (
     Path(__file__).parent.parent
     / "page_to_export"
