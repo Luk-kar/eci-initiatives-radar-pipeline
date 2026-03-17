@@ -17,8 +17,8 @@ def base_df():
                 "Collection Ongoing",  # Collection Ongoing
                 "Collection Ongoing",  # Collection Ongoing
                 "Commission Engaged",  # got response
-                "Law Passed",  # got response + led to legislation
-                "Law Passed",  # got response + led to legislation
+                "Law Passed",  # got response + law passed
+                "Law Passed",  # got response + law passed
                 "Rejected Legislation",  # got response
                 "Collection Unsuccessful",
                 "Withdrawn",
@@ -140,5 +140,5 @@ class TestLedToLegislation:
 
     def test_subset_of_got_response(self, base_df):
         got_response = int(base_df["current_status"].isin(_RESPONSE_STATUSES).sum())
-        led_to_legislation = int((base_df["current_status"] == "Law Passed").sum())
-        assert led_to_legislation <= got_response
+        law_passed = int((base_df["current_status"] == "Law Passed").sum())
+        assert law_passed <= got_response

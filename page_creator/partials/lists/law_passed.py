@@ -42,7 +42,7 @@ def _sort(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _build_row(row: pd.Series) -> str:
-    """Return a ``<tr>`` for a single initiative that led to legislation.
+    """Return a ``<tr>`` for a single initiative that law passed.
 
     Args:
         row: A DataFrame row. Must contain ``title``, ``url``, ``registration_date``,
@@ -67,7 +67,7 @@ def _build_rows(filtered_df: pd.DataFrame) -> str:
     return "".join(_build_row(row) for _, row in filtered_df.iterrows())
 
 
-def generate_led_to_legislation(df: pd.DataFrame) -> str:
+def generate_law_passed(df: pd.DataFrame) -> str:
     """Return an HTML card containing a table of ECIs that led to passed legislation.
 
     Filters for rows with ``current_status == 'Law Passed'``, sorted by
@@ -80,7 +80,7 @@ def generate_led_to_legislation(df: pd.DataFrame) -> str:
 
     Returns:
         An HTML string wrapping the table in a ``card`` div, or a card with a
-        fallback message if no initiatives led to legislation.
+        fallback message if no initiatives law passed.
     """
     df_filtered = _filter(df)
     df_sorted = _sort(df_filtered)
@@ -89,13 +89,13 @@ def generate_led_to_legislation(df: pd.DataFrame) -> str:
     title = (
         '<h3 class="card__title">⚖️ Law Passed: '
         "<span "
-        f'class="card__count" style="color:{colors.led_to_legislation}">{len(df_final)}'
+        f'class="card__count" style="color:{colors.law_passed}">{len(df_final)}'
         "</span>"
         "</h3>"
     )
 
     if df_final.empty:
-        body = '<p class="list-empty">No initiatives have led to legislation yet.</p>'
+        body = '<p class="list-empty">No initiatives have law_passed yet.</p>'
         return wrap_card(title + body)
 
     return wrap_table_card(
@@ -103,5 +103,5 @@ def generate_led_to_legislation(df: pd.DataFrame) -> str:
         _build_rows(df_final),
         df_final,
         _HEADERS,
-        colors.led_to_legislation,
+        colors.law_passed,
     )

@@ -1,4 +1,4 @@
-registration_number,title,objectives,primary_policy_area,registration_year,signatures_numeric,is_open,days_left,commission_outcome,led_to_legislation
+registration_number,title,objectives,primary_policy_area,registration_year,signatures_numeric,is_open,days_left,commission_outcome,law_passed
 ECI(2024)000001,Fur Free Europe,Ban fur farming in the EU.,Animal Welfare,2024,1502319,False,0,Proposal,True
 ECI(2025)000002,Save Bees and Farmers,Phase out synthetic pesticides.,Environment,2025,1054320,False,0,Study,False
 ECI(2026)000003,AI Regulation for Workers,Protect workers from AI monitoring.,Employment,2026,450000,True,85,,False

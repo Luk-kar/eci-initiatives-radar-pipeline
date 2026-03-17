@@ -24,7 +24,7 @@ from page_creator.partials.counters import generate_kpi_row
 from page_creator.partials.lists import (
     generate_collection_ongoing,
     generate_got_response,
-    generate_led_to_legislation,
+    generate_law_passed,
     generate_reached_signatures,
     generate_total_initiatives,
     generate_awaiting_response,
@@ -66,7 +66,7 @@ _GENERATORS = [
     generate_chart_top_10_signatures,
     generate_chart_bubble_finance_plot,
     generate_got_response,
-    generate_led_to_legislation,
+    generate_law_passed,
     generate_reached_signatures,
     generate_total_initiatives,
     generate_awaiting_response,

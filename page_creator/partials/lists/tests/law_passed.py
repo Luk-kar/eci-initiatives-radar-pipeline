@@ -1,11 +1,11 @@
-"""Tests for _filter and _sort logic in led_to_legislation.py."""
+"""Tests for _filter and _sort logic in law passed.py."""
 
 import datetime
 
 import pandas as pd
 import pytest
 
-from page_creator.partials.lists.led_to_legislation import _filter, _sort
+from page_creator.partials.lists.law_passed import _filter, _sort
 
 
 @pytest.fixture

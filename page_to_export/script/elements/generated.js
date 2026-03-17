@@ -6,7 +6,7 @@ const GENERATED_PARTIALS = [
     ["partials/list_collection_unsuccessful.html", "list-collection-unsuccessful-slot"],
     ["partials/list_commission_engaged.html", "list-commission-engaged-slot"],
     ["partials/list_got_response.html", "list-got-response-slot"],
-    ["partials/list_led_to_legislation.html", "list-led-to-legislation-slot"],
+    ["partials/list_law_passed.html", "list-law-passed-slot"],
     ["partials/list_reached_signatures.html", "list-reached-signatures-slot"],
     ["partials/list_rejected_legislation.html", "list-rejected-legislation-slot"],
     ["partials/list_total_initiatives.html", "list-total-initiatives-slot"],

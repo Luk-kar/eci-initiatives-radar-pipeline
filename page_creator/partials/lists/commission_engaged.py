@@ -80,7 +80,7 @@ def generate_commission_engaged(df: pd.DataFrame) -> str:
 
     Returns:
         An HTML string wrapping the table in a ``card`` div, or a card with a
-        fallback message if no initiatives led to legislation.
+        fallback message if no initiatives law passed.
     """
     df_filtered = _filter(df)
     df_sorted = _sort(df_filtered)
@@ -97,7 +97,7 @@ def generate_commission_engaged(df: pd.DataFrame) -> str:
     )
 
     if df_final.empty:
-        body = '<p class="list-empty">No initiatives have led to legislation yet.</p>'
+        body = '<p class="list-empty">No initiatives have law passed yet.</p>'
         return wrap_card(title + body)
 
     return wrap_table_card(

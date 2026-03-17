@@ -57,9 +57,9 @@ def generate_kpi_row(df: pd.DataFrame) -> str:
         {
             "label": "Law Passed:",
             "value": int((df["current_status"] == "Law Passed").sum()),
-            "color": colors.led_to_legislation,
+            "color": colors.law_passed,
             "icon": "⚖️",
-            "target_id": "led-to-legislation-list-slot",
+            "target_id": "law-passed-list-slot",
         },
     ]
 

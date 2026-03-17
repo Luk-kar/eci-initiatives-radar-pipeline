@@ -9,7 +9,7 @@ class KpiColors(NamedTuple):
     collection_ongoing: str = "#3779BA"
     reached_signatures: str = "#527445"
     got_response: str = "#006064"
-    led_to_legislation: str = "#3CA371"
+    law_passed: str = "#3CA371"
     awaiting_response: str = "#9E9E9E"
     collection_unsuccessful: str = "#8B1111"
     commission_engaged: str = "#9CCC65"
@@ -30,7 +30,7 @@ kpi_colors = KpiColors()
 # Derived directly from kpi_colors so chart slices, KPI cards, and list
 # headers always stay in sync. Add a new status here AND in KpiColors.
 STATUS_COLORS: dict[str, str] = {
-    "Law Passed": kpi_colors.led_to_legislation,
+    "Law Passed": kpi_colors.law_passed,
     "Commission Engaged": kpi_colors.commission_engaged,
     "Rejected Legislation": kpi_colors.rejected_legislation,
     "Awaiting Response": kpi_colors.awaiting_response,

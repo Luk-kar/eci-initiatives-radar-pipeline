@@ -9,7 +9,7 @@ _MAX_LINES = 6
 _MAX_HOVER_ITEMS = 10
 
 STATUS_SECTION_MAP: dict[str, str] = {
-    "LawPassed": "led-to-legislation-list-slot",
+    "LawPassed": "law-passed-list-slot",
     "CommissionEngaged": "commission-engaged-list-slot",
     "RejectedLegislation": "rejected-legislation-list-slot",
     "AwaitingResponse": "awaiting-response-list-slot",
