@@ -127,7 +127,7 @@ def _build_rows(open_df: pd.DataFrame) -> str:
     return "".join(_build_row(row) for _, row in open_df.iterrows())
 
 
-def generate_currently_open(df: pd.DataFrame) -> str:
+def generate_collection_ongoing(df: pd.DataFrame) -> str:
     """Return an HTML card containing a table of all Collection Ongoing ECI initiatives.
 
     Filters for rows with ``current_status == 'Collection Ongoing'``, sorted by
@@ -157,7 +157,7 @@ def generate_currently_open(df: pd.DataFrame) -> str:
     title = (
         '<h3 class="card__title">🗳️ Collection Ongoing:'
         "<span "
-        f'class="card__count" style="color:{colors.currently_open}">{len(df_open)}'
+        f'class="card__count" style="color:{colors.collection_ongoing}">{len(df_open)}'
         "</span>"
         "</h3>"
     )

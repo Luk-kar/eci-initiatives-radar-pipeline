@@ -1,4 +1,4 @@
-from .currently_open import generate_currently_open
+from .collection_ongoing import generate_collection_ongoing
 from .got_response import generate_got_response
 from .led_to_legislation import generate_led_to_legislation
 from .reached_signatures import generate_reached_signatures
@@ -10,7 +10,7 @@ from .rejected_legislation import generate_rejected_legislation
 from .withdrawn import generate_withdrawn
 
 __all__ = [
-    "generate_currently_open",
+    "generate_collection_ongoing",
     "generate_led_to_legislation",
     "generate_reached_signatures",
     "generate_total_initiatives",

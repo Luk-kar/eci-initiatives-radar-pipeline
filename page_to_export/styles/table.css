@@ -1,5 +1,5 @@
 /*
-  Styles for the currently-open initiatives table and its supporting elements.
+  Styles for initiatives table and its supporting elements.
   - The scroll wrapper constrains the table to ~5 visible rows with a fade-out gradient at the bottom.
   - A custom navy scrollbar is applied cross-browser via both the modern and webkit APIs.
   - Table headers are uppercase and bold; rows highlight on hover for readability.

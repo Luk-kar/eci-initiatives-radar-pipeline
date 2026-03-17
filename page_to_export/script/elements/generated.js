@@ -2,9 +2,9 @@
 const GENERATED_PARTIALS = [
     ["partials/kpi_row.html", "kpi-row-slot"],
     ["partials/list_awaiting_response.html", "list-awaiting-response-slot"],
+    ["partials/list_collection_ongoing.html", "list-collection-ongoing-slot"],
     ["partials/list_collection_unsuccessful.html", "list-collection-unsuccessful-slot"],
     ["partials/list_commission_engaged.html", "list-commission-engaged-slot"],
-    ["partials/list_currently_open.html", "list-currently-open-slot"],
     ["partials/list_got_response.html", "list-got-response-slot"],
     ["partials/list_led_to_legislation.html", "list-led-to-legislation-slot"],
     ["partials/list_reached_signatures.html", "list-reached-signatures-slot"],

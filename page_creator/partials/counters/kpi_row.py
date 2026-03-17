@@ -32,9 +32,9 @@ def generate_kpi_row(df: pd.DataFrame) -> str:
         {
             "label": "Collection Ongoing:",
             "value": int((df["current_status"] == "Collection Ongoing").sum()),
-            "color": colors.currently_open,
+            "color": colors.collection_ongoing,
             "icon": "🗳️",
-            "target_id": "currently-open-list-slot",
+            "target_id": "collection-ongoing-list-slot",
         },
         {
             "label": "Reached 1M Signatures:",

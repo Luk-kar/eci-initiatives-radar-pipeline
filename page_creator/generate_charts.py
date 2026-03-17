@@ -22,7 +22,7 @@ from page_creator.partials.charts import (
 )
 from page_creator.partials.counters import generate_kpi_row
 from page_creator.partials.lists import (
-    generate_currently_open,
+    generate_collection_ongoing,
     generate_got_response,
     generate_led_to_legislation,
     generate_reached_signatures,
@@ -58,7 +58,7 @@ _EXCLUDE = frozenset({"__init__.py", "helpers.py", "utils.py"})
 
 _GENERATORS = [
     generate_kpi_row,
-    generate_currently_open,
+    generate_collection_ongoing,
     generate_chart_outcomes,
     generate_chart_signatures_cohorts,
     generate_chart_ecis_year,
@@ -88,7 +88,7 @@ def _fn_to_key(fn) -> str:
 
     Examples:
         generate_chart_outcomes    (charts/)   → chart_outcomes.html
-        generate_currently_open    (lists/)    → list_currently_open.html
+        generate_collection_ongoing    (lists/)    → list_collection_ongoing.html
         generate_kpi_row           (counters/) → kpi_row.html
     """
     subdir = fn.__module__.split(".")[-2]
@@ -110,7 +110,7 @@ def _fn_to_key(fn) -> str:
 
     # Strip the prefix segment already embedded in the function name
     # e.g. 'chart_outcomes' with prefix 'chart' → 'outcomes'
-    # but 'currently_open' with prefix 'list'  → 'currently_open' (no match, keep as-is)
+    # but 'collection_ongoing' with prefix 'list'  → 'collection_ongoing' (no match, keep as-is)
     element = raw.removeprefix(f"{prefix}_") if prefix else raw
 
     return f"{prefix}_{element}.html" if prefix else f"{element}.html"

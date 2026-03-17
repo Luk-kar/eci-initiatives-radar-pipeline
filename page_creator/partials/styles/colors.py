@@ -6,7 +6,7 @@ from typing import NamedTuple
 class KpiColors(NamedTuple):
     # ── KPI counters & list headers ───────────────────────────────────────
     total_initiatives: str = "#2A3F69"
-    currently_open: str = "#3779BA"
+    collection_ongoing: str = "#3779BA"
     reached_signatures: str = "#527445"
     got_response: str = "#006064"
     led_to_legislation: str = "#3CA371"
@@ -34,7 +34,7 @@ STATUS_COLORS: dict[str, str] = {
     "Commission Engaged": kpi_colors.commission_engaged,
     "Rejected Legislation": kpi_colors.rejected_legislation,
     "Awaiting Response": kpi_colors.awaiting_response,
-    "Collection Ongoing": kpi_colors.currently_open,
+    "Collection Ongoing": kpi_colors.collection_ongoing,
     "Collection Unsuccessful": kpi_colors.collection_unsuccessful,
     "Withdrawn": kpi_colors.withdrawn,
 }

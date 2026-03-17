@@ -13,7 +13,7 @@ STATUS_SECTION_MAP: dict[str, str] = {
     "CommissionEngaged": "commission-engaged-list-slot",
     "RejectedLegislation": "rejected-legislation-list-slot",
     "AwaitingResponse": "awaiting-response-list-slot",
-    "CollectionOngoing": "currently-open-list-slot",
+    "CollectionOngoing": "collection-ongoing-list-slot",
     "CollectionUnsuccessful": "collection-unsuccessful-list-slot",
     "Withdrawn": "withdrawn-list-slot",
 }

@@ -1,9 +1,9 @@
-"""Tests for _filter and _sort logic in currently_open.py."""
+"""Tests for _filter and _sort logic in collection_ongoing.py."""
 
 import pandas as pd
 import pytest
 
-from page_creator.partials.lists.currently_open import _filter, _sort
+from page_creator.partials.lists.collection_ongoing import _filter, _sort
 
 
 @pytest.fixture
