@@ -87,7 +87,7 @@ def generate_led_to_legislation(df: pd.DataFrame) -> str:
     df_final = normalise_registration_date(df_sorted)
 
     title = (
-        '<h3 class="card__title">⚖️ Led to Legislation: '
+        '<h3 class="card__title">⚖️ Law Passed: '
         "<span "
         f'class="card__count" style="color:{colors.led_to_legislation}">{len(df_final)}'
         "</span>"
