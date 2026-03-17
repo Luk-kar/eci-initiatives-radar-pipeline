@@ -2,18 +2,12 @@
 
 import pandas as pd
 
-from page_creator.utils import wrap_card
-from page_creator.partials.lists.utils import (
-    normalise_registration_date,
-    build_initiative_row,
-    truncate,
-    wrap_table_card,
-)
 from page_creator.partials.styles.colors import kpi_colors as colors
 from page_creator.partials.lists.utils.sort import sort_by_registration_date
+from page_creator.partials.lists.utils import build_card_title, generate_response_card
 
 _STATUS = "Commission Engaged"
-_HEADERS = ["Initiative", "Registration", "Objective", "Legislation Example"]
+_HEADERS = ["Initiative", "Registration", "Objective", "Commission Response"]
 
 
 def _filter(df: pd.DataFrame) -> pd.DataFrame:
@@ -37,34 +31,7 @@ def _sort(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Sorted and date-normalised DataFrame.
     """
-
     return sort_by_registration_date(df)
-
-
-def _build_row(row: pd.Series) -> str:
-    """Return a ``<tr>`` for a single initiative with a Commission response.
-
-    Args:
-        row: A DataFrame row. Must contain ``title``, ``url``, ``registration_date``,
-             ``objective``, and ``commission_answer_text``.
-
-    Returns:
-        A ``<tr>...</tr>`` HTML string.
-    """
-    response = truncate(row["commission_answer_text"], max_len=200)
-    return build_initiative_row(row, f"\n          <td>{response}</td>")
-
-
-def _build_rows(filtered_df: pd.DataFrame) -> str:
-    """Iterate over all matching initiatives and concatenate their row HTML.
-
-    Args:
-        filtered_df: Filtered and sorted DataFrame.
-
-    Returns:
-        Concatenated ``<tr>`` HTML string for all rows.
-    """
-    return "".join(_build_row(row) for _, row in filtered_df.iterrows())
 
 
 def generate_commission_engaged(df: pd.DataFrame) -> str:
@@ -82,28 +49,15 @@ def generate_commission_engaged(df: pd.DataFrame) -> str:
         An HTML string wrapping the table in a ``card`` div, or a card with a
         fallback message if no initiatives law passed.
     """
-    df_filtered = _filter(df)
-    df_sorted = _sort(df_filtered)
-    df_final = normalise_registration_date(df_sorted)
 
     color = colors.commission_engaged
+    df_sorted = _sort(_filter(df))
+    title = build_card_title("🏛️", _STATUS, len(df_sorted), color)
 
-    title = (
-        f'<h3 class="card__title">🏛️ {_STATUS}: '
-        "<span "
-        f'class="card__count" style="color:{color}">{len(df_final)}'
-        "</span>"
-        "</h3>"
-    )
-
-    if df_final.empty:
-        body = '<p class="list-empty">No initiatives have law passed yet.</p>'
-        return wrap_card(title + body)
-
-    return wrap_table_card(
+    return generate_response_card(
+        df_sorted,
         title,
-        _build_rows(df_final),
-        df_final,
         _HEADERS,
         color,
+        empty_message="No initiatives have engaged the Commission yet.",
     )

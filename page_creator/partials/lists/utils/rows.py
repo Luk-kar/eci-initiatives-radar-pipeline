@@ -5,7 +5,8 @@ import pandas as pd
 from page_creator.partials.lists.utils.signatures import sig_cell, threshold_cell
 from page_creator.partials.lists.utils.table import wrap_table_card
 from page_creator.partials.lists.utils.text import truncate
-
+from page_creator.partials.lists.utils.dates import normalise_registration_date
+from page_creator.utils import wrap_card
 
 # Shared column headers for tables that include signature and threshold columns
 HEADERS_WITH_SIGNATURES = [
@@ -73,6 +74,59 @@ def build_sig_threshold_rows(df: pd.DataFrame) -> str:
     return "".join(build_sig_threshold_row(row) for _, row in df.iterrows())
 
 
+def build_response_row(row: pd.Series) -> str:
+    """Return a ``<tr>`` for an initiative with a truncated Commission response cell.
+
+    Shared by ``commission_engaged``, ``rejected_legislation``, and ``got_response``.
+
+    Args:
+        row: Must contain ``title``, ``url``, ``registration_date``,
+             ``objective``, and ``commission_answer_text``.
+
+    Returns:
+        A ``<tr>...</tr>`` HTML string.
+    """
+    response = truncate(row["commission_answer_text"], max_len=200)
+    return build_initiative_row(row, f"\n          <td>{response}</td>")
+
+
+def build_response_rows(df: pd.DataFrame) -> str:
+    """Iterate over a DataFrame and concatenate response ``<tr>`` HTML for each row."""
+    return "".join(build_response_row(row) for _, row in df.iterrows())
+
+
+def generate_response_card(
+    df: pd.DataFrame,
+    title: str,
+    headers: list[str],
+    color: str,
+    empty_message: str,
+) -> str:
+    """Run the standard filter→sort→normalise→render pipeline for response-type lists.
+
+    Shared by ``commission_engaged``, ``rejected_legislation``, and ``got_response``.
+
+    Args:
+        df:            Already-filtered and sorted DataFrame (normalise not yet applied).
+        title:         Pre-rendered ``<h3>`` HTML title string.
+        headers:       Column header labels.
+        color:         CSS colour for the scrollbar.
+        empty_message: Fallback ``<p>`` message text when ``df`` is empty.
+
+    Returns:
+        An HTML string wrapping the table in a ``card`` div.
+    """
+
+    df_final = normalise_registration_date(df)
+
+    if df_final.empty:
+        return wrap_card(title + f'<p class="list-empty">{empty_message}</p>')
+
+    return wrap_table_card(
+        title, build_response_rows(df_final), df_final, headers, color
+    )
+
+
 def wrap_sig_threshold_card(
     title: str,
     df: pd.DataFrame,
@@ -99,3 +153,58 @@ def wrap_sig_threshold_card(
         HEADERS_WITH_SIGNATURES,
         scrollbar_color,
     )
+
+
+# ── Title builder ─────────────────────────────────────────────────────────────
+
+
+def build_card_title(emoji: str, label: str, count: int, color: str) -> str:
+    """Return a ``<h3 class="card__title">`` HTML string with a coloured count badge.
+
+    Shared by every list partial to eliminate repeated f-string boilerplate.
+
+    Args:
+        emoji:  Leading emoji character(s), e.g. ``"🏛️"``.
+        label:  Status label shown after the emoji, e.g. ``"Commission Engaged"``.
+        count:  Number of initiatives, rendered inside the coloured ``<span>``.
+        color:  CSS colour value for the count span.
+
+    Returns:
+        A ``<h3>…</h3>`` HTML string.
+    """
+    return (
+        f'<h3 class="card__title">{emoji} {label}: '
+        f'<span class="card__count" style="color:{color}">{count}</span>'
+        "</h3>"
+    )
+
+
+# ── Sig-threshold card pipeline ────────────────────────────────────────────────
+
+
+def generate_sig_threshold_card(
+    df: pd.DataFrame,
+    title: str,
+    color: str,
+    empty_message: str,
+) -> str:
+    """Run the standard filter→sort→normalise→render pipeline for sig-threshold lists.
+
+    Shared by ``awaiting_response``, ``collection_unsuccessful``, ``withdrawn``,
+    and ``reached_signatures``.
+
+    Args:
+        df:            Already-filtered and sorted DataFrame (normalise not yet applied).
+        title:         Pre-rendered ``<h3>`` HTML title string.
+        color:         CSS colour for the scrollbar / count span.
+        empty_message: Fallback message text when ``df`` is empty.
+
+    Returns:
+        An HTML string wrapping the table in a ``card`` div.
+    """
+    df_final = normalise_registration_date(df)
+
+    if df_final.empty:
+        return wrap_card(title + f'<p class="list-empty">{empty_message}</p>')
+
+    return wrap_sig_threshold_card(title, df_final, color)

@@ -2,15 +2,9 @@
 
 import pandas as pd
 
-from page_creator.utils import wrap_card
-from page_creator.partials.lists.utils import (
-    normalise_registration_date,
-    build_initiative_row,
-    truncate,
-    wrap_table_card,
-)
 from page_creator.partials.styles.colors import kpi_colors as colors
 from page_creator.partials.lists.utils.sort import sort_by_registration_date
+from page_creator.partials.lists.utils import build_card_title, generate_response_card
 
 _RESPONSE_STATUSES = frozenset(
     ["Commission Engaged", "Law Passed", "Rejected Legislation"]
@@ -27,6 +21,7 @@ def _filter(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Filtered DataFrame containing only ``_RESPONSE_STATUSES`` rows.
     """
+
     return df[df["current_status"].isin(_RESPONSE_STATUSES)]
 
 
@@ -39,34 +34,7 @@ def _sort(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Sorted and date-normalised DataFrame.
     """
-
     return sort_by_registration_date(df)
-
-
-def _build_row(row: pd.Series) -> str:
-    """Return a ``<tr>`` for a single initiative with a Commission response.
-
-    Args:
-        row: A DataFrame row. Must contain ``title``, ``url``, ``registration_date``,
-             ``objective``, and ``commission_answer_text``.
-
-    Returns:
-        A ``<tr>...</tr>`` HTML string.
-    """
-    response = truncate(row["commission_answer_text"], max_len=200)
-    return build_initiative_row(row, f"\n          <td>{response}</td>")
-
-
-def _build_rows(filtered_df: pd.DataFrame) -> str:
-    """Iterate over all matching initiatives and concatenate their row HTML.
-
-    Args:
-        filtered_df: Filtered and sorted DataFrame.
-
-    Returns:
-        Concatenated ``<tr>`` HTML string for all rows.
-    """
-    return "".join(_build_row(row) for _, row in filtered_df.iterrows())
 
 
 def generate_got_response(df: pd.DataFrame) -> str:
@@ -86,21 +54,15 @@ def generate_got_response(df: pd.DataFrame) -> str:
         An HTML string wrapping the table in a ``card`` div, or a card with a
         fallback message if no initiatives received a response.
     """
-    df_filtered = _filter(df)
-    df_sorted = _sort(df_filtered)
-    df_final = normalise_registration_date(df_sorted)
 
-    title = (
-        '<h3 class="card__title">'
-        "📬 Got EU Response: "
-        f'<span class="card__count" style="color:{colors.got_response}">{len(df_final)}</span>'
-        "</h3>"
-    )
+    color = colors.got_response
+    df_sorted = _sort(_filter(df))
+    title = build_card_title("📬", "Got EU Response", len(df_sorted), color)
 
-    if df_final.empty:
-        body = '<p class="list-empty">No initiatives have received an EU Commission response.</p>'
-        return wrap_card(title + body)
-
-    return wrap_table_card(
-        title, _build_rows(df_final), df_final, _HEADERS, colors.got_response
+    return generate_response_card(
+        df_sorted,
+        title,
+        _HEADERS,
+        color,
+        empty_message="No initiatives have received an EU Commission response.",
     )

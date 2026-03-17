@@ -2,13 +2,12 @@
 
 import pandas as pd
 
-from page_creator.utils import wrap_card
-from page_creator.partials.lists.utils import (
-    normalise_registration_date,
-    wrap_sig_threshold_card,
-)
 from page_creator.partials.styles.colors import kpi_colors as colors
 from page_creator.partials.lists.utils.sort import sort_by_registration_date
+from page_creator.partials.lists.utils import (
+    build_card_title,
+    generate_sig_threshold_card,
+)
 
 _STATUS = "Collection Unsuccessful"
 
@@ -56,19 +55,14 @@ def generate_collection_unsuccessful(df: pd.DataFrame) -> str:
         An HTML string wrapping the table in a ``card`` div, or a card with a
         fallback message if no initiatives match.
     """
-    df_filtered = _filter(df)
-    df_sorted = _sort(df_filtered)
-    df_final = normalise_registration_date(df_sorted)
 
-    title = (
-        '<h3 class="card__title">'
-        f"🏳️ {_STATUS}: "
-        f'<span class="card__count" style="color:{colors.collection_unsuccessful}">{len(df_final)}</span>'
-        "</h3>"
+    color = colors.collection_unsuccessful
+    df_sorted = _sort(_filter(df))
+    title = build_card_title("🏳️", _STATUS, len(df_sorted), color)
+
+    return generate_sig_threshold_card(
+        df_sorted,
+        title,
+        color,
+        empty_message="No closed-collection initiatives found.",
     )
-
-    if df_final.empty:
-        body = '<p class="list-empty">No closed-collection initiatives found.</p>'
-        return wrap_card(title + body)
-
-    return wrap_sig_threshold_card(title, df_final, colors.collection_unsuccessful)

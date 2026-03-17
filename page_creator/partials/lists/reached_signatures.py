@@ -2,10 +2,9 @@
 
 import pandas as pd
 
-from page_creator.utils import wrap_card
 from page_creator.partials.lists.utils import (
-    normalise_registration_date,
-    wrap_sig_threshold_card,
+    build_card_title,
+    generate_sig_threshold_card,
     SIG_TARGET,
 )
 from page_creator.partials.styles.colors import kpi_colors as colors
@@ -54,21 +53,14 @@ def generate_reached_signatures(df: pd.DataFrame) -> str:
         An HTML string wrapping the table in a ``card`` div, or a card with a
         fallback message if no initiatives reached the threshold.
     """
-    df_filtered = _filter(df)
-    df_sorted = _sort(df_filtered)
-    df_final = normalise_registration_date(df_sorted)
 
-    title = (
-        '<h3 class="card__title">'
-        "✅ Reached 1M Signatures: "
-        "<span "
-        f'class="card__count" style="color:{colors.reached_signatures}">{len(df_final)}'
-        "</span>"
-        "</h3>"
+    color = colors.reached_signatures
+    df_sorted = _sort(_filter(df))
+    title = build_card_title("✅", "Reached 1M Signatures", len(df_sorted), color)
+
+    return generate_sig_threshold_card(
+        df_sorted,
+        title,
+        color,
+        empty_message="No initiatives have reached 1M signatures.",
     )
-
-    if df_final.empty:
-        body = '<p class="list-empty">No initiatives have reached 1M signatures.</p>'
-        return wrap_card(title + body)
-
-    return wrap_sig_threshold_card(title, df_final, colors.reached_signatures)

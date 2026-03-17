@@ -3,11 +3,11 @@
 import pandas as pd
 
 from page_creator.partials.lists.utils import (
-    normalise_registration_date,
-    wrap_sig_threshold_card,
+    build_card_title,
+    generate_sig_threshold_card,
+    sort_by_registration_date,
 )
 from page_creator.partials.styles.colors import kpi_colors as colors
-from page_creator.partials.lists.utils.sort import sort_by_registration_date
 
 
 def _sort(df: pd.DataFrame) -> pd.DataFrame:
@@ -39,15 +39,14 @@ def generate_total_initiatives(df: pd.DataFrame) -> str:
     Returns:
         An HTML string wrapping the table in a ``card`` div.
     """
+
+    color = colors.total_initiatives
     df_sorted = _sort(df)
-    df_final = normalise_registration_date(df_sorted)
+    title = build_card_title("📋", "All Initiatives", len(df_sorted), color)
 
-    title = (
-        '<h3 class="card__title">📋 Total Initiatives: '
-        "<span "
-        f'class="card__count" style="color:{colors.total_initiatives}">{len(df_final)}'
-        "</span>"
-        "</h3>"
+    return generate_sig_threshold_card(
+        df_sorted,
+        title,
+        color,
+        empty_message="No initiatives found.",
     )
-
-    return wrap_sig_threshold_card(title, df_final, colors.total_initiatives)

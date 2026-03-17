@@ -2,15 +2,16 @@
 
 import pandas as pd
 
-from page_creator.utils import wrap_card
 from page_creator.partials.lists.utils import (
-    normalise_registration_date,
+    build_card_title,
     build_initiative_row,
+    normalise_registration_date,
     truncate,
     wrap_table_card,
 )
 from page_creator.partials.styles.colors import kpi_colors as colors
 from page_creator.partials.lists.utils.sort import sort_by_registration_date
+from page_creator.utils import wrap_card
 
 _STATUS = "Law Passed"
 _HEADERS = ["Initiative", "Registration", "Objective", "Legislation Example"]
@@ -82,26 +83,18 @@ def generate_law_passed(df: pd.DataFrame) -> str:
         An HTML string wrapping the table in a ``card`` div, or a card with a
         fallback message if no initiatives law passed.
     """
+
     df_filtered = _filter(df)
     df_sorted = _sort(df_filtered)
     df_final = normalise_registration_date(df_sorted)
 
-    title = (
-        '<h3 class="card__title">⚖️ Law Passed: '
-        "<span "
-        f'class="card__count" style="color:{colors.law_passed}">{len(df_final)}'
-        "</span>"
-        "</h3>"
-    )
+    color = colors.law_passed
+    title = build_card_title("⚖️", "Law Passed", len(df_final), color)
 
     if df_final.empty:
-        body = '<p class="list-empty">No initiatives have law_passed yet.</p>'
-        return wrap_card(title + body)
 
-    return wrap_table_card(
-        title,
-        _build_rows(df_final),
-        df_final,
-        _HEADERS,
-        colors.law_passed,
-    )
+        return wrap_card(
+            title + '<p class="list-empty">No initiatives have law passed yet.</p>'
+        )
+
+    return wrap_table_card(title, _build_rows(df_final), df_final, _HEADERS, color)
