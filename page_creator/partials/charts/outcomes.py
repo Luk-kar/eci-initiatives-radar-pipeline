@@ -24,7 +24,7 @@ STATUS_COLORS = {
     "Commission Engaged": "#9CCC65",
     "Rejected Legislation": "#F44336",
     "Awaiting Response": "#9E9E9E",
-    "Collection Ongoing": "#F5A623",
+    "Collection Ongoing": "#3779BA",
     "Collection Unsuccessful": "#8B1111",
     "Withdrawn": "#4B4B4B",
 }

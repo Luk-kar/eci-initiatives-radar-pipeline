@@ -86,10 +86,12 @@ def generate_commission_engaged(df: pd.DataFrame) -> str:
     df_sorted = _sort(df_filtered)
     df_final = normalise_registration_date(df_sorted)
 
+    color = colors.commission_engaged
+
     title = (
         f'<h3 class="card__title">🏛️ {_STATUS}: '
         "<span "
-        f'class="card__count" style="color:{colors.led_to_legislation}">{len(df_final)}'
+        f'class="card__count" style="color:{color}">{len(df_final)}'
         "</span>"
         "</h3>"
     )
@@ -103,5 +105,5 @@ def generate_commission_engaged(df: pd.DataFrame) -> str:
         _build_rows(df_final),
         df_final,
         _HEADERS,
-        colors.commission_engaged,
+        color,
     )
