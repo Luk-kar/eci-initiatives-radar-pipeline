@@ -14,27 +14,17 @@ from page_creator.partials.charts.utils import (
     build_click_scroll_script,
     STATUS_SECTION_MAP,
 )
+from page_creator.partials.styles.colors import STATUS_COLORS, kpi_colors
 
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
 
-STATUS_COLORS = {
-    "Law Passed": "#3CA371",
-    "Commission Engaged": "#9CCC65",
-    "Rejected Legislation": "#F44336",
-    "Awaiting Response": "#9E9E9E",
-    "Collection Ongoing": "#3779BA",
-    "Collection Unsuccessful": "#8B1111",
-    "Withdrawn": "#4B4B4B",
-}
-
-
 _LABEL_ALIASES: dict[str, str] = {
     "Waiting for Response": "Awaiting Response",
 }
 
-DEFAULT_COLOR = "#757575"
+DEFAULT_COLOR = kpi_colors.default_status
 
 MAX_TITLE_LEN = 40
 

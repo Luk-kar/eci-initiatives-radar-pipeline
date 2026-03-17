@@ -8,6 +8,7 @@ import plotly.graph_objects as go
 from page_creator.config import MARGIN, HEIGHT, DIV_ARGS
 from page_creator.utils import wrap_card
 from page_creator.partials.charts.utils import hover_wrap
+from page_creator.partials.styles.colors import STATUS_COLORS, kpi_colors
 
 
 # ── Constants ──────────────────────────────────────────────────────────────
@@ -41,41 +42,40 @@ _HOVERTEMPLATE_SYMBOL = (
 STATUS_MARKERS = {
     "Commission Engaged": {
         "symbol": "triangle-right",
-        "color": "#9CCC65",
+        "color": STATUS_COLORS["Commission Engaged"],
         "label": "Commission Engaged",
     },
     "Rejected Legislation": {
         "symbol": "x",
-        "color": "#F44336",
+        "color": STATUS_COLORS["Rejected Legislation"],
         "label": "Rejected Legislation",
     },
     "Collection Unsuccessful": {
         "symbol": "x",
-        "color": "#8B1111",
+        "color": STATUS_COLORS["Collection Unsuccessful"],
         "label": "Collection Unsuccessful",
     },
     "Withdrawn": {
         "symbol": "x",
-        "color": "#4B4B4B",
+        "color": STATUS_COLORS["Withdrawn"],
         "label": "Withdrawn",
     },
     "Waiting for Response": {
         "symbol": "hourglass",
-        "color": "#9E9E9E",
+        "color": STATUS_COLORS["Awaiting Response"],
         "label": "Waiting for Response",
     },
     "Law Passed": {
         "symbol": "star",
-        "color": "#3CA371",
+        "color": STATUS_COLORS["Law Passed"],
         "label": "Law Passed",
     },
     "Collection Ongoing": {
         "symbol": "triangle-right",
-        "color": "#F5A623",
+        "color": STATUS_COLORS["Collection Ongoing"],
         "label": "Collection Ongoing",
     },
 }
-
 _COMMISSION_ANSWER_FALLBACK = {
     "Collection Unsuccessful": "<i>Did not reach the required signatures.</i>",
     "Withdrawn": "<i>Withdrawn by the organisers.</i>",
@@ -227,7 +227,7 @@ def _add_threshold_line(fig: go.Figure) -> None:
     fig.add_vline(
         x=ECI_THRESHOLD,
         line_dash="dash",
-        line_color="#3AB23F",
+        line_color=kpi_colors.threshold_line,
         line_width=3,
     )
 

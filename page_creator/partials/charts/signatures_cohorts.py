@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 
 from page_creator.config import MARGIN, HEIGHT, DIV_ARGS
 from page_creator.utils import wrap_card
-
+from page_creator.partials.styles.colors import kpi_colors
 
 ECI_THRESHOLD = 1_000_000
 NUM_BINS = 50
@@ -137,12 +137,12 @@ def _add_threshold_line(fig: go.Figure) -> None:
     fig.add_vline(
         x=ECI_THRESHOLD,
         line_dash="dash",
-        line_color="#3AB23F",
+        line_color=kpi_colors.threshold_line,
         line_width=3,
         annotation_text="1M Threshold",
         annotation_position="top right",
         annotation_font_size=13,
-        annotation_font_color="#3AB23F",
+        annotation_font_color=kpi_colors.threshold_line,
     )
 
 

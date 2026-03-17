@@ -10,6 +10,7 @@ import plotly.graph_objects as go
 # Local
 from page_creator.config import DIV_ARGS
 from page_creator.utils import wrap_card
+from page_creator.partials.styles.colors import kpi_colors
 
 MAP_HEIGHT = 500
 MAP_WIDTH = 1000
@@ -221,7 +222,9 @@ def generate_chart_signatures_map(df: pd.DataFrame) -> str:
                 lat=cdf["lat"] + dy,
                 text=cdf["label"],
                 mode="text",
-                textfont=dict(size=10, color="#4d297f", family="Arial Black"),
+                textfont=dict(
+                    size=10, color=kpi_colors.map_text_outline, family="Arial Black"
+                ),
                 hoverinfo="skip",
                 showlegend=False,
             )
