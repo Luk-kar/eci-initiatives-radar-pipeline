@@ -55,9 +55,9 @@ Desktop.ini
 *.swp
 *.swo
 
-# markdown artifacts
-*.mk
-!README*.md
+# Ignore root-level markdown files except README.md
+/*.md
+!/README.md
 
 # created page to export
 page_to_export/partials/*
@@ -75,3 +75,4 @@ page_to_export/partials/*
 
 # Ignore raw HTML debugging dumps locally so you don't commit 1,000 files by accident
 data/latest_session/*.html
+/data/

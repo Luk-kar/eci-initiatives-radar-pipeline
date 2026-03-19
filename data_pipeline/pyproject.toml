@@ -1,0 +1,22 @@
+[project]
+name = "eci-data-pipeline"
+version = "0.1.0"
+description = "Web scraping pipeline for European Citizens' Initiatives (ECI) data."
+readme = "../README.ECI_initiatives.md"
+requires-python = ">=3.10"
+
+dependencies = [
+  "selenium==4.35.0",
+  "beautifulsoup4==4.13.5",
+  "pydantic==2.12.5",
+  "html5lib==1.1",
+]
+
+[project.scripts]
+eci-scrape-initiatives = "scraper.initiatives.__main__:scrape_eci_initiatives"
+eci-scrape-responses = "scraper.responses.main:scrape_commission_responses"
+eci-scrape-followup = "scraper.responses_followup_website.main:scrape_followup_websites"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
