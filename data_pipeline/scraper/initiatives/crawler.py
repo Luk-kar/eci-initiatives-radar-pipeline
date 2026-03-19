@@ -94,12 +94,19 @@ def wait_for_listing_page_content(driver: webdriver.Chrome, current_page: int) -
     """Wait for listing page elements to load."""
 
     wait = WebDriverWait(driver, WEBDRIVER_TIMEOUT_DEFAULT)
+
     try:
         cards_initiative_selector = ECIlistingSelectors.INITIATIVE_CARDS
         wait.until(
             EC.presence_of_element_located((By.CSS_SELECTOR, cards_initiative_selector))
         )
         logger.info(LOG_MESSAGES["page_loaded"].format(page=current_page))
+
+        # Additional wait for dynamic content
+        random_time = random.uniform(*WAIT_DYNAMIC_CONTENT)
+        logger.debug(f"Waiting {random_time:.1f}s for dynamic content...")
+        time.sleep(random_time)
+
     except Exception as e:
         logger.warning(
             f"No initiatives found or timeout on page {current_page}: "

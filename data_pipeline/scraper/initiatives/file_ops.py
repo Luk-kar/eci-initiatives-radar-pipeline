@@ -33,10 +33,6 @@ def save_listing_page(
     driver: webdriver.Chrome, list_dir: str, current_page: int
 ) -> Tuple[str, str]:
     """Save listing page source and return page source and file path."""
-    # Additional wait for dynamic content
-    random_time = random.uniform(*WAIT_DYNAMIC_CONTENT)
-    logger.debug(f"Waiting {random_time:.1f}s for dynamic content...")
-    time.sleep(random_time)
 
     # Get page source and save it
     page_source = driver.page_source
