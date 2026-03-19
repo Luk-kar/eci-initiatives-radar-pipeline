@@ -48,12 +48,14 @@ def download_initiatives(
     Returns:
         Tuple containing updated data list and list of failed URLs
     """
+
     updated_data: list = []
     failed_urls: list = []
 
     # NOTE: driver lifecycle (init/quit) is managed by caller
 
     for i, row in enumerate(initiative_data):
+
         url = row["url"]
         logger.info(f"Processing {i+1}/{len(initiative_data)}: {url}")
 
@@ -84,6 +86,7 @@ def _attempt_download(
     Raises:
         Exception: On rate limiting or any page/save failure.
     """
+
     logger.info("Downloading the html file...")
     driver.get(url)
 
@@ -98,20 +101,26 @@ def _attempt_download(
 
 def _log_error(url: str, e: Exception) -> None:
     """Log a download error with a category label based on the error message."""
+
     error_type = type(e).__name__
     error_msg = str(e).lower()
     prefix = f"{url}:\n{error_type}:\n{e}"
 
     if "chrome not reachable" in error_msg or "session not created" in error_msg:
         logger.error(f"❌ Browser crash/connection error downloading:\n{prefix}")
+
     elif "timeout" in error_msg:
         logger.error(f"❌ Timeout error downloading:\n{prefix}")
+
     elif "permission" in error_msg or "access" in error_msg:
         logger.error(f"❌ Permission/access error downloading:\n{prefix}")
+
     elif "network" in error_msg or "connection" in error_msg:
         logger.error(f"❌ Network error downloading:\n{prefix}")
+
     elif "disk" in error_msg or "space" in error_msg:
         logger.error(f"❌ Disk space error downloading:\n{prefix}")
+
     else:
         logger.error(f"❌ Unknown error downloading:\n{prefix}")
 
@@ -128,6 +137,7 @@ def _handle_exception(
     Returns:
         Tuple of (outcome, updated retry_count).
     """
+
     error_msg = str(e)
     is_rate_limited = any(indicator in error_msg for indicator in RATE_LIMIT_INDICATORS)
     logger.debug(f"🔍 Exception details for {url}: {type(e).__name__}: {error_msg}")
@@ -139,7 +149,9 @@ def _handle_exception(
     retry_count += 1
 
     if retry_count <= max_retries:
+
         wait_time = retry_wait_base * (retry_count**2)
+
         logger.warning(
             LOG_MESSAGES["rate_limit_retry"].format(
                 retry=retry_count,
@@ -147,6 +159,7 @@ def _handle_exception(
                 wait_time=wait_time,
             )
         )
+
         time.sleep(wait_time)
         return _RetryOutcome.CONTINUE, retry_count
 
@@ -165,6 +178,7 @@ def download_single_initiative(
     Returns:
         bool: True if successful, False if all retries exhausted.
     """
+
     retry_wait_base = random.uniform(*RETRY_WAIT_BASE)
     retry_count = 0
 
@@ -207,6 +221,7 @@ def wait_for_page_content(driver: webdriver.Chrome) -> None:
             )
         )
         logger.debug("Initiative progress timeline loaded")
+
     except Exception:
         logger.warning(
             "Initiative progress timeline not found, "
@@ -227,11 +242,14 @@ def wait_for_page_content(driver: webdriver.Chrome) -> None:
     element_found = False
 
     for selector in content_selectors_to_wait:
+
         try:
             wait.until(EC.presence_of_element_located((By.XPATH, selector)))
             logger.debug(f"Content loaded: {selector}")
             element_found = True
+
             break
+
         except Exception:
             continue
 
