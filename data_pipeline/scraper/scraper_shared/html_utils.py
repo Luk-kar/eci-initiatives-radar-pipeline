@@ -8,7 +8,7 @@ import html5lib
 from html5lib.html5parser import ParseError
 from bs4 import BeautifulSoup
 
-from .const import MIN_HTML_LENGTH
+from .consts import MIN_HTML_LENGTH
 
 
 def validate_html(page_source: str, min_length: int | None = None) -> None:

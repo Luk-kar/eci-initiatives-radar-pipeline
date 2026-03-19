@@ -21,7 +21,7 @@ import datetime
 import os
 from pathlib import Path
 
-from ..scraper_shared.const import (
+from ..scraper_shared.consts import (
     BASE_URL,
     DATA_DIR_NAME,
     LOG_DIR_NAME,

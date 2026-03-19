@@ -7,7 +7,7 @@ import logging
 import os
 from typing import Optional
 
-from .const import LOG_DIR_NAME, DATA_DIR_NAME, SCRIPT_DIR
+from .consts import LOG_DIR_NAME, DATA_DIR_NAME, SCRIPT_DIR
 
 
 def get_logger(name: str, log_dir: Optional[str] = None) -> logging.Logger:

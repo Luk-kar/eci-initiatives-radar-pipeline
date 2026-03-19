@@ -5,7 +5,7 @@ Shared browser initialization and management utilities.
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-from .const import CHROME_OPTIONS
+from .consts import CHROME_OPTIONS
 
 
 def initialize_browser(logger, log_messages: dict | None = None) -> webdriver.Chrome:
