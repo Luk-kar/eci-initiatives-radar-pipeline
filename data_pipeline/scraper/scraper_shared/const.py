@@ -16,6 +16,7 @@ SCRIPT_DIR = Path(__file__).parent.parent.parent.parent.absolute()
 # Shared directory names
 DATA_DIR_NAME = "data"
 LOG_DIR_NAME = "logs"
+DEBUGGING_DIR_NAME = "debugging"
 
 # Shared browser configuration
 CHROME_OPTIONS = [

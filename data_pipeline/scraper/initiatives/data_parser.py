@@ -56,5 +56,5 @@ def parse_initiatives_list_data(
             }
         )
 
-    logger.info(f"Found {len(initiative_data)} initiative entries")
+    logger.info(f"✅ Found {len(initiative_data)} initiative entries")
     return initiative_data

@@ -32,6 +32,7 @@ from ..scraper_shared.const import (
     MIN_HTML_LENGTH,
     RATE_LIMIT_INDICATORS,
     SCRIPT_DIR,
+    DEBUGGING_DIR_NAME,
 )
 
 # Scraping timestamp (unique to initiatives scraper as it runs first)
@@ -81,7 +82,7 @@ LOG_MESSAGES = {
     "browser_success": "Browser initialized successfully",
     "browser_closed": "Browser closed",
     "page_loaded": "Initiatives loaded successfully on page {page}",
-    "page_saved": "Page {page} saved to: {path}",
+    "page_saved": "✅ Page {page} saved to: {path}",
     "next_button_found": "Found 'Next' button on page {page}, navigating to page {next_page}",
     "last_page": "No 'Next' button found on page {page}. This appears to be the last page.",
     "download_success": "✅ Successfully downloaded: {filename}",

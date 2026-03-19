@@ -86,15 +86,17 @@ def _attempt_download(
     Raises:
         Exception: On rate limiting or any page/save failure.
     """
-
     logger.info("Downloading the html file...")
     driver.get(url)
 
     time.sleep(random.uniform(*WAIT_DYNAMIC_CONTENT))
     check_rate_limiting(driver)
-    wait_for_page_content(driver)
+    content_found = wait_for_page_content(driver)
 
-    file_name = save_initiative_page(pages_dir, url, driver.page_source)
+    file_name = save_initiative_page(
+        pages_dir, url, driver.page_source, debug=not content_found
+    )
+
     logger.info(LOG_MESSAGES["download_success"].format(filename=file_name))
     return file_name
 
@@ -167,6 +169,23 @@ def _handle_exception(
     return _RetryOutcome.EXHAUSTED, retry_count
 
 
+def _save_debug_page(
+    driver: webdriver.Chrome,
+    pages_dir: str,
+    url: str,
+) -> None:
+    """Attempt to save the last loaded page source to the debugging directory."""
+
+    try:
+        page_source = driver.page_source
+
+        file_name = save_initiative_page(pages_dir, url, page_source, debug=True)
+        logger.info(f"🐛 Debug page saved: {file_name}")
+
+    except Exception as e:
+        logger.warning(f"⚠️  Could not save debug page for {url}: {e}")
+
+
 def download_single_initiative(
     driver: webdriver.Chrome,
     pages_dir: str,
@@ -178,7 +197,6 @@ def download_single_initiative(
     Returns:
         bool: True if successful, False if all retries exhausted.
     """
-
     retry_wait_base = random.uniform(*RETRY_WAIT_BASE)
     retry_count = 0
 
@@ -195,9 +213,9 @@ def download_single_initiative(
                 return False
             if outcome is _RetryOutcome.EXHAUSTED:
                 break
-            # _RetryOutcome.CONTINUE: loop again
 
     logger.error(f"❌ Exhausted all {max_retries} retries for: {url}")
+    _save_debug_page(driver, pages_dir, url)  # ← save whatever is left
     return False
 
 
@@ -208,12 +226,14 @@ def check_rate_limiting(driver: webdriver.Chrome) -> None:
         raise Exception(RATE_LIMIT_INDICATORS[3])
 
 
-def wait_for_page_content(driver: webdriver.Chrome) -> None:
-    """Wait for initiative page content to load."""
+def wait_for_page_content(driver: webdriver.Chrome) -> bool:
+    """Wait for initiative page content to load.
 
+    Returns:
+        bool: True if main content was found, False otherwise.
+    """
     wait = WebDriverWait(driver, WEBDRIVER_TIMEOUT_CONTENT)
 
-    # Wait for initiative progress timeline
     try:
         wait.until(
             EC.presence_of_element_located(
@@ -221,15 +241,12 @@ def wait_for_page_content(driver: webdriver.Chrome) -> None:
             )
         )
         logger.debug("Initiative progress timeline loaded")
-
     except Exception:
         logger.warning(
             "Initiative progress timeline not found, "
-            "Should be in all initiatives."
-            "\ncontinuing..."
+            "Should be in all initiatives.\ncontinuing..."
         )
 
-    # Wait for at least one of the main content sections
     content_selectors_to_wait = [
         ECIinitiativeSelectors.OBJECTIVES,
         ECIinitiativeSelectors.ANNEX,
@@ -239,19 +256,16 @@ def wait_for_page_content(driver: webdriver.Chrome) -> None:
         ECIinitiativeSelectors.SOCIAL_SHARE,
     ]
 
-    element_found = False
-
     for selector in content_selectors_to_wait:
 
         try:
+
             wait.until(EC.presence_of_element_located((By.XPATH, selector)))
             logger.debug(f"Content loaded: {selector}")
-            element_found = True
-
-            break
+            return True
 
         except Exception:
             continue
 
-    if not element_found:
-        logger.warning("No main content other elements found, but proceeding...")
+    logger.warning("No main content elements found, but proceeding...")
+    return False

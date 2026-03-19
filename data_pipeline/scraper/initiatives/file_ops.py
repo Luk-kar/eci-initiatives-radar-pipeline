@@ -51,26 +51,46 @@ def save_listing_page(
     return page_source, page_path
 
 
-def save_initiative_page(pages_dir: str, url: str, page_source: str) -> str:
-    """Save initiative page source to file and return filename."""
-    # Double-check page source for rate limiting content
-    if any(indicator in page_source for indicator in RATE_LIMIT_INDICATORS[:2]):
+def save_initiative_page(
+    pages_dir: str,
+    url: str,
+    page_source: str,
+    debug: bool = False,
+) -> str:
+    """Save initiative page source to file and return filename.
+
+    Args:
+        pages_dir: Base directory for initiative pages.
+        url: Initiative URL used to derive year/filename.
+        page_source: Raw HTML content to save.
+        debug: If True, save under the debugging directory instead.
+    """
+
+    if not debug and any(
+        indicator in page_source for indicator in RATE_LIMIT_INDICATORS[:2]
+    ):
         raise Exception("429 - Rate limited (found in page source)")
 
-    # Extract year and number from URL for filename
     parts = url.rstrip("/").split("/")
     year = parts[-2]
     number = parts[-1]
 
-    # Generate directory under pages_dir for year
-    year_dir = os.path.join(pages_dir, year)
+    if debug:
+
+        # data/<timestamp>/debugging/initiatives/<year>/
+        run_dir = os.path.dirname(pages_dir)
+        module_dir = os.path.basename(pages_dir)
+        year_dir = os.path.join(run_dir, DEBUGGING_DIR_NAME, module_dir, year)
+
+    else:
+        # data/<timestamp>/initiatives/<year>/
+        year_dir = os.path.join(pages_dir, year)
+
     ensure_dirs(year_dir)
 
-    # Create filename with year and number to avoid overwriting
     file_name = f"{year}_{number}.html"
     file_path = os.path.join(year_dir, file_name)
 
-    # Validate then prettify+save
     try:
         validate_html(page_source, MIN_HTML_LENGTH)
     except Exception as e:
