@@ -1,5 +1,6 @@
 # Python Standard Library
 import datetime
+from enum import Enum, auto
 import random
 import time
 from typing import Tuple
@@ -24,6 +25,12 @@ from .consts import (
 )
 from .file_ops import save_initiative_page
 from .scraper_logger import logger
+
+
+class _RetryOutcome(Enum):
+    CONTINUE = auto()
+    EXHAUSTED = auto()
+    ABORT = auto()
 
 
 def download_initiatives(
@@ -67,6 +74,86 @@ def download_initiatives(
     return updated_data, failed_urls
 
 
+def _attempt_download(
+    driver: webdriver.Chrome,
+    pages_dir: str,
+    url: str,
+) -> str:
+    """Perform a single download attempt. Returns the saved filename.
+
+    Raises:
+        Exception: On rate limiting or any page/save failure.
+    """
+    logger.info("Downloading the html file...")
+    driver.get(url)
+
+    time.sleep(random.uniform(*WAIT_DYNAMIC_CONTENT))
+    check_rate_limiting(driver)
+    wait_for_page_content(driver)
+
+    file_name = save_initiative_page(pages_dir, url, driver.page_source)
+    logger.info(LOG_MESSAGES["download_success"].format(filename=file_name))
+    return file_name
+
+
+def _log_error(url: str, e: Exception) -> None:
+    """Log a download error with a category label based on the error message."""
+    error_type = type(e).__name__
+    error_msg = str(e).lower()
+    prefix = f"{url}:\n{error_type}:\n{e}"
+
+    if "chrome not reachable" in error_msg or "session not created" in error_msg:
+        logger.error(f"❌ Browser crash/connection error downloading:\n{prefix}")
+    elif "timeout" in error_msg:
+        logger.error(f"❌ Timeout error downloading:\n{prefix}")
+    elif "permission" in error_msg or "access" in error_msg:
+        logger.error(f"❌ Permission/access error downloading:\n{prefix}")
+    elif "network" in error_msg or "connection" in error_msg:
+        logger.error(f"❌ Network error downloading:\n{prefix}")
+    elif "disk" in error_msg or "space" in error_msg:
+        logger.error(f"❌ Disk space error downloading:\n{prefix}")
+    else:
+        logger.error(f"❌ Unknown error downloading:\n{prefix}")
+
+
+def _handle_exception(
+    e: Exception,
+    url: str,
+    retry_count: int,
+    max_retries: int,
+    retry_wait_base: float,
+) -> tuple[_RetryOutcome, int]:
+    """Classify the exception and apply retry back-off if rate-limited.
+
+    Returns:
+        Tuple of (outcome, updated retry_count).
+    """
+    error_msg = str(e)
+    is_rate_limited = any(indicator in error_msg for indicator in RATE_LIMIT_INDICATORS)
+    logger.debug(f"🔍 Exception details for {url}: {type(e).__name__}: {error_msg}")
+
+    if not is_rate_limited:
+        logger.error(f"❌ Non-retryable error downloading:\n{url}:\n{e}")
+        return _RetryOutcome.ABORT, retry_count
+
+    retry_count += 1
+
+    if retry_count <= max_retries:
+        wait_time = retry_wait_base * (retry_count**2)
+        logger.warning(
+            LOG_MESSAGES["rate_limit_retry"].format(
+                retry=retry_count,
+                max_retries=max_retries,
+                wait_time=wait_time,
+            )
+        )
+        time.sleep(wait_time)
+        return _RetryOutcome.CONTINUE, retry_count
+
+    _log_error(url, e)
+    return _RetryOutcome.EXHAUSTED, retry_count
+
+
 def download_single_initiative(
     driver: webdriver.Chrome,
     pages_dir: str,
@@ -76,117 +163,33 @@ def download_single_initiative(
     """Download a single initiative page with retry logic.
 
     Returns:
-        bool: True if successful, False if failed
+        bool: True if successful, False if all retries exhausted.
     """
-
-    retry_wait_base = 1 * random.uniform(*RETRY_WAIT_BASE)
+    retry_wait_base = random.uniform(*RETRY_WAIT_BASE)
     retry_count = 0
 
     while retry_count <= max_retries:
         try:
-            logger.info("Downloading the html file...")
-            driver.get(url)
-
-            # Additional wait for dynamic content
-            time.sleep(random.uniform(*WAIT_DYNAMIC_CONTENT))
-
-            # Check for rate limiting
-            check_rate_limiting(driver)
-
-            # Wait for page content to load
-            wait_for_page_content(driver)
-
-            # Get page source and save
-            page_source = driver.page_source
-            file_name = save_initiative_page(pages_dir, url, page_source)
-
-            logger.info(LOG_MESSAGES["download_success"].format(filename=file_name))
+            _attempt_download(driver, pages_dir, url)
             return True
 
         except Exception as e:
-
-            error_msg = str(e)
-
-            is_rate_limited = any(
-                indicator in error_msg for indicator in RATE_LIMIT_INDICATORS
+            outcome, retry_count = _handle_exception(
+                e, url, retry_count, max_retries, retry_wait_base
             )
-
-            logger.debug(
-                f"🔍 Exception details for {url}: {type(e).__name__}: {error_msg}"
-            )
-
-            if is_rate_limited:
-
-                retry_count += 1
-
-                if retry_count <= max_retries:
-
-                    wait_time = retry_wait_base * (retry_count**2)
-
-                    logger.warning(
-                        LOG_MESSAGES["rate_limit_retry"].format(
-                            retry=retry_count,
-                            max_retries=max_retries,
-                            wait_time=wait_time,
-                        )
-                    )
-
-                    time.sleep(wait_time)
-
-                else:
-                    error_type = type(e).__name__
-
-                    # Categorize different types of errors for better logging
-                    if (
-                        "chrome not reachable" in error_msg.lower()
-                        or "session not created" in error_msg.lower()
-                    ):
-                        logger.error(
-                            f"❌ Browser crash/connection error downloading:\n"
-                            f"{url}:\n{error_type}:\n{error_msg}"
-                        )
-                    elif "timeout" in error_msg.lower():
-                        logger.error(
-                            f"❌ Timeout error downloading:\n"
-                            f"{url}:\n{error_type}:\n{error_msg}"
-                        )
-                    elif (
-                        "permission" in error_msg.lower()
-                        or "access" in error_msg.lower()
-                    ):
-                        logger.error(
-                            f"❌ Permission/access error downloading:\n"
-                            f"{url}:\n{error_type}:\n{error_msg}"
-                        )
-                    elif (
-                        "network" in error_msg.lower()
-                        or "connection" in error_msg.lower()
-                    ):
-                        logger.error(
-                            f"❌ Network error downloading:\n"
-                            f"{url}:\n{error_type}:\n{error_msg}"
-                        )
-                    elif "disk" in error_msg.lower() or "space" in error_msg.lower():
-                        logger.error(
-                            f"❌ Disk space error downloading:\n"
-                            f"{url}:\n{error_type}:\n{error_msg}"
-                        )
-                    else:
-                        logger.error(
-                            f"❌ Unknown error downloading:\n"
-                            f"{url}:\n{error_type}:\n{error_msg}"
-                        )
-
-            else:
-                logger.error(f"❌ Rate limit hit, error downloading:\n{url}:\n{e}")
+            if outcome is _RetryOutcome.ABORT:
+                return False
+            if outcome is _RetryOutcome.EXHAUSTED:
+                break
+            # _RetryOutcome.CONTINUE: loop again
 
     logger.error(f"❌ Exhausted all {max_retries} retries for: {url}")
-
     return False
 
 
 def check_rate_limiting(driver: webdriver.Chrome) -> None:
     """Raise if the current page shows rate limiting indicators."""
+
     if any(indicator in driver.page_source for indicator in RATE_LIMIT_INDICATORS):
         raise Exception(RATE_LIMIT_INDICATORS[3])
 
