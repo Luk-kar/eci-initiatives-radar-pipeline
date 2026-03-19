@@ -7,7 +7,7 @@ class ECIinitiativeSelectors:
     INITIATIVE_PROGRESS = "ol.ecl-timeline"
 
     # Content section headings
-    OBJECTIVES = "//h2[@class='ecl-u-type-heading-2' and text()='Objectives']"
+    OBJECTIVES = "//h2[contains(@class,'ecl-u-type-heading-2') and .='Objectives']"
     ANNEX = "//h2[@class='ecl-u-type-heading-2' and text()='Annex']"
     SOURCES_OF_FUNDING = (
         "//h2[@class='ecl-u-type-heading-2' and text()='Sources of funding']"

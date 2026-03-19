@@ -54,11 +54,14 @@ def download_initiatives(
 
         if success:
             row["datetime"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            time.sleep(random.uniform(*WAIT_BETWEEN_DOWNLOADS))
         else:
             failed_urls.append(url)
 
         updated_data.append(row)
+
+        wait_time = random.uniform(*WAIT_BETWEEN_DOWNLOADS)
+        logger.info(f"Awaiting next page in: {wait_time:.2f}s")
+        time.sleep(wait_time)
 
     logger.info(f"Download completed. Failed URLs: {len(failed_urls)}")
     return updated_data, failed_urls
@@ -84,14 +87,14 @@ def download_single_initiative(
             logger.info("Downloading the html file...")
             driver.get(url)
 
+            # Additional wait for dynamic content
+            time.sleep(random.uniform(*WAIT_DYNAMIC_CONTENT))
+
             # Check for rate limiting
             check_rate_limiting(driver)
 
             # Wait for page content to load
             wait_for_page_content(driver)
-
-            # Additional wait for dynamic content
-            time.sleep(random.uniform(*WAIT_DYNAMIC_CONTENT))
 
             # Get page source and save
             page_source = driver.page_source
@@ -101,7 +104,9 @@ def download_single_initiative(
             return True
 
         except Exception as e:
+
             error_msg = str(e)
+
             is_rate_limited = any(
                 indicator in error_msg for indicator in RATE_LIMIT_INDICATORS
             )
@@ -111,10 +116,13 @@ def download_single_initiative(
             )
 
             if is_rate_limited:
+
                 retry_count += 1
 
                 if retry_count <= max_retries:
+
                     wait_time = retry_wait_base * (retry_count**2)
+
                     logger.warning(
                         LOG_MESSAGES["rate_limit_retry"].format(
                             retry=retry_count,
@@ -122,7 +130,9 @@ def download_single_initiative(
                             wait_time=wait_time,
                         )
                     )
+
                     time.sleep(wait_time)
+
                 else:
                     error_type = type(e).__name__
 
@@ -163,40 +173,22 @@ def download_single_initiative(
                         )
                     else:
                         logger.error(
-                            f"❌ Error downloading:\n"
+                            f"❌ Unknown error downloading:\n"
                             f"{url}:\n{error_type}:\n{error_msg}"
                         )
 
-                    return False
             else:
-                logger.error(f"❌ Error downloading:\n{url}:\n{e}")
-                return False
+                logger.error(f"❌ Rate limit hit, error downloading:\n{url}:\n{e}")
 
     logger.error(f"❌ Exhausted all {max_retries} retries for: {url}")
+
     return False
 
 
 def check_rate_limiting(driver: webdriver.Chrome) -> None:
-    """Check if the current page shows rate limiting errors."""
-
-    try:
-        rate_limit_title = driver.find_element(
-            By.CSS_SELECTOR, ECIinitiativeSelectors.PAGE_HEADER_TITLE
-        )
-
-        if rate_limit_title and any(
-            indicator in rate_limit_title.text for indicator in RATE_LIMIT_INDICATORS
-        ):
-            raise Exception(RATE_LIMIT_INDICATORS[3])
-
-    except Exception as rate_check_error:
-        if any(
-            indicator in str(rate_check_error) for indicator in RATE_LIMIT_INDICATORS
-        ):
-            raise rate_check_error
-
-        # If it's not a rate limit check error, continue normally
-        pass
+    """Raise if the current page shows rate limiting indicators."""
+    if any(indicator in driver.page_source for indicator in RATE_LIMIT_INDICATORS):
+        raise Exception(RATE_LIMIT_INDICATORS[3])
 
 
 def wait_for_page_content(driver: webdriver.Chrome) -> None:
@@ -233,7 +225,7 @@ def wait_for_page_content(driver: webdriver.Chrome) -> None:
 
     for selector in content_selectors_to_wait:
         try:
-            wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, selector)))
+            wait.until(EC.presence_of_element_located((By.XPATH, selector)))
             logger.debug(f"Content loaded: {selector}")
             element_found = True
             break
