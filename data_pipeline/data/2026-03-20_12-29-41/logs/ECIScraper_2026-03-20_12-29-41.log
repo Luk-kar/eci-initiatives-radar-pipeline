@@ -1,0 +1,171 @@
+2026-03-20 12:29:41,215 - ECIScraper - INFO - scrape_eci_initiatives:35 - Starting scraping at: 2026-03-20_12-29-41
+2026-03-20 12:29:41,215 - ECIScraper - DEBUG - setup_scraping_dirs:31 - Created directories: /home/karol/Documents/Programming/Data_Engineering/eci_workplace/eci_pipeline/data_pipeline/data/2026-03-20_12-29-41/listings, /home/karol/Documents/Programming/Data_Engineering/eci_workplace/eci_pipeline/data_pipeline/data/2026-03-20_12-29-41/initiatives
+2026-03-20 12:29:41,215 - ECIScraper - INFO - initialize_browser:23 - Initializing browser...
+2026-03-20 12:29:43,150 - ECIScraper - DEBUG - initialize_browser:32 - Browser initialized successfully
+2026-03-20 12:29:43,150 - ECIScraper - INFO - scrape_all_listings:59 - Starting pagination scraping from: https://citizens-initiative.europa.eu/find-initiative_en
+2026-03-20 12:29:43,150 - ECIScraper - INFO - load_listing_url:95 - Loading page: https://citizens-initiative.europa.eu/find-initiative_en
+2026-03-20 12:29:46,453 - ECIScraper - INFO - wait_for_listing_page_content:73 - Initiatives loaded successfully on page 1
+2026-03-20 12:29:46,453 - ECIScraper - DEBUG - wait_for_listing_page_content:75 - Waiting 1.7s for dynamic content...
+2026-03-20 12:29:48,418 - ECIScraper - INFO - save_listing_page:48 - ✅ Page 1 saved to: /home/karol/Documents/Programming/Data_Engineering/eci_workplace/eci_pipeline/data_pipeline/data/2026-03-20_12-29-41/listings/Find_initiative_European_Citizens_Initiative_page_001.html
+2026-03-20 12:29:48,418 - ECIScraper - INFO - parse_initiatives_list_data:17 - Parsing saved listing page for initiatives links...
+2026-03-20 12:29:48,486 - ECIScraper - INFO - parse_initiatives_list_data:60 - ✅ Found 10 initiative entries
+2026-03-20 12:29:48,496 - ECIScraper - INFO - navigate_to_next_page:40 - Found 'Next' button on page 1, navigating to page 2
+2026-03-20 12:29:51,214 - ECIScraper - INFO - wait_for_listing_page_content:73 - Initiatives loaded successfully on page 2
+2026-03-20 12:29:51,214 - ECIScraper - DEBUG - wait_for_listing_page_content:75 - Waiting 1.7s for dynamic content...
+2026-03-20 12:29:53,181 - ECIScraper - INFO - save_listing_page:48 - ✅ Page 2 saved to: /home/karol/Documents/Programming/Data_Engineering/eci_workplace/eci_pipeline/data_pipeline/data/2026-03-20_12-29-41/listings/Find_initiative_European_Citizens_Initiative_page_002.html
+2026-03-20 12:29:53,181 - ECIScraper - INFO - parse_initiatives_list_data:17 - Parsing saved listing page for initiatives links...
+2026-03-20 12:29:53,237 - ECIScraper - INFO - parse_initiatives_list_data:60 - ✅ Found 10 initiative entries
+2026-03-20 12:29:53,245 - ECIScraper - INFO - navigate_to_next_page:40 - Found 'Next' button on page 2, navigating to page 3
+2026-03-20 12:29:55,680 - ECIScraper - INFO - wait_for_listing_page_content:73 - Initiatives loaded successfully on page 3
+2026-03-20 12:29:55,680 - ECIScraper - DEBUG - wait_for_listing_page_content:75 - Waiting 1.8s for dynamic content...
+2026-03-20 12:29:57,706 - ECIScraper - INFO - save_listing_page:48 - ✅ Page 3 saved to: /home/karol/Documents/Programming/Data_Engineering/eci_workplace/eci_pipeline/data_pipeline/data/2026-03-20_12-29-41/listings/Find_initiative_European_Citizens_Initiative_page_003.html
+2026-03-20 12:29:57,706 - ECIScraper - INFO - parse_initiatives_list_data:17 - Parsing saved listing page for initiatives links...
+2026-03-20 12:29:57,760 - ECIScraper - INFO - parse_initiatives_list_data:60 - ✅ Found 10 initiative entries
+2026-03-20 12:29:57,767 - ECIScraper - INFO - navigate_to_next_page:40 - Found 'Next' button on page 3, navigating to page 4
+2026-03-20 12:30:00,254 - ECIScraper - INFO - wait_for_listing_page_content:73 - Initiatives loaded successfully on page 4
+2026-03-20 12:30:00,254 - ECIScraper - DEBUG - wait_for_listing_page_content:75 - Waiting 1.7s for dynamic content...
+2026-03-20 12:30:02,207 - ECIScraper - INFO - save_listing_page:48 - ✅ Page 4 saved to: /home/karol/Documents/Programming/Data_Engineering/eci_workplace/eci_pipeline/data_pipeline/data/2026-03-20_12-29-41/listings/Find_initiative_European_Citizens_Initiative_page_004.html
+2026-03-20 12:30:02,207 - ECIScraper - INFO - parse_initiatives_list_data:17 - Parsing saved listing page for initiatives links...
+2026-03-20 12:30:02,269 - ECIScraper - INFO - parse_initiatives_list_data:60 - ✅ Found 10 initiative entries
+2026-03-20 12:30:02,275 - ECIScraper - INFO - navigate_to_next_page:40 - Found 'Next' button on page 4, navigating to page 5
+2026-03-20 12:30:05,700 - ECIScraper - INFO - wait_for_listing_page_content:73 - Initiatives loaded successfully on page 5
+2026-03-20 12:30:05,700 - ECIScraper - DEBUG - wait_for_listing_page_content:75 - Waiting 1.9s for dynamic content...
+2026-03-20 12:30:08,037 - ECIScraper - INFO - save_listing_page:48 - ✅ Page 5 saved to: /home/karol/Documents/Programming/Data_Engineering/eci_workplace/eci_pipeline/data_pipeline/data/2026-03-20_12-29-41/listings/Find_initiative_European_Citizens_Initiative_page_005.html
+2026-03-20 12:30:08,037 - ECIScraper - INFO - parse_initiatives_list_data:17 - Parsing saved listing page for initiatives links...
+2026-03-20 12:30:08,102 - ECIScraper - INFO - parse_initiatives_list_data:60 - ✅ Found 10 initiative entries
+2026-03-20 12:30:08,109 - ECIScraper - INFO - navigate_to_next_page:40 - Found 'Next' button on page 5, navigating to page 6
+2026-03-20 12:30:11,391 - ECIScraper - INFO - wait_for_listing_page_content:73 - Initiatives loaded successfully on page 6
+2026-03-20 12:30:11,391 - ECIScraper - DEBUG - wait_for_listing_page_content:75 - Waiting 1.9s for dynamic content...
+2026-03-20 12:30:13,612 - ECIScraper - INFO - save_listing_page:48 - ✅ Page 6 saved to: /home/karol/Documents/Programming/Data_Engineering/eci_workplace/eci_pipeline/data_pipeline/data/2026-03-20_12-29-41/listings/Find_initiative_European_Citizens_Initiative_page_006.html
+2026-03-20 12:30:13,612 - ECIScraper - INFO - parse_initiatives_list_data:17 - Parsing saved listing page for initiatives links...
+2026-03-20 12:30:13,670 - ECIScraper - INFO - parse_initiatives_list_data:60 - ✅ Found 10 initiative entries
+2026-03-20 12:30:13,677 - ECIScraper - INFO - navigate_to_next_page:40 - Found 'Next' button on page 6, navigating to page 7
+2026-03-20 12:30:15,379 - ECIScraper - INFO - wait_for_listing_page_content:73 - Initiatives loaded successfully on page 7
+2026-03-20 12:30:15,379 - ECIScraper - DEBUG - wait_for_listing_page_content:75 - Waiting 1.9s for dynamic content...
+2026-03-20 12:30:17,591 - ECIScraper - INFO - save_listing_page:48 - ✅ Page 7 saved to: /home/karol/Documents/Programming/Data_Engineering/eci_workplace/eci_pipeline/data_pipeline/data/2026-03-20_12-29-41/listings/Find_initiative_European_Citizens_Initiative_page_007.html
+2026-03-20 12:30:17,592 - ECIScraper - INFO - parse_initiatives_list_data:17 - Parsing saved listing page for initiatives links...
+2026-03-20 12:30:17,653 - ECIScraper - INFO - parse_initiatives_list_data:60 - ✅ Found 10 initiative entries
+2026-03-20 12:30:17,661 - ECIScraper - INFO - navigate_to_next_page:40 - Found 'Next' button on page 7, navigating to page 8
+2026-03-20 12:30:19,571 - ECIScraper - INFO - wait_for_listing_page_content:73 - Initiatives loaded successfully on page 8
+2026-03-20 12:30:19,571 - ECIScraper - DEBUG - wait_for_listing_page_content:75 - Waiting 1.7s for dynamic content...
+2026-03-20 12:30:21,637 - ECIScraper - INFO - save_listing_page:48 - ✅ Page 8 saved to: /home/karol/Documents/Programming/Data_Engineering/eci_workplace/eci_pipeline/data_pipeline/data/2026-03-20_12-29-41/listings/Find_initiative_European_Citizens_Initiative_page_008.html
+2026-03-20 12:30:21,637 - ECIScraper - INFO - parse_initiatives_list_data:17 - Parsing saved listing page for initiatives links...
+2026-03-20 12:30:21,699 - ECIScraper - INFO - parse_initiatives_list_data:60 - ✅ Found 10 initiative entries
+2026-03-20 12:30:21,706 - ECIScraper - INFO - navigate_to_next_page:40 - Found 'Next' button on page 8, navigating to page 9
+2026-03-20 12:30:23,512 - ECIScraper - INFO - wait_for_listing_page_content:73 - Initiatives loaded successfully on page 9
+2026-03-20 12:30:23,512 - ECIScraper - DEBUG - wait_for_listing_page_content:75 - Waiting 1.9s for dynamic content...
+2026-03-20 12:30:25,657 - ECIScraper - INFO - save_listing_page:48 - ✅ Page 9 saved to: /home/karol/Documents/Programming/Data_Engineering/eci_workplace/eci_pipeline/data_pipeline/data/2026-03-20_12-29-41/listings/Find_initiative_European_Citizens_Initiative_page_009.html
+2026-03-20 12:30:25,657 - ECIScraper - INFO - parse_initiatives_list_data:17 - Parsing saved listing page for initiatives links...
+2026-03-20 12:30:25,716 - ECIScraper - INFO - parse_initiatives_list_data:60 - ✅ Found 10 initiative entries
+2026-03-20 12:30:25,723 - ECIScraper - INFO - navigate_to_next_page:40 - Found 'Next' button on page 9, navigating to page 10
+2026-03-20 12:30:27,097 - ECIScraper - INFO - wait_for_listing_page_content:73 - Initiatives loaded successfully on page 10
+2026-03-20 12:30:27,097 - ECIScraper - DEBUG - wait_for_listing_page_content:75 - Waiting 1.6s for dynamic content...
+2026-03-20 12:30:28,887 - ECIScraper - INFO - save_listing_page:48 - ✅ Page 10 saved to: /home/karol/Documents/Programming/Data_Engineering/eci_workplace/eci_pipeline/data_pipeline/data/2026-03-20_12-29-41/listings/Find_initiative_European_Citizens_Initiative_page_010.html
+2026-03-20 12:30:28,887 - ECIScraper - INFO - parse_initiatives_list_data:17 - Parsing saved listing page for initiatives links...
+2026-03-20 12:30:28,942 - ECIScraper - INFO - parse_initiatives_list_data:60 - ✅ Found 10 initiative entries
+2026-03-20 12:30:28,948 - ECIScraper - INFO - navigate_to_next_page:40 - Found 'Next' button on page 10, navigating to page 11
+2026-03-20 12:30:30,754 - ECIScraper - INFO - wait_for_listing_page_content:73 - Initiatives loaded successfully on page 11
+2026-03-20 12:30:30,754 - ECIScraper - DEBUG - wait_for_listing_page_content:75 - Waiting 1.9s for dynamic content...
+2026-03-20 12:30:32,869 - ECIScraper - INFO - save_listing_page:48 - ✅ Page 11 saved to: /home/karol/Documents/Programming/Data_Engineering/eci_workplace/eci_pipeline/data_pipeline/data/2026-03-20_12-29-41/listings/Find_initiative_European_Citizens_Initiative_page_011.html
+2026-03-20 12:30:32,869 - ECIScraper - INFO - parse_initiatives_list_data:17 - Parsing saved listing page for initiatives links...
+2026-03-20 12:30:32,921 - ECIScraper - INFO - parse_initiatives_list_data:60 - ✅ Found 10 initiative entries
+2026-03-20 12:30:32,927 - ECIScraper - INFO - navigate_to_next_page:40 - Found 'Next' button on page 11, navigating to page 12
+2026-03-20 12:30:34,818 - ECIScraper - INFO - wait_for_listing_page_content:73 - Initiatives loaded successfully on page 12
+2026-03-20 12:30:34,818 - ECIScraper - DEBUG - wait_for_listing_page_content:75 - Waiting 1.8s for dynamic content...
+2026-03-20 12:30:36,789 - ECIScraper - INFO - save_listing_page:48 - ✅ Page 12 saved to: /home/karol/Documents/Programming/Data_Engineering/eci_workplace/eci_pipeline/data_pipeline/data/2026-03-20_12-29-41/listings/Find_initiative_European_Citizens_Initiative_page_012.html
+2026-03-20 12:30:36,789 - ECIScraper - INFO - parse_initiatives_list_data:17 - Parsing saved listing page for initiatives links...
+2026-03-20 12:30:36,845 - ECIScraper - INFO - parse_initiatives_list_data:60 - ✅ Found 10 initiative entries
+2026-03-20 12:30:36,852 - ECIScraper - INFO - navigate_to_next_page:40 - Found 'Next' button on page 12, navigating to page 13
+2026-03-20 12:30:38,578 - ECIScraper - INFO - wait_for_listing_page_content:73 - Initiatives loaded successfully on page 13
+2026-03-20 12:30:38,578 - ECIScraper - DEBUG - wait_for_listing_page_content:75 - Waiting 1.7s for dynamic content...
+2026-03-20 12:30:40,456 - ECIScraper - INFO - save_listing_page:48 - ✅ Page 13 saved to: /home/karol/Documents/Programming/Data_Engineering/eci_workplace/eci_pipeline/data_pipeline/data/2026-03-20_12-29-41/listings/Find_initiative_European_Citizens_Initiative_page_013.html
+2026-03-20 12:30:40,456 - ECIScraper - INFO - parse_initiatives_list_data:17 - Parsing saved listing page for initiatives links...
+2026-03-20 12:30:40,513 - ECIScraper - INFO - parse_initiatives_list_data:60 - ✅ Found 8 initiative entries
+2026-03-20 12:30:40,525 - ECIScraper - INFO - navigate_to_next_page:53 - No 'Next' button found on page 13. This appears to be the last page.
+2026-03-20 12:30:40,525 - ECIScraper - INFO - _paginate_and_scrape:122 - Completed scraping 13 pages with 128 total initiatives
+2026-03-20 12:30:40,526 - ECIScraper - INFO - _save_and_download_initiatives:123 - Initiative data saved to: /home/karol/Documents/Programming/Data_Engineering/eci_workplace/eci_pipeline/data_pipeline/data/2026-03-20_12-29-41/listings/initiatives_list.csv
+2026-03-20 12:30:40,526 - ECIScraper - INFO - _save_and_download_initiatives:125 - Starting individual initiative pages download...
+2026-03-20 12:30:40,526 - ECIScraper - INFO - download_all_initiatives:52 - Processing 1/128: https://citizens-initiative.europa.eu/initiatives/details/2024/000006_en
+2026-03-20 12:30:40,526 - ECIScraper - INFO - _attempt_download:107 - Downloading the html file...
+2026-03-20 12:30:43,165 - ECIScraper - DEBUG - wait_for_page_content:27 - Initiative progress timeline loaded
+2026-03-20 12:30:43,173 - ECIScraper - DEBUG - wait_for_page_content:46 - Content loaded: //h2[contains(@class,'ecl-u-type-heading-2') and .='Objectives']
+2026-03-20 12:30:43,271 - ECIScraper - INFO - _attempt_download:117 - ✅ Successfully downloaded: {year}_{number}.html
+2026-03-20 12:30:43,272 - ECIScraper - INFO - download_all_initiatives:64 - Awaiting next page in: 1.49s
+2026-03-20 12:30:44,757 - ECIScraper - INFO - download_all_initiatives:52 - Processing 2/128: https://citizens-initiative.europa.eu/initiatives/details/2026/000003_en
+2026-03-20 12:30:44,757 - ECIScraper - INFO - _attempt_download:107 - Downloading the html file...
+2026-03-20 12:30:46,968 - ECIScraper - DEBUG - wait_for_page_content:27 - Initiative progress timeline loaded
+2026-03-20 12:30:46,974 - ECIScraper - DEBUG - wait_for_page_content:46 - Content loaded: //h2[contains(@class,'ecl-u-type-heading-2') and .='Objectives']
+2026-03-20 12:30:47,102 - ECIScraper - INFO - _attempt_download:117 - ✅ Successfully downloaded: {year}_{number}.html
+2026-03-20 12:30:47,102 - ECIScraper - INFO - download_all_initiatives:64 - Awaiting next page in: 1.36s
+2026-03-20 12:30:48,458 - ECIScraper - INFO - download_all_initiatives:52 - Processing 3/128: https://citizens-initiative.europa.eu/initiatives/details/2026/000004_en
+2026-03-20 12:30:48,458 - ECIScraper - INFO - _attempt_download:107 - Downloading the html file...
+2026-03-20 12:30:50,409 - ECIScraper - DEBUG - wait_for_page_content:27 - Initiative progress timeline loaded
+2026-03-20 12:30:50,414 - ECIScraper - DEBUG - wait_for_page_content:46 - Content loaded: //h2[contains(@class,'ecl-u-type-heading-2') and .='Objectives']
+2026-03-20 12:30:50,490 - ECIScraper - INFO - _attempt_download:117 - ✅ Successfully downloaded: {year}_{number}.html
+2026-03-20 12:30:50,490 - ECIScraper - INFO - download_all_initiatives:64 - Awaiting next page in: 1.22s
+2026-03-20 12:30:51,710 - ECIScraper - INFO - download_all_initiatives:52 - Processing 4/128: https://citizens-initiative.europa.eu/initiatives/details/2025/000006_en
+2026-03-20 12:30:51,711 - ECIScraper - INFO - _attempt_download:107 - Downloading the html file...
+2026-03-20 12:30:53,972 - ECIScraper - DEBUG - wait_for_page_content:27 - Initiative progress timeline loaded
+2026-03-20 12:30:53,978 - ECIScraper - DEBUG - wait_for_page_content:46 - Content loaded: //h2[contains(@class,'ecl-u-type-heading-2') and .='Objectives']
+2026-03-20 12:30:54,078 - ECIScraper - INFO - _attempt_download:117 - ✅ Successfully downloaded: {year}_{number}.html
+2026-03-20 12:30:54,078 - ECIScraper - INFO - download_all_initiatives:64 - Awaiting next page in: 1.33s
+2026-03-20 12:30:55,409 - ECIScraper - INFO - download_all_initiatives:52 - Processing 5/128: https://citizens-initiative.europa.eu/initiatives/details/2026/000001_en
+2026-03-20 12:30:55,409 - ECIScraper - INFO - _attempt_download:107 - Downloading the html file...
+2026-03-20 12:30:57,581 - ECIScraper - DEBUG - handle_retry_exception:70 - 🔍 Exception details for https://citizens-initiative.europa.eu/initiatives/details/2026/000001_en: Exception: Rate limiting detected
+2026-03-20 12:30:57,581 - ECIScraper - WARNING - handle_retry_exception:81 - ⚠️  Rate limiting detected. Retrying 1/5 in 1.2s...
+2026-03-20 12:30:58,769 - ECIScraper - INFO - _attempt_download:107 - Downloading the html file...
+2026-03-20 12:31:01,102 - ECIScraper - DEBUG - wait_for_page_content:27 - Initiative progress timeline loaded
+2026-03-20 12:31:01,108 - ECIScraper - DEBUG - wait_for_page_content:46 - Content loaded: //h2[contains(@class,'ecl-u-type-heading-2') and .='Objectives']
+2026-03-20 12:31:01,206 - ECIScraper - INFO - _attempt_download:117 - ✅ Successfully downloaded: {year}_{number}.html
+2026-03-20 12:31:01,206 - ECIScraper - INFO - download_all_initiatives:64 - Awaiting next page in: 1.14s
+2026-03-20 12:31:02,347 - ECIScraper - INFO - download_all_initiatives:52 - Processing 6/128: https://citizens-initiative.europa.eu/initiatives/details/2024/000004_en
+2026-03-20 12:31:02,347 - ECIScraper - INFO - _attempt_download:107 - Downloading the html file...
+2026-03-20 12:31:04,083 - ECIScraper - DEBUG - handle_retry_exception:70 - 🔍 Exception details for https://citizens-initiative.europa.eu/initiatives/details/2024/000004_en: Exception: Rate limiting detected
+2026-03-20 12:31:04,084 - ECIScraper - WARNING - handle_retry_exception:81 - ⚠️  Rate limiting detected. Retrying 1/5 in 1.1s...
+2026-03-20 12:31:05,190 - ECIScraper - INFO - _attempt_download:107 - Downloading the html file...
+2026-03-20 12:31:07,325 - ECIScraper - DEBUG - wait_for_page_content:27 - Initiative progress timeline loaded
+2026-03-20 12:31:07,331 - ECIScraper - DEBUG - wait_for_page_content:46 - Content loaded: //h2[contains(@class,'ecl-u-type-heading-2') and .='Objectives']
+2026-03-20 12:31:07,456 - ECIScraper - INFO - _attempt_download:117 - ✅ Successfully downloaded: {year}_{number}.html
+2026-03-20 12:31:07,457 - ECIScraper - INFO - download_all_initiatives:64 - Awaiting next page in: 0.96s
+2026-03-20 12:31:08,414 - ECIScraper - INFO - download_all_initiatives:52 - Processing 7/128: https://citizens-initiative.europa.eu/initiatives/details/2026/000002_en
+2026-03-20 12:31:08,415 - ECIScraper - INFO - _attempt_download:107 - Downloading the html file...
+2026-03-20 12:31:10,239 - ECIScraper - DEBUG - wait_for_page_content:27 - Initiative progress timeline loaded
+2026-03-20 12:31:10,245 - ECIScraper - DEBUG - wait_for_page_content:46 - Content loaded: //h2[contains(@class,'ecl-u-type-heading-2') and .='Objectives']
+2026-03-20 12:31:10,340 - ECIScraper - INFO - _attempt_download:117 - ✅ Successfully downloaded: {year}_{number}.html
+2026-03-20 12:31:10,341 - ECIScraper - INFO - download_all_initiatives:64 - Awaiting next page in: 1.33s
+2026-03-20 12:31:11,674 - ECIScraper - INFO - download_all_initiatives:52 - Processing 8/128: https://citizens-initiative.europa.eu/initiatives/details/2025/000001_en
+2026-03-20 12:31:11,675 - ECIScraper - INFO - _attempt_download:107 - Downloading the html file...
+2026-03-20 12:31:13,851 - ECIScraper - DEBUG - wait_for_page_content:27 - Initiative progress timeline loaded
+2026-03-20 12:31:13,858 - ECIScraper - DEBUG - wait_for_page_content:46 - Content loaded: //h2[contains(@class,'ecl-u-type-heading-2') and .='Objectives']
+2026-03-20 12:31:13,958 - ECIScraper - INFO - _attempt_download:117 - ✅ Successfully downloaded: {year}_{number}.html
+2026-03-20 12:31:13,958 - ECIScraper - INFO - download_all_initiatives:64 - Awaiting next page in: 1.40s
+2026-03-20 12:31:15,355 - ECIScraper - INFO - download_all_initiatives:52 - Processing 9/128: https://citizens-initiative.europa.eu/initiatives/details/2024/000010_en
+2026-03-20 12:31:15,356 - ECIScraper - INFO - _attempt_download:107 - Downloading the html file...
+2026-03-20 12:31:17,404 - ECIScraper - DEBUG - handle_retry_exception:70 - 🔍 Exception details for https://citizens-initiative.europa.eu/initiatives/details/2024/000010_en: Exception: Rate limiting detected
+2026-03-20 12:31:17,404 - ECIScraper - WARNING - handle_retry_exception:81 - ⚠️  Rate limiting detected. Retrying 1/5 in 1.1s...
+2026-03-20 12:31:18,486 - ECIScraper - INFO - _attempt_download:107 - Downloading the html file...
+2026-03-20 12:31:20,783 - ECIScraper - DEBUG - wait_for_page_content:27 - Initiative progress timeline loaded
+2026-03-20 12:31:20,790 - ECIScraper - DEBUG - wait_for_page_content:46 - Content loaded: //h2[contains(@class,'ecl-u-type-heading-2') and .='Objectives']
+2026-03-20 12:31:20,913 - ECIScraper - INFO - _attempt_download:117 - ✅ Successfully downloaded: {year}_{number}.html
+2026-03-20 12:31:20,914 - ECIScraper - INFO - download_all_initiatives:64 - Awaiting next page in: 0.90s
+2026-03-20 12:31:21,818 - ECIScraper - INFO - download_all_initiatives:52 - Processing 10/128: https://citizens-initiative.europa.eu/initiatives/details/2024/000007_en
+2026-03-20 12:31:21,818 - ECIScraper - INFO - _attempt_download:107 - Downloading the html file...
+2026-03-20 12:31:23,844 - ECIScraper - DEBUG - wait_for_page_content:27 - Initiative progress timeline loaded
+2026-03-20 12:31:23,850 - ECIScraper - DEBUG - wait_for_page_content:46 - Content loaded: //h2[contains(@class,'ecl-u-type-heading-2') and .='Objectives']
+2026-03-20 12:31:23,950 - ECIScraper - INFO - _attempt_download:117 - ✅ Successfully downloaded: {year}_{number}.html
+2026-03-20 12:31:23,950 - ECIScraper - INFO - download_all_initiatives:64 - Awaiting next page in: 1.50s
+2026-03-20 12:31:25,446 - ECIScraper - INFO - download_all_initiatives:52 - Processing 11/128: https://citizens-initiative.europa.eu/initiatives/details/2024/000011_en
+2026-03-20 12:31:25,447 - ECIScraper - INFO - _attempt_download:107 - Downloading the html file...
+2026-03-20 12:31:27,866 - ECIScraper - DEBUG - wait_for_page_content:27 - Initiative progress timeline loaded
+2026-03-20 12:31:27,872 - ECIScraper - DEBUG - wait_for_page_content:46 - Content loaded: //h2[contains(@class,'ecl-u-type-heading-2') and .='Objectives']
+2026-03-20 12:31:27,971 - ECIScraper - INFO - _attempt_download:117 - ✅ Successfully downloaded: {year}_{number}.html
+2026-03-20 12:31:27,971 - ECIScraper - INFO - download_all_initiatives:64 - Awaiting next page in: 1.30s
+2026-03-20 12:31:29,271 - ECIScraper - INFO - download_all_initiatives:52 - Processing 12/128: https://citizens-initiative.europa.eu/initiatives/details/2025/000005_en
+2026-03-20 12:31:29,271 - ECIScraper - INFO - _attempt_download:107 - Downloading the html file...
+2026-03-20 12:31:31,304 - ECIScraper - DEBUG - wait_for_page_content:27 - Initiative progress timeline loaded
+2026-03-20 12:31:31,310 - ECIScraper - DEBUG - wait_for_page_content:46 - Content loaded: //h2[contains(@class,'ecl-u-type-heading-2') and .='Objectives']
+2026-03-20 12:31:31,408 - ECIScraper - INFO - _attempt_download:117 - ✅ Successfully downloaded: {year}_{number}.html
+2026-03-20 12:31:31,408 - ECIScraper - INFO - download_all_initiatives:64 - Awaiting next page in: 0.96s
+2026-03-20 12:31:32,365 - ECIScraper - INFO - download_all_initiatives:52 - Processing 13/128: https://citizens-initiative.europa.eu/initiatives/details/2025/000002_en
+2026-03-20 12:31:32,366 - ECIScraper - INFO - _attempt_download:107 - Downloading the html file...
+2026-03-20 12:31:33,147 - ECIScraper - INFO - scrape_eci_initiatives:49 - Browser closed

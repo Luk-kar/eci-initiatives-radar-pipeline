@@ -19,6 +19,7 @@ from .consts import (
     RATE_LIMIT_INDICATORS,
     LISTING_PAGE_FILENAME_PATTERN,
     LOG_MESSAGES,
+    INITIATIVE_PAGE_FILENAME_PATTERN,
 )
 from ._logger import logger
 
@@ -85,7 +86,7 @@ def save_initiative_page(
 
     ensure_dirs(year_dir)
 
-    file_name = f"{year}_{number}.html"
+    file_name = INITIATIVE_PAGE_FILENAME_PATTERN
     file_path = os.path.join(year_dir, file_name)
 
     try:

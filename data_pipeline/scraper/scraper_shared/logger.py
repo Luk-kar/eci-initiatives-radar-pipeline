@@ -7,7 +7,7 @@ import logging
 import os
 from typing import Optional
 
-from .consts import LOG_DIR_NAME, DATA_DIR_NAME, SCRIPT_DIR
+from .consts import LOG_DIR_NAME, DATA_DIR_NAME, PIPELINE_DIR
 
 
 def get_logger(name: str, log_dir: Optional[str] = None) -> logging.Logger:
@@ -19,7 +19,7 @@ def get_logger(name: str, log_dir: Optional[str] = None) -> logging.Logger:
     Args:
         name: Logger name (e.g. "ECIScraper", "ECIResponsesScraper").
         log_dir: Directory where log files should be written. If not provided,
-            logs will be written under SCRIPT_DIR/data/<timestamp>/logs/ and
+            logs will be written under PIPELINE_DIR/data/<timestamp>/logs/ and
             must be fully specified by the caller.
 
     Returns:
@@ -34,7 +34,7 @@ def get_logger(name: str, log_dir: Optional[str] = None) -> logging.Logger:
     if log_dir is None:
         # Fallback: create a timestamped log directory under shared data dir.
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        log_dir = os.path.join(SCRIPT_DIR, DATA_DIR_NAME, timestamp, LOG_DIR_NAME)
+        log_dir = os.path.join(PIPELINE_DIR, DATA_DIR_NAME, timestamp, LOG_DIR_NAME)
 
     os.makedirs(log_dir, exist_ok=True)
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")

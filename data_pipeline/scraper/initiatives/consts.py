@@ -31,8 +31,9 @@ from ..scraper_shared.consts import (
     WEBDRIVER_TIMEOUT_CONTENT,
     MIN_HTML_LENGTH,
     RATE_LIMIT_INDICATORS,
-    SCRIPT_DIR,
+    PIPELINE_DIR,
     DEBUGGING_DIR_NAME,
+    INITIATIVE_PAGE_FILENAME_PATTERN,
 )
 
 # Scraping timestamp (unique to initiatives scraper as it runs first)
@@ -46,7 +47,7 @@ LISTINGS_DIR_NAME = "listings"
 PAGES_DIR_NAME = "initiatives"
 
 # Log directory path
-LOG_DIR = os.path.join(SCRIPT_DIR, DATA_DIR_NAME, START_SCRAPING, LOG_DIR_NAME)
+LOG_DIR = os.path.join(PIPELINE_DIR, DATA_DIR_NAME, START_SCRAPING, LOG_DIR_NAME)
 
 # Module-specific Timing Configuration (in seconds)
 # Fine-tune these based on server response times and rate limiting behavior
@@ -59,7 +60,6 @@ LISTING_PAGE_FILENAME_PATTERN = (
     "Find_initiative_European_Citizens_Initiative_page_{:03d}.html"
 )
 LISTING_PAGE_MAIN_FILENAME = "Find_initiative_European_Citizens_Initiative.html"
-INITIATIVE_PAGE_FILENAME_PATTERN = "{year}_{number}.html"
 
 # CSV Configuration
 CSV_FIELDNAMES = [

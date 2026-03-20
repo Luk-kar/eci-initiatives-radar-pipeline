@@ -10,13 +10,15 @@ and other configuration values common to all scraper modules:
 
 from pathlib import Path
 
-# Script / project root
-SCRIPT_DIR = Path(__file__).parent.parent.parent.parent.absolute()
-
-# Shared directory names
-DATA_DIR_NAME = "data"
-LOG_DIR_NAME = "logs"
-DEBUGGING_DIR_NAME = "debugging"
+from ...consts import (  # data_pipeline
+    PIPELINE_DIR,
+    INITIATIVES_DIR_NAME,
+    LISTINGS_DIR_NAME,
+    INITIATIVE_PAGE_FILENAME_PATTERN,
+    LOG_DIR_NAME,
+    DATA_DIR_NAME,
+    DEBUGGING_DIR_NAME,
+)
 
 # Shared browser configuration
 CHROME_OPTIONS = [

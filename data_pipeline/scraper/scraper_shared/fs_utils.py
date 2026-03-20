@@ -14,7 +14,7 @@ def ensure_dirs(*paths: str) -> None:
 
 
 def build_timestamped_run_dirs(
-    script_dir: str,
+    pipeline_dir: str,
     data_dir_name: str,
     timestamp: str,
     *subdirs: str,
@@ -22,7 +22,7 @@ def build_timestamped_run_dirs(
     """Build and return a dict of timestamped directories.
 
     Args:
-        script_dir: Project root or base script directory.
+        pipeline_dir: Project root or base script directory.
         data_dir_name: Name of the shared data folder (e.g. "data").
         timestamp: Timestamp string (YYYY-MM-DD_HH-MM-SS).
         subdirs: Subdirectory names to create under the timestamp dir.
@@ -30,7 +30,7 @@ def build_timestamped_run_dirs(
     Returns:
         Mapping of subdir name → full path.
     """
-    base = os.path.join(script_dir, data_dir_name, timestamp)
+    base = os.path.join(pipeline_dir, data_dir_name, timestamp)
     paths: dict[str, str] = {}
     for name in subdirs:
         full = os.path.join(base, name)

@@ -14,7 +14,7 @@ from .statistics import display_completion_summary
 from .browser import initialize_browser
 from .consts import (
     START_SCRAPING,
-    SCRIPT_DIR,
+    PIPELINE_DIR,
     BASE_URL,
     DATA_DIR_NAME,
     LISTINGS_DIR_NAME,
@@ -62,9 +62,11 @@ def _setup_directories() -> Tuple[str, str]:
     """Create and return (list_dir, pages_dir) for this scraping run."""
 
     list_dir = os.path.join(
-        SCRIPT_DIR, DATA_DIR_NAME, START_SCRAPING, LISTINGS_DIR_NAME
+        PIPELINE_DIR, DATA_DIR_NAME, START_SCRAPING, LISTINGS_DIR_NAME
     )
-    pages_dir = os.path.join(SCRIPT_DIR, DATA_DIR_NAME, START_SCRAPING, PAGES_DIR_NAME)
+    pages_dir = os.path.join(
+        PIPELINE_DIR, DATA_DIR_NAME, START_SCRAPING, PAGES_DIR_NAME
+    )
     setup_scraping_dirs(list_dir, pages_dir)
 
     return list_dir, pages_dir
