@@ -10,6 +10,7 @@ pyproject.toml
 ../data_pipeline/scraper/initiatives/css_selectors.py
 ../data_pipeline/scraper/initiatives/data_parser.py
 ../data_pipeline/scraper/initiatives/file_ops.py
+../data_pipeline/scraper/initiatives/log_messages.py
 ../data_pipeline/scraper/initiatives/statistics.py
 ../data_pipeline/scraper/initiatives/fetchers/__init__.py
 ../data_pipeline/scraper/initiatives/fetchers/ecis/__init__.py
@@ -18,12 +19,19 @@ pyproject.toml
 ../data_pipeline/scraper/initiatives/fetchers/listings/__init__.py
 ../data_pipeline/scraper/initiatives/fetchers/listings/fetcher.py
 ../data_pipeline/scraper/initiatives/fetchers/listings/page_ops.py
+../data_pipeline/scraper/initiatives/fetchers/tests/__init__.py
+../data_pipeline/scraper/initiatives/fetchers/tests/conftest.py
+../data_pipeline/scraper/initiatives/fetchers/tests/test_ecis_fetcher.py
+../data_pipeline/scraper/initiatives/fetchers/tests/test_ecis_waiter.py
+../data_pipeline/scraper/initiatives/fetchers/tests/test_listings_fetcher.py
+../data_pipeline/scraper/initiatives/fetchers/tests/test_listings_page_ops.py
 ../data_pipeline/scraper/scraper_shared/__init__.py
 ../data_pipeline/scraper/scraper_shared/browser.py
 ../data_pipeline/scraper/scraper_shared/consts.py
 ../data_pipeline/scraper/scraper_shared/fetch_utils.py
 ../data_pipeline/scraper/scraper_shared/fs_utils.py
 ../data_pipeline/scraper/scraper_shared/html_utils.py
+../data_pipeline/scraper/scraper_shared/log_messages.py
 ../data_pipeline/scraper/scraper_shared/logger.py
 ../eci_data_pipeline.egg-info/PKG-INFO
 ../eci_data_pipeline.egg-info/SOURCES.txt

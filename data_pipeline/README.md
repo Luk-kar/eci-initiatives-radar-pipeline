@@ -11,3 +11,8 @@ uv pip install -e data_pipeline
 eci-scrape-initiatives
 # or
 python -m data_pipeline.scraper.initiatives
+
+# 5. For tests:
+uv pip install -e data_pipeline[dev]
+python -m pytest data_pipeline
+======================

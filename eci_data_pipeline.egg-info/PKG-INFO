@@ -8,3 +8,5 @@ Requires-Dist: selenium==4.35.0
 Requires-Dist: beautifulsoup4==4.13.5
 Requires-Dist: pydantic==2.12.5
 Requires-Dist: html5lib==1.1
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
