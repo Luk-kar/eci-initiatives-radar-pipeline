@@ -2,7 +2,7 @@
 Pipeline-wide constants for the ECI data pipeline.
 
 Shared across all pipeline stages:
-- scraper (initiatives, responses, responses_followup_website)
+- scraper (initiatives, responses, responses_followup)
 - extractor
 - csv_merger
 - csv_renamer
@@ -24,7 +24,7 @@ DEBUGGING_DIR_NAME = "debugging"
 INITIATIVES_DIR_NAME = "initiatives"
 LISTINGS_DIR_NAME = "listings"
 RESPONSES_DIR_NAME = "responses"
-RESPONSES_FOLLOWUP_DIR_NAME = "responses_followup_website"
+RESPONSES_FOLLOWUP_DIR_NAME = "responses_followup"
 
 # ── HTML page filename pattern ─────────────────────────────────────────────────
 # Produced by scraper, consumed by extractor.
@@ -36,7 +36,7 @@ INITIATIVE_PAGE_FILENAME_PATTERN = "{year}_{number}.html"
 # Produced by extractor, consumed by merger and renamer.
 ECI_INITIATIVES_CSV_PATTERN = "eci_initiatives_{timestamp}.csv"
 ECI_RESPONSES_CSV_PATTERN = "eci_responses_{timestamp}.csv"
-ECI_RESPONSES_FOLLOWUP_CSV_PATTERN = "eci_responses_followup_website_{timestamp}.csv"
+ECI_RESPONSES_FOLLOWUP_CSV_PATTERN = "eci_responses_followup_{timestamp}.csv"
 
 # ── Merger CSV output filename pattern ─────────────────────────────────────────
 # Produced by merger, consumed by renamer.
@@ -48,13 +48,11 @@ ECI_DASHBOARD_CSV_PATTERN = "eci_dashboard_{timestamp}.csv"
 # ── Log filename patterns ──────────────────────────────────────────────────────
 LOG_SCRAPER_INITIATIVES_PATTERN = "scraper_initiatives_{timestamp}.log"
 LOG_SCRAPER_RESPONSES_PATTERN = "scraper_responses_{timestamp}.log"
-LOG_SCRAPER_RESPONSES_FOLLOWUP_PATTERN = (
-    "scraper_responses_followup_website_{timestamp}.log"
-)
+LOG_SCRAPER_RESPONSES_FOLLOWUP_PATTERN = "scraper_responses_followup_{timestamp}.log"
 LOG_EXTRACTOR_INITIATIVES_PATTERN = "extractor_initiatives_{timestamp}.log"
 LOG_EXTRACTOR_RESPONSES_PATTERN = "extractor_responses_{timestamp}.log"
 LOG_EXTRACTOR_RESPONSES_FOLLOWUP_PATTERN = (
-    "extractor_responses_followup_website_{timestamp}.log"
+    "extractor_responses_followup_{timestamp}.log"
 )
 LOG_MERGER_PATTERN = "merger_responses_and_followup_{timestamp}.log"
 LOG_DASHBOARD_PATTERN = "dashboard_{timestamp}.log"

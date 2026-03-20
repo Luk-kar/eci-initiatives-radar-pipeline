@@ -15,7 +15,7 @@ dependencies = [
 [project.scripts]
 eci-scrape-initiatives = "data_pipeline.scraper.initiatives.__main__:scrape_eci_initiatives"
 eci-scrape-responses = "data_pipeline.scraper.responses.main:scrape_commission_responses"
-eci-scrape-followup = "data_pipeline.scraper.responses_followup_website.main:scrape_followup_websites"
+eci-scrape-followup = "data_pipeline.scraper.responses_followup.main:scrape_followup_websites"
 
 [tool.setuptools]
 package-dir = {"" = ".."}  # look for packages in the parent of data_pipeline/

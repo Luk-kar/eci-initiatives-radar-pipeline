@@ -5,7 +5,7 @@ Contains browser settings, validation rules, rate limiting detection,
 and other configuration values common to all scraper modules:
 - initiatives
 - responses
-- responses_followup_website
+- responses_followup
 """
 
 from pathlib import Path
