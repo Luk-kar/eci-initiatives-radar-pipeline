@@ -6,7 +6,13 @@ from collections import Counter
 from typing import Dict, List
 
 # Local modules
-from .consts import CSV_FILENAME
+from .consts import (
+    CSV_FILENAME,
+    PIPELINE_DIR,
+    DATA_DIR_NAME,
+    LISTINGS_DIR_NAME,
+    PAGES_DIR_NAME,
+)
 from ._logger import logger
 from .log_messages import LOG_MESSAGES
 
@@ -32,9 +38,11 @@ def gather_scraping_statistics(
 ) -> dict:
     """Gather all statistics needed for the completion summary."""
 
+    run_dir = os.path.join(PIPELINE_DIR, DATA_DIR_NAME, start_scraping)
+
     # Count initiatives by status from CSV
     current_status_counter: Counter[str] = Counter()
-    url_list_file = f"initiatives/{start_scraping}/list/{CSV_FILENAME}"
+    url_list_file = os.path.join(run_dir, LISTINGS_DIR_NAME, CSV_FILENAME)
 
     if os.path.exists(url_list_file):
         with open(url_list_file, "r", encoding="utf-8") as file:
@@ -44,11 +52,10 @@ def gather_scraping_statistics(
                     current_status_counter[row["current_status"]] += 1
 
     # Count downloaded files
-    pages_dir = f"initiatives/{start_scraping}/initiatives"
+    pages_dir = os.path.join(run_dir, PAGES_DIR_NAME)
     downloaded_files_count = 0
 
     if os.path.exists(pages_dir):
-        # Iterate through year directories and count HTML files
         for year_dir in os.listdir(pages_dir):
             year_path = os.path.join(pages_dir, year_dir)
             if os.path.isdir(year_path):
