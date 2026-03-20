@@ -11,7 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 # Shared
-from ..scraper_shared.downloader import (
+from ..scraper_shared.fetch_utils import (
     check_rate_limiting,
     download_with_retry,
     save_debug_page,
@@ -28,7 +28,7 @@ from .consts import (
     LOG_MESSAGES,
 )
 from .file_ops import save_initiative_page
-from .scraper_logger import logger
+from ._logger import logger
 
 
 def download_initiatives(
@@ -116,31 +116,6 @@ def wait_for_page_content(driver: webdriver.Chrome) -> bool:
     return False
 
 
-def _attempt_download(
-    driver: webdriver.Chrome,
-    pages_dir: str,
-    url: str,
-) -> str:
-    """Perform a single download attempt. Returns the saved filename.
-
-    Raises:
-        Exception: On rate limiting or any page/save failure.
-    """
-
-    logger.info("Downloading the html file...")
-    driver.get(url)
-
-    time.sleep(random.uniform(*WAIT_DYNAMIC_CONTENT))
-    check_rate_limiting(driver)
-    content_found = wait_for_page_content(driver)
-
-    file_name = save_initiative_page(
-        pages_dir, url, driver.page_source, debug=not content_found
-    )
-    logger.info(LOG_MESSAGES["download_success"].format(filename=file_name))
-    return file_name
-
-
 def download_single_initiative(
     driver: webdriver.Chrome,
     pages_dir: str,
@@ -166,3 +141,28 @@ def download_single_initiative(
         retry_wait_base=random.uniform(*RETRY_WAIT_BASE),
         logger=logger,
     )
+
+
+def _attempt_download(
+    driver: webdriver.Chrome,
+    pages_dir: str,
+    url: str,
+) -> str:
+    """Perform a single download attempt. Returns the saved filename.
+
+    Raises:
+        Exception: On rate limiting or any page/save failure.
+    """
+
+    logger.info("Downloading the html file...")
+    driver.get(url)
+
+    time.sleep(random.uniform(*WAIT_DYNAMIC_CONTENT))
+    check_rate_limiting(driver)
+    content_found = wait_for_page_content(driver)
+
+    file_name = save_initiative_page(
+        pages_dir, url, driver.page_source, debug=not content_found
+    )
+    logger.info(LOG_MESSAGES["download_success"].format(filename=file_name))
+    return file_name

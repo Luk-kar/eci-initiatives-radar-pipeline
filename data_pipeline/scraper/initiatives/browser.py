@@ -2,7 +2,7 @@ from selenium import webdriver
 
 from ..scraper_shared.browser import initialize_browser as _shared_initialize_browser
 from .consts import LOG_MESSAGES
-from .scraper_logger import logger
+from ._logger import logger
 
 
 def initialize_browser() -> webdriver.Chrome:

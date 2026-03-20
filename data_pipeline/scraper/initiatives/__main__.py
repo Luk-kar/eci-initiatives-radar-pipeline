@@ -7,8 +7,8 @@ import os
 from selenium import webdriver
 
 # Local
-from .crawler import scrape_all_initiatives_on_all_pages
-from .downloader import download_initiatives
+from .scraper_listing import scrape_all_initiatives_on_all_pages
+from .scraper_ecis import download_initiatives
 from .file_ops import setup_scraping_dirs, write_initiatives_csv
 from .statistics import display_completion_summary, gather_scraping_statistics
 from .browser import initialize_browser
@@ -22,7 +22,7 @@ from .consts import (
     CSV_FILENAME,
     LOG_MESSAGES,
 )
-from .scraper_logger import logger
+from ._logger import logger
 
 
 def scrape_eci_initiatives() -> str:
@@ -81,6 +81,7 @@ def save_and_download_initiatives(
     initiative_data: list[Dict[str, str]],
 ) -> Tuple[list, list]:
     """Save initiative data to CSV and download individual pages."""
+
     url_list_file = os.path.join(list_dir, CSV_FILENAME)
 
     # Save initial data to CSV

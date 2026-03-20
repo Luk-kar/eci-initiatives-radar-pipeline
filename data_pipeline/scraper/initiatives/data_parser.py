@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 
 # Local
 from .css_selectors import ECIlistingSelectors
-from .scraper_logger import logger
+from ._logger import logger
 
 
 def parse_initiatives_list_data(
