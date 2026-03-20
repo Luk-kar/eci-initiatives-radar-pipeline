@@ -17,6 +17,7 @@ def display_completion_summary(
     failed_urls: list,
 ) -> None:
     """Display final completion summary with statistics."""
+
     stats = gather_scraping_statistics(start_scraping, initiative_data, failed_urls)
     display_summary_info(start_scraping, saved_page_paths, stats)
     display_results_and_files(start_scraping, saved_page_paths, failed_urls, stats)
@@ -65,6 +66,7 @@ def display_summary_info(
     start_scraping: str, saved_page_paths: list, stats: dict
 ) -> None:
     """Display the main summary information and statistics."""
+
     logger.info(LOG_SUMMARY["divider_line"])
     logger.info(LOG_SUMMARY["scraping_complete"])
     logger.info(LOG_SUMMARY["divider_line"])
@@ -92,6 +94,7 @@ def display_results_and_files(
     start_scraping: str, saved_page_paths: list, failed_urls: list, stats: dict
 ) -> None:
     """Display download results and file location information."""
+
     logger.info(
         LOG_SUMMARY["pages_downloaded"].format(
             downloaded_count=stats["downloaded_count"],

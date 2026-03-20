@@ -25,6 +25,7 @@ from ._logger import logger
 
 def setup_scraping_dirs(list_dir: str, pages_dir: str) -> None:
     """Create necessary directories for scraping output."""
+
     ensure_dirs(list_dir, pages_dir)
     logger.debug(f"Created directories: {list_dir}, {pages_dir}")
 
@@ -116,4 +117,5 @@ def write_initiatives_csv(
         file_path: Full path to the CSV file
         initiative_data: List of initiative dictionaries to write
     """
+
     write_csv(file_path, CSV_FIELDNAMES, initiative_data)

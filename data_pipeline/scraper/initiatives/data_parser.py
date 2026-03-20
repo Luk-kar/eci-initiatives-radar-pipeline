@@ -20,6 +20,7 @@ def parse_initiatives_list_data(
     initiative_data: list[Dict[str, str]] = []
 
     for content_block in soup.select(ECIlistingSelectors.CONTENT_BLOCKS):
+
         title_link = content_block.select_one(ECIlistingSelectors.INITIATIVE_CARDS)
         if not title_link or not title_link.get("href"):
             continue
