@@ -21,8 +21,8 @@ from ...consts import (
     WAIT_BETWEEN_PAGES,
     WEBDRIVER_TIMEOUT_DEFAULT,
     LISTING_PAGE_FILENAME_PATTERN,
-    LOG_MESSAGES,
 )
+from ...log_messages import LOG_MESSAGES
 from ..._logger import logger
 
 

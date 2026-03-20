@@ -76,3 +76,4 @@ page_to_export/partials/*
 # Ignore raw HTML debugging dumps locally so you don't commit 1,000 files by accident
 data/latest_session/*.html
 /data/
+/data_pipeline/data/

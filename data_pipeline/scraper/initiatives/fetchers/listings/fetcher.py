@@ -28,8 +28,8 @@ from ...consts import (
     DEFAULT_MAX_RETRIES,
     RETRY_WAIT_BASE,
     LISTING_PAGE_MAIN_FILENAME,
-    LOG_MESSAGES,
 )
+from ...log_messages import LOG_MESSAGES
 from ..._logger import logger
 from .page_ops import (
     navigate_to_next_page,

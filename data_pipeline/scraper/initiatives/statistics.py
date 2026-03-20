@@ -6,8 +6,9 @@ from collections import Counter
 from typing import Dict, List
 
 # Local modules
-from .consts import CSV_FILENAME, LOG_MESSAGES
+from .consts import CSV_FILENAME
 from ._logger import logger
+from .log_messages import LOG_MESSAGES
 
 
 def display_completion_summary(

@@ -20,8 +20,8 @@ from .consts import (
     LISTINGS_DIR_NAME,
     PAGES_DIR_NAME,
     CSV_FILENAME,
-    LOG_MESSAGES,
 )
+from .log_messages import LOG_MESSAGES
 from ._logger import logger
 
 

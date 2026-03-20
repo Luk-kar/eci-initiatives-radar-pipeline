@@ -20,8 +20,8 @@ from ...consts import (
     WAIT_BETWEEN_DOWNLOADS,
     RETRY_WAIT_BASE,
     DEFAULT_MAX_RETRIES,
-    LOG_MESSAGES,
 )
+from ...log_messages import LOG_MESSAGES
 from ...file_ops import save_initiative_page
 from ..._logger import logger
 from .waiter import wait_for_page_content

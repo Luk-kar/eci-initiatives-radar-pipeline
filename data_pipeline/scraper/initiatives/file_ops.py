@@ -18,10 +18,10 @@ from .consts import (
     MIN_HTML_LENGTH,
     RATE_LIMIT_INDICATORS,
     LISTING_PAGE_FILENAME_PATTERN,
-    LOG_MESSAGES,
     INITIATIVE_PAGE_FILENAME_PATTERN,
 )
 from ._logger import logger
+from .log_messages import LOG_MESSAGES
 
 
 def setup_scraping_dirs(list_dir: str, pages_dir: str) -> None:

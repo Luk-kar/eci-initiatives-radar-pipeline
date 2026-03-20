@@ -1,7 +1,7 @@
 from selenium import webdriver
 
 from ..scraper_shared.browser import initialize_browser as _shared_initialize_browser
-from .consts import LOG_MESSAGES
+from .log_messages import LOG_MESSAGES
 from ._logger import logger
 
 
