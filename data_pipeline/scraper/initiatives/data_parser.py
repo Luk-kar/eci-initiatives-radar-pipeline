@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 # Local
 from .css_selectors import ECIlistingSelectors
 from ._logger import logger
+from .log_messages import LOG_MESSAGES
 
 
 def parse_initiatives_list_data(
@@ -14,7 +15,7 @@ def parse_initiatives_list_data(
 ) -> list[Dict[str, str]]:
     """Parse HTML page source and extract initiatives data."""
 
-    logger.info("Parsing saved listing page for initiatives links...")
+    logger.info(LOG_MESSAGES["parsing_listing"])
 
     soup = BeautifulSoup(page_source, "html.parser")
     initiative_data: list[Dict[str, str]] = []
@@ -57,5 +58,5 @@ def parse_initiatives_list_data(
             }
         )
 
-    logger.info(f"✅ Found {len(initiative_data)} initiative entries")
+    logger.info(LOG_MESSAGES["parsing_complete"].format(count=len(initiative_data)))
     return initiative_data

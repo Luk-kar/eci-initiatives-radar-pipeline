@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from ...css_selectors import ECIinitiativeSelectors
 from ...consts import WEBDRIVER_TIMEOUT_CONTENT
 from ..._logger import logger
+from ...log_messages import LOG_MESSAGES
 
 
 def wait_for_page_content(driver: webdriver.Chrome) -> bool:
@@ -24,12 +25,9 @@ def wait_for_page_content(driver: webdriver.Chrome) -> bool:
                 (By.CSS_SELECTOR, ECIinitiativeSelectors.INITIATIVE_PROGRESS)
             )
         )
-        logger.debug("Initiative progress timeline loaded")
+        logger.debug(LOG_MESSAGES["timeline_loaded"])
     except Exception:
-        logger.warning(
-            "Initiative progress timeline not found, "
-            "should be in all initiatives.\ncontinuing..."
-        )
+        logger.warning(LOG_MESSAGES["timeline_not_found"])
 
     content_selectors_to_wait = [
         ECIinitiativeSelectors.OBJECTIVES,
@@ -43,10 +41,10 @@ def wait_for_page_content(driver: webdriver.Chrome) -> bool:
     for selector in content_selectors_to_wait:
         try:
             wait.until(EC.presence_of_element_located((By.XPATH, selector)))
-            logger.debug(f"Content loaded: {selector}")
+            logger.debug(LOG_MESSAGES["content_loaded"].format(selector=selector))
             return True
         except Exception:
             continue
 
-    logger.warning("No main content elements found, but proceeding...")
+    logger.warning(LOG_MESSAGES["no_content_found"])
     return False

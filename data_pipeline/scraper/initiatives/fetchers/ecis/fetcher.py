@@ -49,7 +49,11 @@ def download_all_initiatives(
 
     for i, row in enumerate(initiative_data):
         url = row["url"]
-        logger.info(f"Processing {i+1}/{len(initiative_data)}: {url}")
+        logger.info(
+            LOG_MESSAGES["processing_initiative"].format(
+                index=i + 1, total=len(initiative_data), url=url
+            )
+        )
 
         success = download_single_initiative(driver, pages_dir, url)
 
@@ -61,10 +65,10 @@ def download_all_initiatives(
         updated_data.append(row)
 
         wait_time = random.uniform(*WAIT_BETWEEN_DOWNLOADS)
-        logger.info(f"Awaiting next page in: {wait_time:.2f}s")
+        logger.info(LOG_MESSAGES["awaiting_next_page"].format(wait_time=wait_time))
         time.sleep(wait_time)
 
-    logger.info(f"Download completed. Failed URLs: {len(failed_urls)}")
+    logger.info(LOG_MESSAGES["download_complete"].format(failed_count=len(failed_urls)))
     return updated_data, failed_urls
 
 
@@ -104,7 +108,7 @@ def _attempt_download(
     Raises:
         Exception: On rate limiting or any page/save failure.
     """
-    logger.info("Downloading the html file...")
+    logger.info(LOG_MESSAGES["downloading_html"])
     driver.get(url)
 
     time.sleep(random.uniform(*WAIT_DYNAMIC_CONTENT))

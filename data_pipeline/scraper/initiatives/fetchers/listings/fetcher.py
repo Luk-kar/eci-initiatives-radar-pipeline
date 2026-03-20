@@ -56,10 +56,10 @@ def scrape_all_listings(
     """
 
     url = base_url + ROUTE_FIND_INITIATIVE
-    logger.info(f"Starting pagination scraping from: {url}")
+    logger.info(LOG_MESSAGES["pagination_start"].format(url=url))
 
     if not _fetch_first_listing_page(driver, url, list_dir):
-        logger.error("❌ Failed to load first listing page. Aborting pagination.")
+        logger.error(LOG_MESSAGES["first_page_failed"])
         return [], []
 
     return _paginate_and_scrape(driver, base_url, list_dir, url)
@@ -120,8 +120,9 @@ def _paginate_and_scrape(
             break
 
     logger.info(
-        f"Completed scraping {current_page} pages with "
-        f"{len(all_initiative_data)} total initiatives"
+        LOG_MESSAGES["pagination_complete"].format(
+            page_count=current_page, total_initiatives=len(all_initiative_data)
+        )
     )
     return all_initiative_data, saved_page_paths
 
@@ -165,7 +166,7 @@ def scrape_single_listing_page(
     )
 
     if not success:
-        logger.error(f"❌ Failed to scrape listing page {current_page}")
+        logger.error(LOG_MESSAGES["listing_page_failed"].format(page=current_page))
         return [], ""
 
     return result["data"], result["path"]
@@ -194,11 +195,11 @@ def save_main_listing_page(
                     (By.CSS_SELECTOR, ECIlistingSelectors.PAGINATION_LINKS)
                 )
             )
-            logger.info("Initiatives loaded successfully")
+            logger.info(LOG_MESSAGES["listings_loaded"])
 
         except Exception as e:
             check_rate_limiting(driver)
-            logger.warning(f"Timeout waiting for initiatives: {e} — continuing")
+            logger.warning(LOG_MESSAGES["listing_timeout"].format(error=e))
 
         page_source = driver.page_source
         main_page_path = os.path.join(list_dir, LISTING_PAGE_MAIN_FILENAME)
@@ -206,7 +207,7 @@ def save_main_listing_page(
         with open(main_page_path, "w", encoding="utf-8") as f:
             f.write(BeautifulSoup(page_source, "html.parser").prettify())
 
-        logger.info(f"Main page saved to: {main_page_path}")
+        logger.info(LOG_MESSAGES["main_page_saved"].format(path=main_page_path))
         result["source"] = page_source
         result["path"] = main_page_path
 
@@ -225,7 +226,7 @@ def save_main_listing_page(
     )
 
     if not success:
-        logger.error("❌ Failed to scrape main initiatives page")
+        logger.error(LOG_MESSAGES["main_page_failed"])
         return "", ""
 
     return result["source"], result["path"]

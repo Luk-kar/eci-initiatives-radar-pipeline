@@ -72,7 +72,7 @@ def wait_for_listing_page_content(driver: webdriver.Chrome, current_page: int) -
         )
         logger.info(LOG_MESSAGES["page_loaded"].format(page=current_page))
         random_time = random.uniform(*WAIT_DYNAMIC_CONTENT)
-        logger.debug(f"Waiting {random_time:.1f}s for dynamic content...")
+        logger.debug(LOG_MESSAGES["dynamic_content_wait"].format(wait_time=random_time))
         time.sleep(random_time)
 
     except Exception as e:
@@ -80,8 +80,7 @@ def wait_for_listing_page_content(driver: webdriver.Chrome, current_page: int) -
         # Swallow genuine "no content on this page" timeouts.
         check_rate_limiting(driver)
         logger.warning(
-            f"No initiatives found or timeout on page {current_page}: "
-            f"{e} — continuing with current content"
+            LOG_MESSAGES["listing_content_timeout"].format(page=current_page, error=e)
         )
 
 
@@ -92,7 +91,7 @@ def load_listing_url(driver: webdriver.Chrome, url: str) -> None:
         Exception: If the loaded page shows rate limiting indicators.
     """
 
-    logger.info(f"Loading page: {url}")
+    logger.info(LOG_MESSAGES["loading_page"].format(url=url))
     driver.get(url)
     time.sleep(random.uniform(*WAIT_DYNAMIC_CONTENT))
     check_rate_limiting(driver)

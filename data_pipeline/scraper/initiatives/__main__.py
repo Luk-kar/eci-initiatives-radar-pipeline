@@ -97,7 +97,7 @@ def _run_ecis_pages_phase(
     """
 
     if not all_initiatives_catalog:
-        logger.warning("No initiatives found to classify or download")
+        logger.warning(LOG_MESSAGES["no_initiatives_found"])
         return []
 
     return _save_and_download_initiatives(
@@ -120,15 +120,15 @@ def _save_and_download_initiatives(
     url_list_file = os.path.join(list_dir, CSV_FILENAME)
 
     write_initiatives_csv(url_list_file, initiative_data)
-    logger.info(f"Initiative data saved to: {url_list_file}")
+    logger.info(LOG_MESSAGES["initiative_data_saved"].format(path=url_list_file))
 
-    logger.info("Starting individual initiative pages download...")
+    logger.info(LOG_MESSAGES["download_phase_start"])
     updated_data, failed_urls = download_all_initiatives(
         driver, pages_dir, initiative_data
     )
 
     write_initiatives_csv(url_list_file, updated_data)
-    logger.info(f"Updated CSV with download timestamps: {url_list_file}")
+    logger.info(LOG_MESSAGES["csv_timestamps_updated"].format(path=url_list_file))
 
     return failed_urls
 

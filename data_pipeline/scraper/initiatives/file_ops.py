@@ -28,7 +28,9 @@ def setup_scraping_dirs(list_dir: str, pages_dir: str) -> None:
     """Create necessary directories for scraping output."""
 
     ensure_dirs(list_dir, pages_dir)
-    logger.debug(f"Created directories: {list_dir}, {pages_dir}")
+    logger.debug(
+        LOG_MESSAGES["dirs_created"].format(list_dir=list_dir, pages_dir=pages_dir)
+    )
 
 
 def save_listing_page(
@@ -86,22 +88,22 @@ def save_initiative_page(
 
     ensure_dirs(year_dir)
 
-    file_name = INITIATIVE_PAGE_FILENAME_PATTERN
+    file_name = INITIATIVE_PAGE_FILENAME_PATTERN.format(year=year, number=number)
     file_path = os.path.join(year_dir, file_name)
 
     try:
         validate_html(page_source, MIN_HTML_LENGTH)
     except Exception as e:
         logger.warning(
-            f"⚠️  HTML validation warning for {file_name}: {type(e).__name__}: {e}"
+            LOG_MESSAGES["html_validation_warning"].format(
+                filename=file_name, error_type=type(e).__name__, error=e
+            )
         )
-
     try:
         save_html(file_path, page_source)
     except Exception as e:
         logger.warning(
-            f"⚠️  Failed to prettify HTML for {file_name}: {str(e)}. "
-            "Saving raw HTML without prettification."
+            LOG_MESSAGES["html_prettify_failed"].format(filename=file_name, error=e)
         )
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(page_source)
