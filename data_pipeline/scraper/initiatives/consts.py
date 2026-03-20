@@ -51,7 +51,7 @@ LOG_DIR = os.path.join(SCRIPT_DIR, DATA_DIR_NAME, START_SCRAPING, LOG_DIR_NAME)
 # Module-specific Timing Configuration (in seconds)
 # Fine-tune these based on server response times and rate limiting behavior
 WAIT_BETWEEN_PAGES = (1.0, 2.0)  # Delay between pagination clicks
-WAIT_BETWEEN_DOWNLOADS = (0.5, 1.5)  # Delay between downloading individual pages
+WAIT_BETWEEN_DOWNLOADS = (0.9, 1.5)  # Delay between downloading individual pages
 RETRY_WAIT_BASE = (1.0, 1.2)  # Base time for retry exponential backoff
 
 # Module-specific File Naming Patterns

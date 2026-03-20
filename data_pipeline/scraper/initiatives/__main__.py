@@ -7,8 +7,8 @@ import os
 from selenium import webdriver
 
 # Local
-from .scraper_listing import scrape_all_initiatives_on_all_pages
-from .scraper_ecis import download_initiatives
+from .fetchers.listings import scrape_all_listings
+from .fetchers.ecis import download_all_initiatives
 from .file_ops import setup_scraping_dirs, write_initiatives_csv
 from .statistics import display_completion_summary, gather_scraping_statistics
 from .browser import initialize_browser
@@ -47,8 +47,8 @@ def scrape_eci_initiatives() -> str:
 
     try:
         # Phase 1: listings
-        all_initiatives_catalog, saved_page_listing_paths = (
-            scrape_all_initiatives_on_all_pages(driver, base_url, list_dir)
+        all_initiatives_catalog, saved_page_listing_paths = scrape_all_listings(
+            driver, base_url, list_dir
         )
 
         # Phase 2: detail pages, same driver
@@ -89,7 +89,9 @@ def save_and_download_initiatives(
     logger.info(f"Initiative data saved to: {url_list_file}")
 
     logger.info("Starting individual initiative pages download...")
-    updated_data, failed_urls = download_initiatives(driver, pages_dir, initiative_data)
+    updated_data, failed_urls = download_all_initiatives(
+        driver, pages_dir, initiative_data
+    )
 
     # Update CSV with download timestamps
     write_initiatives_csv(url_list_file, updated_data)

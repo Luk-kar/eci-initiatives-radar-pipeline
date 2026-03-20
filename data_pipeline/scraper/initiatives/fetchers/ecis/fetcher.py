@@ -6,32 +6,28 @@ from typing import Tuple
 
 # Third-party
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 
 # Shared
-from ..scraper_shared.fetch_utils import (
+from ....scraper_shared.fetch_utils import (
     check_rate_limiting,
     download_with_retry,
     save_debug_page,
 )
 
 # Local
-from .css_selectors import ECIinitiativeSelectors
-from .consts import (
+from ...consts import (
     WAIT_DYNAMIC_CONTENT,
     WAIT_BETWEEN_DOWNLOADS,
     RETRY_WAIT_BASE,
-    WEBDRIVER_TIMEOUT_CONTENT,
     DEFAULT_MAX_RETRIES,
     LOG_MESSAGES,
 )
-from .file_ops import save_initiative_page
-from ._logger import logger
+from ...file_ops import save_initiative_page
+from ..._logger import logger
+from .waiter import wait_for_page_content
 
 
-def download_initiatives(
+def download_all_initiatives(
     driver: webdriver.Chrome,
     pages_dir: str,
     initiative_data: list,
@@ -46,7 +42,6 @@ def download_initiatives(
     Returns:
         Tuple containing updated data list and list of failed URLs
     """
-
     updated_data: list = []
     failed_urls: list = []
 
@@ -73,49 +68,6 @@ def download_initiatives(
     return updated_data, failed_urls
 
 
-def wait_for_page_content(driver: webdriver.Chrome) -> bool:
-    """Wait for initiative page content to load.
-
-    Returns:
-        bool: True if main content was found, False otherwise.
-    """
-
-    wait = WebDriverWait(driver, WEBDRIVER_TIMEOUT_CONTENT)
-
-    try:
-        wait.until(
-            EC.presence_of_element_located(
-                (By.CSS_SELECTOR, ECIinitiativeSelectors.INITIATIVE_PROGRESS)
-            )
-        )
-        logger.debug("Initiative progress timeline loaded")
-    except Exception:
-        logger.warning(
-            "Initiative progress timeline not found, "
-            "should be in all initiatives.\ncontinuing..."
-        )
-
-    content_selectors_to_wait = [
-        ECIinitiativeSelectors.OBJECTIVES,
-        ECIinitiativeSelectors.ANNEX,
-        ECIinitiativeSelectors.ORGANISERS,
-        ECIinitiativeSelectors.REPRESENTATIVE,
-        ECIinitiativeSelectors.SOURCES_OF_FUNDING,
-        ECIinitiativeSelectors.SOCIAL_SHARE,
-    ]
-
-    for selector in content_selectors_to_wait:
-        try:
-            wait.until(EC.presence_of_element_located((By.XPATH, selector)))
-            logger.debug(f"Content loaded: {selector}")
-            return True
-        except Exception:
-            continue
-
-    logger.warning("No main content elements found, but proceeding...")
-    return False
-
-
 def download_single_initiative(
     driver: webdriver.Chrome,
     pages_dir: str,
@@ -127,7 +79,6 @@ def download_single_initiative(
     Returns:
         bool: True if successful, False if all retries exhausted.
     """
-
     return download_with_retry(
         attempt_fn=lambda: _attempt_download(driver, pages_dir, url),
         debug_fn=lambda: save_debug_page(
@@ -153,7 +104,6 @@ def _attempt_download(
     Raises:
         Exception: On rate limiting or any page/save failure.
     """
-
     logger.info("Downloading the html file...")
     driver.get(url)
 
