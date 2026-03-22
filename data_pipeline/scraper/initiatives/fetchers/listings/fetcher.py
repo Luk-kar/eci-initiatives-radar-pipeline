@@ -1,7 +1,15 @@
+"""
+Main orchestration module for fetching ECI listing pages.
+
+This module coordinates the high-level scraping workflow for the European
+Citizens' Initiative (ECI) listing pages. It manages the pagination loop, handles
+browser interactions, saves the raw HTML content, and extracts initiative data
+to feed into the downstream data pipeline.
+"""
+
 # Python Standard Library
 import os
 import random
-import time
 from typing import Tuple
 
 # Third-party
@@ -10,6 +18,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
 
 # Shared
 from ....scraper_shared.fetch_utils import (
@@ -197,7 +206,7 @@ def save_main_listing_page(
             )
             logger.info(LOG_MESSAGES["listings_loaded"])
 
-        except Exception as e:
+        except TimeoutException as e:
             check_rate_limiting(driver)
             logger.warning(LOG_MESSAGES["listing_timeout"].format(error=e))
 

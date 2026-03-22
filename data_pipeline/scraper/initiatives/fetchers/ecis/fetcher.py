@@ -1,3 +1,12 @@
+"""
+Main orchestration module for fetching individual ECI detail pages.
+
+This module coordinates the scraping workflow for specific European
+Citizens' Initiative (ECI) records. It navigates to provided URLs,
+handles browser interactions and dynamic waits, and saves the fully
+rendered HTML pages for downstream data extraction.
+"""
+
 # Python Standard Library
 import datetime
 import random
@@ -44,8 +53,6 @@ def download_all_initiatives(
     """
     updated_data: list = []
     failed_urls: list = []
-
-    # NOTE: driver lifecycle (init/quit) is managed by caller
 
     for i, row in enumerate(initiative_data):
         url = row["url"]

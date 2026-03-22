@@ -1,3 +1,11 @@
+"""
+Page-level browser operations for ECI listing scraping.
+
+This module provides helpers for loading listing pages, moving through
+pagination, and coordinating WebDriver interactions required to collect
+initiative listing content.
+"""
+
 # Python Standard Library
 import os
 import random
@@ -8,6 +16,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
 # Shared
 from ....scraper_shared.fetch_utils import check_rate_limiting
@@ -48,7 +57,7 @@ def navigate_to_next_page(driver: webdriver.Chrome, current_page: int) -> bool:
 
         return True
 
-    except Exception:
+    except NoSuchElementException:
 
         logger.info(LOG_MESSAGES["last_page"].format(page=current_page))
         return False
@@ -71,13 +80,15 @@ def wait_for_listing_page_content(driver: webdriver.Chrome, current_page: int) -
             )
         )
         logger.info(LOG_MESSAGES["page_loaded"].format(page=current_page))
+
         random_time = random.uniform(*WAIT_DYNAMIC_CONTENT)
         logger.debug(LOG_MESSAGES["dynamic_content_wait"].format(wait_time=random_time))
         time.sleep(random_time)
 
-    except Exception as e:
+    except TimeoutException as e:
         # Re-raise rate limit timeouts — let retry handle them.
         # Swallow genuine "no content on this page" timeouts.
+
         check_rate_limiting(driver)
         logger.warning(
             LOG_MESSAGES["listing_content_timeout"].format(page=current_page, error=e)
