@@ -1,3 +1,13 @@
+"""
+CSS selector definitions for the ECI scraper.
+
+This module centralizes all CSS selectors and XPath queries used by Selenium
+to locate HTML elements across both the European Citizens' Initiative (ECI)
+listing pages and individual detail pages. Storing them here ensures
+consistency and simplifies updates when page structures change.
+"""
+
+
 class ECIinitiativeSelectors:
     """
     CSS selectors for European Citizens' Initiative (ECI) individual page elements
@@ -25,6 +35,14 @@ class ECIinitiativeSelectors:
 
 
 class ECIlistingSelectors:
+    """
+    Selectors for extracting data from individual ECI initiative pages.
+
+    This class contains the XPath and CSS selectors necessary to parse
+    specific initiative details, such as objectives, organizers, funding sources,
+    and progress metrics from a fully loaded detail page.
+    """
+
     # Navigation and pagination
     NEXT_BUTTON = 'li.ecl-pagination__item--next a[aria-label="Go to next page"]'
     PAGINATION_LINKS = (

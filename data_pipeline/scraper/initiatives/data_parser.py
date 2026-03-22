@@ -1,3 +1,12 @@
+"""
+HTML parsing module for extracting ECI initiative data.
+
+This module processes raw HTML content saved from the scraper,
+locating initiative listings, parsing relative URLs into absolute ones,
+and structuring the extracted data into lists of dictionaries for
+downstream processing and storage.
+"""
+
 # Python Standard Library
 from typing import Dict
 

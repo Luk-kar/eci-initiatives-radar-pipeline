@@ -1,5 +1,11 @@
+"""
+Browser management and WebDriver configuration for the ECI scraper.
+"""
+
+# Third-party
 from selenium import webdriver
 
+# Local
 from ..scraper_shared.browser import initialize_browser as _shared_initialize_browser
 from .log_messages import LOG_MESSAGES
 from ._logger import logger

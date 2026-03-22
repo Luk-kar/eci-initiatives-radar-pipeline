@@ -19,7 +19,6 @@ Note on Fine-Tuning:
 
 import datetime
 import os
-from pathlib import Path
 
 from ..scraper_shared.consts import (
     BASE_URL,

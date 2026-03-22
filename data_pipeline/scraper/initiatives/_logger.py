@@ -1,3 +1,11 @@
+"""
+Logging configuration for the ECI scraper module.
+
+This internal module sets up and provides a pre-configured logger instance
+specifically tailored for tracking the execution flow, warnings, and errors
+across the European Citizens' Initiative scraping pipeline.
+"""
+
 from ..scraper_shared.logger import get_logger
 from .consts import LOG_DIR
 

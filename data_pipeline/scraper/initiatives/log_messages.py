@@ -16,22 +16,35 @@ LOG_MESSAGES: dict = {
     # ── Listing fetcher ────────────────────────────────────────────────────────
     "pagination_start": "Starting pagination scraping from: {url}",
     "first_page_failed": "❌ Failed to load first listing page. Aborting pagination.",
-    "pagination_complete": "Completed scraping {page_count} pages with {total_initiatives} total initiatives",
+    "pagination_complete": (
+        "Completed scraping {page_count} pages "
+        "with {total_initiatives} total initiatives"
+    ),
     "listing_page_failed": "❌ Failed to scrape listing page {page}",
     "listings_loaded": "Initiatives loaded successfully",
     "page_loaded": "Initiatives loaded successfully on page {page}",
     "main_page_saved": "Main page saved to: {path}",
     "main_page_failed": "❌ Failed to scrape main initiatives page",
     "listing_timeout": "Timeout waiting for initiatives: {error} — continuing",
-    "next_button_found": "Found 'Next' button on page {page}, navigating to page {next_page}",
-    "last_page": "No 'Next' button found on page {page}. This appears to be the last page.",
-    "listing_content_timeout": "No initiatives found or timeout on page {page}: {error} — continuing with current content",
+    "next_button_found": (
+        "Found 'Next' button on page {page}, navigating to page {next_page}"
+    ),
+    "last_page": (
+        "No 'Next' button found on page {page}. " "This appears to be the last page."
+    ),
+    "listing_content_timeout": (
+        "No initiatives found or timeout on page {page}: "
+        "{error} — continuing with current content"
+    ),
     # ── Data parser ────────────────────────────────────────────────────────────
     "parsing_listing": "Parsing saved listing page for initiatives links...",
     "processing_initiative": SHARED_LOG_MESSAGES["processing_item"],  # alias
     # ── ECI content waiter ─────────────────────────────────────────────────────
     "timeline_loaded": "Initiative progress timeline loaded",
-    "timeline_not_found": "Initiative progress timeline not found, should be in all initiatives.\ncontinuing...",
+    "timeline_not_found": (
+        "Initiative progress timeline not found, "
+        "should be in all initiatives.\ncontinuing..."
+    ),
     # ── Summary ────────────────────────────────────────────────────────────────
     "summary_scraping": {
         "scraping_complete": "🎉 SCRAPING FINISHED! 🎉",

@@ -1,9 +1,17 @@
+"""
+Execution tracking and summary statistics for the ECI scraper.
+
+This module provides data structures and formatting utilities to record
+the scraping session's outcome, tracking successfully parsed pages,
+skipped initiatives, and encountered errors to generate a final summary report.
+"""
+
 # Python Standard Library
 import csv
 import datetime
 import os
 from collections import Counter
-from typing import Dict, List
+from typing import Dict
 
 # Local modules
 from .consts import (

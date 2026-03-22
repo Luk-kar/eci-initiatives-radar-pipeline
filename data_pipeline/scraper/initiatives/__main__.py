@@ -1,5 +1,12 @@
+"""
+Execution entry point for the European Citizens' Initiative (ECI) scraper.
+
+This script initializes the scraping pipeline from the command line,
+coordinating the fetching of listing pages and individual initiative details.
+It serves as the main driver for data collection within the ECI module.
+"""
+
 # Python Standard Library
-import datetime
 from typing import Dict, Tuple
 import os
 

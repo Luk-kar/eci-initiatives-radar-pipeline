@@ -1,19 +1,27 @@
+"""
+File operation utilities for saving scraped ECI pages.
+
+This module handles creating directories, constructing file paths,
+and writing raw HTML content to disk. It includes logic for saving both
+individual initiative detail pages and main listing pages, while also
+supporting debugging modes.
+"""
+
 # Python Standard Library
 import os
-import random
-import time
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
 # Third-party
 from selenium import webdriver
+from html5lib.html5parser import ParseError
 
 # Shared
 from ..scraper_shared.fs_utils import ensure_dirs, write_csv
 from ..scraper_shared.html_utils import validate_html, save_html
+from ..scraper_shared.exceptions import RateLimitError
 
 # Local
 from .consts import (
-    WAIT_DYNAMIC_CONTENT,
     CSV_FIELDNAMES,
     MIN_HTML_LENGTH,
     RATE_LIMIT_INDICATORS,
@@ -69,7 +77,7 @@ def save_initiative_page(
     if not debug and any(
         indicator in page_source for indicator in RATE_LIMIT_INDICATORS[:2]
     ):
-        raise Exception("429 - Rate limited (found in page source)")
+        raise RateLimitError("429 - Rate limited (found in page source)")
 
     parts = url.rstrip("/").split("/")
     year = parts[-2]
@@ -93,7 +101,9 @@ def save_initiative_page(
 
     try:
         validate_html(page_source, MIN_HTML_LENGTH)
-    except Exception as e:
+
+    except (ValueError, ParseError) as e:
+
         logger.warning(
             LOG_MESSAGES["html_validation_warning"].format(
                 filename=file_name, error_type=type(e).__name__, error=e
@@ -101,7 +111,9 @@ def save_initiative_page(
         )
     try:
         save_html(file_path, page_source)
-    except Exception as e:
+
+    except OSError as e:
+
         logger.warning(
             LOG_MESSAGES["html_prettify_failed"].format(filename=file_name, error=e)
         )
