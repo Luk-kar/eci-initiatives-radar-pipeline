@@ -36,6 +36,7 @@ class ScrapeArtifacts:
 @pytest.fixture(scope="session")
 def e2e_scrape(tmp_path_factory) -> ScrapeArtifacts:
     """Run a limited live scrape via scrape_eci_initiatives; output lands in a temp directory."""
+
     import data_pipeline.scraper.initiatives.consts as initiatives_consts
     from data_pipeline.scraper.initiatives.__main__ import scrape_eci_initiatives
     from data_pipeline.scraper.initiatives import data_parser
