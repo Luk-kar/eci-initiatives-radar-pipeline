@@ -25,6 +25,7 @@ def get_logger(name: str, log_dir: Optional[str] = None) -> logging.Logger:
     Returns:
         Configured logging.Logger instance.
     """
+
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
 

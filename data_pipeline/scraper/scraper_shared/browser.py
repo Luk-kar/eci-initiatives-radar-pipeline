@@ -21,13 +21,16 @@ def initialize_browser(logger, log_messages: dict | None = None) -> webdriver.Ch
     if log_messages is not None:
         if "browser_init" in log_messages:
             logger.info(log_messages["browser_init"])
+
     chrome_options = Options()
+
     for option in CHROME_OPTIONS:
         chrome_options.add_argument(option)
 
     driver = webdriver.Chrome(options=chrome_options)
 
     if log_messages is not None:
+
         if "browser_success" in log_messages:
             logger.debug(log_messages["browser_success"])
 

@@ -30,6 +30,7 @@ def build_timestamped_run_dirs(
     Returns:
         Mapping of subdir name → full path.
     """
+
     base = os.path.join(pipeline_dir, data_dir_name, timestamp)
     paths: dict[str, str] = {}
     for name in subdirs:
@@ -43,13 +44,15 @@ def write_csv(
     fieldnames: List[str],
     rows: Iterable[Dict[str, str]],
 ) -> None:
-    """Write an iterable of dict rows to CSV with the given fieldnames.
+    """
+    Write an iterable of dict rows to CSV with the given fieldnames.
 
     Args:
         file_path: Full path to the CSV file.
         fieldnames: CSV column names.
         rows: Iterable of dictionaries matching the fieldnames.
     """
+
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
     with open(file_path, "w", encoding="utf-8", newline="") as f:

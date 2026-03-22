@@ -16,6 +16,7 @@ def validate_html(page_source: str, min_length: int | None = None) -> None:
 
     Raises ValueError if too short, ParseError if parse issues are detected.
     """
+
     threshold = min_length if min_length is not None else MIN_HTML_LENGTH
     if len(page_source) < threshold:
         raise ValueError(
@@ -36,7 +37,8 @@ def validate_html(page_source: str, min_length: int | None = None) -> None:
 
 
 def save_html(path: str, page_source: str) -> None:
-    """Prettify and save HTML to disk.
+    """
+    Prettify and save HTML to disk.
 
     Assumes the HTML was already validated by validate_html() upstream.
 
@@ -44,6 +46,7 @@ def save_html(path: str, page_source: str) -> None:
         path: Destination file path.
         page_source: Raw HTML string.
     """
+
     os.makedirs(os.path.dirname(path), exist_ok=True)
     soup = BeautifulSoup(page_source, "html.parser")
     pretty_html = soup.prettify()
