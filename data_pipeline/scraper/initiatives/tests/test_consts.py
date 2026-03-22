@@ -1,4 +1,15 @@
+"""
+Tests for the configuration constants used by the ECI initiatives scraper.
+
+This module verifies that all timeout values, retry limits, and randomized
+wait time ranges are correctly defined with valid types and logical bounds.
+This ensures the scraper operates with safe, predictable delays and timeouts.
+"""
+
+# Third-party
 import pytest
+
+# Local
 from data_pipeline.scraper.initiatives.consts import (
     WAIT_DYNAMIC_CONTENT,
     WAIT_BETWEEN_DOWNLOADS,
@@ -18,6 +29,14 @@ _WAIT_TUPLES = [
 
 
 class TestWaitTuples:
+    """
+    Test suite for randomized wait time configurations.
+
+    Validates that wait time constants (like WAIT_DYNAMIC_CONTENT) are properly
+    formatted as two-element tuples representing lower and upper bounds. It ensures
+    both values are non-negative and that the lower bound is strictly less than
+    the upper bound.
+    """
 
     @pytest.mark.parametrize("name,constant", _WAIT_TUPLES)
     def test_is_two_element_tuple(self, name, constant):
@@ -35,6 +54,12 @@ class TestWaitTuples:
 
 
 class TestNumericConsts:
+    """
+    Test suite for scalar numeric configuration constants.
+
+    Validates that individual threshold limits, such as maximum retries and
+    WebDriver timeouts, are properly defined as positive integers or numbers.
+    """
 
     def test_default_max_retries_is_positive_int(self):
         assert isinstance(DEFAULT_MAX_RETRIES, int)

@@ -1,4 +1,12 @@
-import pytest
+"""
+Tests for the HTML data parser of the ECI initiatives scraper.
+
+This module verifies the extraction of initiative information from listing pages.
+It ensures that the parser correctly reads HTML content, identifies initiative
+cards, and formats the extracted data into the expected structures.
+"""
+
+# Local
 from data_pipeline.scraper.initiatives.data_parser import parse_initiatives_list_data
 
 BASE_URL = "https://citizens-initiative.europa.eu"
@@ -28,6 +36,15 @@ def _make_listing_html(hrefs: list[str]) -> str:
 
 
 class TestParseInitiativesListData:
+    """
+    Test suite for the `parse_initiatives_list_data` function.
+
+    Validates that the parser correctly extracts initiative records from
+    listing page HTML. It ensures proper handling of empty or invalid HTML,
+    verifies that the correct number of items are extracted as dictionaries,
+    and confirms that relative href attributes are accurately converted to
+    absolute URLs using the provided base URL.
+    """
 
     def test_returns_empty_list_for_empty_string(self):
         assert parse_initiatives_list_data("", BASE_URL) == []
