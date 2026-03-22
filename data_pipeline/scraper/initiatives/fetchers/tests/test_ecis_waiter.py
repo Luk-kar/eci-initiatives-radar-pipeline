@@ -1,6 +1,16 @@
-import pytest
+"""
+Tests for ECI detail page synchronization utilities.
+
+This module validates the explicit wait logic used to ensure dynamic
+content is fully loaded on individual initiative pages. It tests the handling
+of successful element locations, fallback mechanisms for missing content,
+and timeout scenarios across various page selectors.
+"""
+
 from unittest.mock import MagicMock, patch
+
 from selenium.common.exceptions import TimeoutException
+
 from data_pipeline.scraper.initiatives.fetchers.ecis.waiter import wait_for_page_content
 
 MODULE = "data_pipeline.scraper.initiatives.fetchers.ecis.waiter"
@@ -9,6 +19,14 @@ N_CONTENT_SELECTORS = 6
 
 
 class TestWaitForPageContent:
+    """
+    Test suite for dynamic page content synchronization.
+
+    Validates that the waiter function correctly probes for the primary
+    initiative timeline and gracefully falls back to checking secondary
+    content selectors. It ensures the function returns True when content
+    is eventually found, and False when all selectors exhaust their timeouts.
+    """
 
     def test_returns_true_when_timeline_and_first_content_found(self, mock_driver):
 

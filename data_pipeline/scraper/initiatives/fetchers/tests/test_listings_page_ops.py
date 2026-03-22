@@ -1,6 +1,16 @@
-import pytest
+"""
+Tests for listing page browser operations.
+
+This module validates the low-level Selenium interactions used during
+the scraping of ECI listing pages, including URL navigation, pagination
+clicks, explicit waits for dynamic content, and debug file saving.
+"""
+
 from unittest.mock import MagicMock, patch
+
+import pytest
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
+
 from data_pipeline.scraper.initiatives.fetchers.listings.page_ops import (
     navigate_to_next_page,
     wait_for_listing_page_content,
@@ -12,6 +22,13 @@ MODULE = "data_pipeline.scraper.initiatives.fetchers.listings.page_ops"
 
 
 class TestNavigateToNextPage:
+    """
+    Test suite for pagination navigation logic.
+
+    Validates that the fetcher correctly identifies and clicks the 'next page'
+    button when available, returning True, and accurately returns False when
+    the button is absent, signaling the end of the pagination loop.
+    """
 
     def test_returns_true_and_clicks_next_button(self, mock_driver):
 
@@ -39,6 +56,13 @@ class TestNavigateToNextPage:
 
 
 class TestWaitForListingPageContent:
+    """
+    Test suite for dynamic content synchronization.
+
+    Validates that the fetcher waits for initiative cards to load on a listing
+    page. It ensures successful loads pass silently, genuine timeouts (no content)
+    are swallowed, and rate-limiting timeouts are correctly propagated upward.
+    """
 
     def test_no_exception_when_content_found(self, mock_driver):
 
@@ -70,6 +94,13 @@ class TestWaitForListingPageContent:
 
 
 class TestLoadListingUrl:
+    """
+    Test suite for initial listing URL navigation.
+
+    Validates that the fetcher directs the WebDriver to the target URL,
+    waits appropriately, and performs a rate-limit check immediately after
+    the page request, bubbling up any detected rate-limit exceptions.
+    """
 
     def test_calls_driver_get_with_url(self, mock_driver):
 
@@ -108,6 +139,13 @@ class TestLoadListingUrl:
 
 
 class TestSaveDebugListingPage:
+    """
+    Test suite for saving raw HTML during debug runs.
+
+    Validates that when debugging is enabled, the raw listing page HTML is
+    written to the designated debugging directory with a filename that correctly
+    encodes the current pagination sequence.
+    """
 
     def test_creates_file_in_debug_subdirectory(self, tmp_path):
 

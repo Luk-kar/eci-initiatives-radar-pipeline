@@ -1,5 +1,15 @@
+"""
+Tests for the individual ECI initiative fetcher orchestration logic.
+
+This module validates the core workflow of navigating to specific
+initiative detail pages, waiting for dynamically loaded content,
+saving the resulting HTML, and managing fetch errors or rate limits.
+"""
+
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import MagicMock, patch
+
 from data_pipeline.scraper.initiatives.fetchers.ecis.fetcher import (
     download_all_initiatives,
     download_single_initiative,
@@ -34,8 +44,17 @@ def attempt_patches():
 
 
 class TestDownloadAllInitiatives:
+    """
+    Test suite for the orchestration of downloading all ECI initiatives.
 
-    def test_all_succeed_no_failed_urls(self, mock_driver, tmp_path, no_sleep):
+    Validates the end-to-end process of reading parsed URLs from the listing
+    scraper, looping through each initiative, invoking the detail page
+    fetcher, and appropriately compiling statistics on successful and
+    failed downloads.
+    """
+
+    @pytest.mark.usefixtures("no_sleep")
+    def test_all_succeed_no_failed_urls(self, mock_driver, tmp_path):
 
         data = [
             {"url": URL, "datetime": ""},
@@ -48,9 +67,8 @@ class TestDownloadAllInitiatives:
         assert len(updated) == 2
         assert all(row["datetime"] for row in updated)
 
-    def test_failed_url_recorded_datetime_not_set(
-        self, mock_driver, tmp_path, no_sleep
-    ):
+    @pytest.mark.usefixtures("no_sleep")
+    def test_failed_url_recorded_datetime_not_set(self, mock_driver, tmp_path):
         data = [
             {"url": URL, "datetime": ""},
             {"url": "https://host/2022/000002_en", "datetime": ""},
@@ -73,7 +91,8 @@ class TestDownloadAllInitiatives:
         assert failed == []
         mock_dl.assert_not_called()
 
-    def test_preserves_existing_row_fields(self, mock_driver, tmp_path, no_sleep):
+    @pytest.mark.usefixtures("no_sleep")
+    def test_preserves_existing_row_fields(self, mock_driver, tmp_path):
 
         data = [{"url": URL, "datetime": "", "title": "Test ECI"}]
         with patch(f"{MODULE}.download_single_initiative", return_value=True):
@@ -86,6 +105,13 @@ class TestDownloadAllInitiatives:
 
 
 class TestDownloadSingleInitiative:
+    """
+    Test suite for fetching and saving an individual ECI detail page.
+
+    Validates that the fetcher correctly navigates to a specific initiative URL,
+    waits for the required dynamic content to render, and properly delegates
+    the raw HTML to the file operations module for saving.
+    """
 
     @pytest.mark.parametrize(
         "retry_result,expected",
@@ -115,8 +141,17 @@ class TestDownloadSingleInitiative:
 
 
 class TestAttemptDownload:
+    """
+    Test suite for a single download attempt within the retry wrapper.
 
-    def test_returns_filename_on_success(self, mock_driver, tmp_path, attempt_patches):
+    Validates that the fetcher correctly tries to load an initiative page,
+    waits for content, and returns success, while properly handling
+    and surfacing failures like timeouts or missing elements so the
+    retry mechanism can intervene.
+    """
+
+    @pytest.mark.usefixtures("attempt_patches")
+    def test_returns_filename_on_success(self, mock_driver, tmp_path):
 
         with patch(f"{MODULE}.wait_for_page_content", return_value=True), patch(
             f"{MODULE}.save_initiative_page", return_value=FILENAME
@@ -124,7 +159,8 @@ class TestAttemptDownload:
             result = _attempt_download(mock_driver, str(tmp_path), URL)
         assert result == FILENAME
 
-    def test_navigates_to_correct_url(self, mock_driver, tmp_path, attempt_patches):
+    @pytest.mark.usefixtures("attempt_patches")
+    def test_navigates_to_correct_url(self, mock_driver, tmp_path):
 
         with patch(f"{MODULE}.wait_for_page_content", return_value=True), patch(
             f"{MODULE}.save_initiative_page", return_value=FILENAME
@@ -144,7 +180,8 @@ class TestAttemptDownload:
         ):
             assert download_single_initiative(mock_driver, str(tmp_path), URL) is False
 
-    def test_raises_when_rate_limited(self, mock_driver, tmp_path, attempt_patches):
+    @pytest.mark.usefixtures("attempt_patches")
+    def test_raises_when_rate_limited(self, mock_driver, tmp_path):
         with patch(f"{MODULE}.check_rate_limiting", side_effect=Exception("429")):
             with pytest.raises(Exception, match="429"):
                 _attempt_download(mock_driver, str(tmp_path), URL)

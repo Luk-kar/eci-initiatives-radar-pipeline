@@ -1,6 +1,15 @@
+"""
+Pytest configuration and shared fixtures for the fetchers test suite.
+
+This module provides common mock objects and data structures used to
+test the ECI listing and detail page fetchers, such as mocked Selenium
+WebDrivers, fake HTML responses, and pre-configured temporary directories.
+"""
+
 import pytest
-from unittest.mock import MagicMock
 from selenium import webdriver
+
+from unittest.mock import MagicMock
 
 
 @pytest.fixture

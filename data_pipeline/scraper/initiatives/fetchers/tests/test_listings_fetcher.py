@@ -1,7 +1,14 @@
-import pytest
-import os
+"""
+Tests for the main orchestration logic of the listings fetcher.
 
+This module validates the core pagination and page-saving workflow,
+ensuring that the fetcher correctly loops over initiative listing pages,
+handles timeouts or missing content, and properly records parsed URLs.
+"""
+
+import os
 from unittest.mock import MagicMock, patch
+
 from data_pipeline.scraper.initiatives.fetchers.listings.fetcher import (
     scrape_all_listings,
     scrape_single_listing_page,
@@ -13,12 +20,28 @@ BASE_URL = "https://citizens-initiative.europa.eu"
 ROUTE = "/find-initiative_en"
 
 
+# pylint: disable=unused-argument
 def _fake_retry_calls_attempt(attempt_fn, **kwargs):
+    """
+    Mock replacement for tenacity/retry wrappers.
+
+    Accepts **kwargs to match the signature of the real retry wrapper
+    being patched, but simply executes the attempt function immediately
+    without applying the actual retry logic.
+    """
+
     attempt_fn()
     return True
 
 
 class TestScrapeAllListings:
+    """
+    Test suite for the overall pagination orchestration loop.
+
+    Validates that the fetcher correctly loops over all available ECI
+    listing pages until no more pages exist, accumulating the parsed
+    initiative URLs into a final combined list.
+    """
 
     def test_returns_empty_when_first_page_fails(self, mock_driver, tmp_path):
 
@@ -57,6 +80,13 @@ class TestScrapeAllListings:
 
 
 class TestScrapeSingleListingPage:
+    """
+    Test suite for the overall pagination orchestration loop.
+
+    Validates that the fetcher correctly loops over all available ECI
+    listing pages until no more pages exist, accumulating the parsed
+    initiative URLs into a final combined list.
+    """
 
     def test_returns_data_and_path_on_success(self, mock_driver, tmp_path):
 
@@ -112,6 +142,13 @@ class TestScrapeSingleListingPage:
 
 
 class TestSaveMainListingPage:
+    """
+    Test suite for saving the master listing HTML page to disk.
+
+    Validates that the fetcher correctly loads the first page of the ECI
+    listings, verifies its contents, and delegates the HTML saving logic
+    to the designated file operation utility.
+    """
 
     def test_returns_source_and_path_on_success(self, mock_driver, tmp_path):
 
