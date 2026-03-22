@@ -15,6 +15,7 @@ PIPELINE_DIR = Path(__file__).parent.absolute()
 PROJECT_DIR = PIPELINE_DIR.parent.absolute()
 
 # ── Top-level output directory ─────────────────────────────────────────────────
+DATA_PIPELINE_DIR_NAME = "data_pipeline"
 DATA_DIR_NAME = "data"
 LOG_DIR_NAME = "logs"
 DEBUGGING_DIR_NAME = "debugging"
