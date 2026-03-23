@@ -43,7 +43,7 @@ class TestECIHTMLParserParse:
     @pytest.fixture()
     def sample_html(self, tmp_path) -> Path:
 
-        src = FIXTURES_DIR / "sample_initiative.html"
+        src = FIXTURES_DIR / "2020_000001_en.html"
         dest = tmp_path / "2023" / "2023_000008.html"
         dest.parent.mkdir(parents=True)
         dest.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
