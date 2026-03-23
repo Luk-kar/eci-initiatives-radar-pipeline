@@ -17,7 +17,7 @@ from data_pipeline.pipeline_shared.consts import (
     LOG_EXTRACTOR_INITIATIVES_PATTERN,
     PIPELINE_DIR,
     DATA_PIPELINE_DIR_NAME,
-    TIMESTAMP_FORMAT_FILE,
+    TIMESTAMP_FORMAT,
 )
 from data_pipeline.extractor.initiatives._logger import setup_logger
 from data_pipeline.extractor.initiatives.extractor import extract_initiatives
@@ -33,7 +33,7 @@ def extract_eci_initiatives() -> str:
     Returns:
         Timestamp string used for output filenames.
     """
-    timestamp = datetime.now().strftime(TIMESTAMP_FORMAT_FILE)
+    timestamp = datetime.now().strftime(TIMESTAMP_FORMAT)
 
     data_dir = PIPELINE_DIR / DATA_DIR_NAME
 

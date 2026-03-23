@@ -6,8 +6,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
-
-_TIMESTAMP_FORMAT = "%Y-%m-%d_%H-%M-%S"
+from .consts import TIMESTAMP_FORMAT
 
 
 def get_logger(log_dir: Path, log_filename_pattern: str) -> logging.Logger:
@@ -37,7 +36,7 @@ def get_logger(log_dir: Path, log_filename_pattern: str) -> logging.Logger:
     log_dir = Path(log_dir)
     log_dir.mkdir(parents=True, exist_ok=True)
 
-    timestamp = datetime.now().strftime(_TIMESTAMP_FORMAT)
+    timestamp = datetime.now().strftime(TIMESTAMP_FORMAT)
     log_file = log_dir / log_filename_pattern.format(timestamp=timestamp)
 
     # File handler (detailed)

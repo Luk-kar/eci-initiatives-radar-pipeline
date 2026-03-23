@@ -8,7 +8,7 @@ from pathlib import Path
 
 from data_pipeline.pipeline_shared.consts import (
     LOG_EXTRACTOR_INITIATIVES_PATTERN,
-    TIMESTAMP_FORMAT_FILE,
+    TIMESTAMP_FORMAT,
 )
 from data_pipeline.pipeline_shared.logger import (
     set_console_handler,
@@ -23,11 +23,15 @@ def setup_logger(log_dir_path: Path, timestamp) -> logging.Logger:
     The logger name is derived from ``LOG_EXTRACTOR_INITIATIVES_PATTERN`` by
     stripping the ``_{timestamp}.log`` suffix, which keeps
     ``logging.getLogger`` idempotent — calling ``setup_logger`` a second time
-    returns the same instance without adding duplicate handlers.
+    with the same pattern returns the same instance without adding duplicate
+    handlers.
 
     Args:
-        log_dir: Directory where the log file will be written.  Created
+        log_dir_path: Directory where the log file will be written.  Created
             automatically if it does not exist.
+        timestamp: Timestamp used to resolve the log filename.  Accepts either
+            a pre-formatted ``str`` or a ``datetime`` object — in the latter
+            case it is formatted with ``TIMESTAMP_FORMAT`` before use.
 
     Returns:
         Configured ``logging.Logger`` instance with a DEBUG-level file handler
@@ -35,7 +39,7 @@ def setup_logger(log_dir_path: Path, timestamp) -> logging.Logger:
     """
 
     if not isinstance(timestamp, str):
-        timestamp = timestamp.strftime(TIMESTAMP_FORMAT_FILE)
+        timestamp = timestamp.strftime(TIMESTAMP_FORMAT)
 
     log_dir_path.mkdir(parents=True, exist_ok=True)
 
