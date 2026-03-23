@@ -14,7 +14,7 @@ from data_pipeline.extractor.initiatives.parser import ECIHTMLParser
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
-_PARSER_FIELDS = "data_pipeline.extractor.initiatives.parser.fields"
+_PARSER_MODULE = "data_pipeline.extractor.initiatives.parser"
 
 
 class TestECIHTMLParserCsvColumns:
@@ -53,7 +53,7 @@ class TestECIHTMLParserParse:
     def test_parse_returns_dict(self, parser, sample_html):
 
         with patch.multiple(
-            _PARSER_FIELDS,
+            _PARSER_MODULE,
             extract_registration_number=MagicMock(return_value="ECI(2018)000008"),
             extract_title=MagicMock(return_value="Save bees and farmers"),
             extract_objective=MagicMock(return_value="To protect biodiversity"),
@@ -75,7 +75,7 @@ class TestECIHTMLParserParse:
     def test_parse_result_contains_all_csv_columns(self, parser, sample_html):
 
         with patch.multiple(
-            _PARSER_FIELDS,
+            _PARSER_MODULE,
             extract_registration_number=MagicMock(return_value="ECI(2018)000008"),
             extract_title=MagicMock(return_value="Save bees and farmers"),
             extract_objective=MagicMock(return_value="To protect biodiversity"),
@@ -108,7 +108,7 @@ class TestECIHTMLParserParse:
         bad_html.write_text("<not valid", encoding="utf-8")
 
         with patch(
-            f"{_PARSER_FIELDS}.extract_title",
+            f"{_PARSER_MODULE}.extract_title",
             side_effect=RuntimeError("boom"),
         ):
             with pytest.raises(ValueError, match="Error parsing"):
@@ -123,7 +123,7 @@ class TestECIHTMLParserParse:
         original = RuntimeError("original cause")
 
         with patch(
-            f"{_PARSER_FIELDS}.extract_title",
+            f"{_PARSER_MODULE}.extract_title",
             side_effect=original,
         ):
             with pytest.raises(ValueError) as exc_info:
