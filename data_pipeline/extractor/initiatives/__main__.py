@@ -49,7 +49,7 @@ def extract_eci_initiatives() -> str:
 
     # ── 3. Extract ─────────────────────────────────────────────────────────────
     initiatives_dir = run_dir / INITIATIVES_DIR_NAME
-    output_csv = data_dir / ECI_INITIATIVES_CSV_PATTERN.format(timestamp=timestamp)
+    output_csv = run_dir / ECI_INITIATIVES_CSV_PATTERN.format(timestamp=timestamp)
 
     logger.info("Input  : %s", initiatives_dir)
     logger.info("Output : %s", output_csv)

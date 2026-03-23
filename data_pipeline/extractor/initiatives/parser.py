@@ -5,10 +5,11 @@ Responsible for extracting structured data from a single initiative HTML file.
 Implementation is pending.
 """
 
+from typing import List
 from pathlib import Path
 
 
-def parse_initiative_page(html_file: Path) -> dict:
+def parse_initiative_page(html_file: Path, csv_columns: List[str]) -> dict:
     """
     Parse a single ECI initiative HTML file.
 

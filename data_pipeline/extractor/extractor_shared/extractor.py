@@ -70,7 +70,7 @@ def extract_html_to_csv(
             logger.debug("Parsing: %s", html_file)
 
             try:
-                parsed = parse_function(html_file)
+                parsed = parse_function(html_file, csv_columns)
                 writer.writerow({col: parsed.get(col, "") for col in csv_columns})
                 rows_written += 1
 
