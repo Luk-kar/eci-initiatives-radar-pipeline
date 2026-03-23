@@ -28,9 +28,8 @@ def get_logger(log_dir: Path, log_filename_pattern: str) -> logging.Logger:
     Returns:
         Configured ``logging.Logger`` instance.
     """
-    logger_name = log_filename_pattern.replace("_{timestamp}.log", "")
-    logger = logging.getLogger(logger_name)
-    logger.setLevel(logging.DEBUG)
+
+    logger = set_logger_and_its_level(log_filename_pattern)
 
     if logger.handlers:
         return logger
@@ -42,6 +41,29 @@ def get_logger(log_dir: Path, log_filename_pattern: str) -> logging.Logger:
     log_file = log_dir / log_filename_pattern.format(timestamp=timestamp)
 
     # File handler (detailed)
+    file_handler = set_file_handler(log_file)
+
+    # Console handler (simpler)
+    console_handler = set_console_handler()
+
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+
+    return logger
+
+
+def set_logger_and_its_level(log_filename_pattern: str) -> logging.Logger:
+    """Instantiate a named logger and set its level to DEBUG."""
+
+    logger_name = log_filename_pattern.replace("_{timestamp}.log", "")
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.DEBUG)
+    return logger
+
+
+def set_file_handler(log_file: Path) -> logging.FileHandler:
+    """Create a DEBUG-level file handler with a detailed formatter."""
+
     file_handler = logging.FileHandler(log_file, encoding="utf-8")
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(
@@ -50,15 +72,15 @@ def get_logger(log_dir: Path, log_filename_pattern: str) -> logging.Logger:
             "%(funcName)s:%(lineno)d - %(message)s"
         )
     )
+    return file_handler
 
-    # Console handler (simpler)
+
+def set_console_handler() -> logging.StreamHandler:
+    """Create an INFO-level console handler with a simple formatter."""
+
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(
         logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
     )
-
-    logger.addHandler(file_handler)
-    logger.addHandler(console_handler)
-
-    return logger
+    return console_handler
