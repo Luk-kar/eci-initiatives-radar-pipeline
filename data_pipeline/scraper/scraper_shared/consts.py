@@ -10,7 +10,7 @@ and other configuration values common to all scraper modules:
 
 from pathlib import Path
 
-from ...consts import (  # data_pipeline
+from ...pipeline_shared.consts import (  # data_pipeline
     PIPELINE_DIR,
     INITIATIVES_DIR_NAME,
     LISTINGS_DIR_NAME,

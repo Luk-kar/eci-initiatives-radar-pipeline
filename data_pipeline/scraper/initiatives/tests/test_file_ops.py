@@ -21,7 +21,7 @@ from data_pipeline.scraper.initiatives.file_ops import (
     save_listing_page,
 )
 from data_pipeline.scraper.initiatives.consts import LISTING_PAGE_FILENAME_PATTERN
-from data_pipeline.consts import DEBUGGING_DIR_NAME
+from data_pipeline.pipeline_shared.consts import DEBUGGING_DIR_NAME
 
 MODULE = "data_pipeline.scraper.initiatives.file_ops"
 

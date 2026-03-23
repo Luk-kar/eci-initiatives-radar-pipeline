@@ -11,7 +11,7 @@ Shared across all pipeline stages:
 from pathlib import Path
 
 # ── Project root ───────────────────────────────────────────────────────────────
-PIPELINE_DIR = Path(__file__).parent.absolute()
+PIPELINE_DIR = Path(__file__).parent.parent.absolute()
 PROJECT_DIR = PIPELINE_DIR.parent.absolute()
 
 # ── Top-level output directory ─────────────────────────────────────────────────

@@ -16,13 +16,13 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from data_pipeline.consts import (
+from data_pipeline.pipeline_shared.consts import (
     DATA_DIR_NAME,
     ECI_INITIATIVES_CSV_PATTERN,
     INITIATIVES_DIR_NAME,
     LOG_DIR_NAME,
     LOG_EXTRACTOR_INITIATIVES_PATTERN,
-    PROJECT_DIR,
+    PIPELINE_DIR,
     DATA_PIPELINE_DIR_NAME,
 )
 from data_pipeline.extractor.initiatives.extractor import extract_initiatives
@@ -55,7 +55,7 @@ def extract_eci_initiatives() -> str:
         run_dir: Explicit timestamped run directory, e.g.
                  ``data_pipeline/data/2026-03-22_15-51-04``.
                  If ``None``, the newest directory under
-                 ``PROJECT_DIR / DATA_DIR_NAME`` is used.
+                 ``PIPELINE_DIR / DATA_DIR_NAME`` is used.
 
     Returns:
         Timestamp string used for output filenames.
@@ -65,7 +65,7 @@ def extract_eci_initiatives() -> str:
         SystemExit: On unrecoverable errors (logged before exit).
     """
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    data_dir = PROJECT_DIR / DATA_PIPELINE_DIR_NAME / DATA_DIR_NAME
+    data_dir = PIPELINE_DIR / DATA_DIR_NAME
 
     # ── 1. Resolve run directory ───────────────────────────────────────────────
     run_dir = find_newest_run_dir(data_dir)
@@ -101,23 +101,6 @@ def extract_eci_initiatives() -> str:
 
     logger.info("Extraction complete — timestamp: %s", timestamp)
     return timestamp
-
-
-def _parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Extract ECI initiative data from scraped HTML files."
-    )
-    parser.add_argument(
-        "--run-dir",
-        type=Path,
-        default=None,
-        metavar="DIR",
-        help=(
-            "Explicit run directory to process "
-            "(default: newest under data_pipeline/data/)."
-        ),
-    )
-    return parser.parse_args()
 
 
 if __name__ == "__main__":
