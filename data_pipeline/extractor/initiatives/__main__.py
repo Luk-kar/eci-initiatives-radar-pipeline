@@ -19,8 +19,8 @@ from data_pipeline.pipeline_shared.consts import (
     DATA_PIPELINE_DIR_NAME,
     TIMESTAMP_FORMAT,
 )
-from data_pipeline.extractor.initiatives._logger import setup_logger
-from data_pipeline.extractor.initiatives.extractor import extract_initiatives
+from ._logger import setup_logger
+from .extractor import extract_initiatives
 from data_pipeline.pipeline_shared.locate_run_dir import (
     find_newest_scraped_data_dir,
 )
