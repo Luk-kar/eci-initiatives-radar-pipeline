@@ -1,0 +1,3 @@
+def construct_url(registration_number: str) -> str:
+    """Construct the canonical ECI URL from a registration number."""
+    ...

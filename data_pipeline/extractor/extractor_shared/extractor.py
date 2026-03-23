@@ -6,20 +6,31 @@ Provides two building blocks used by domain-specific extractors:
 - ``_find_html_files`` — walks a year-partitioned directory tree and returns
   all non-empty HTML files in deterministic order.
 - ``extract_html_to_csv`` — drives the full extraction loop: discovers files,
-  delegates parsing to a caller-supplied function, and writes results to a CSV.
+  delegates parsing to a caller-supplied parser, and writes results to a CSV.
 
 Domain extractors (e.g. ``data_pipeline.extractor.initiatives``) are expected
-to wrap ``extract_html_to_csv`` with their own column schema and parse function
-rather than calling it directly.
+to wrap ``extract_html_to_csv`` with their own ``HTMLParserProtocol``
+implementation rather than calling it directly.
 """
 
 import csv
 import logging
 from pathlib import Path
+from typing import Protocol
 
 from .errors import HTMLParseError
 
 logger = logging.getLogger(__name__)
+
+
+class HTMLParserProtocol(Protocol):
+    """Structural interface required by ``extract_html_to_csv``."""
+
+    csv_columns: list[str]
+
+    def parse(self, html_file: Path) -> dict:
+        """Parse a single HTML file and return a column-keyed dict."""
+        ...
 
 
 def _find_html_files(source_dir: Path) -> list[Path]:
@@ -51,21 +62,22 @@ def _find_html_files(source_dir: Path) -> list[Path]:
 def extract_html_to_csv(
     source_dir: Path,
     output_csv: Path,
-    csv_columns: list[str],
-    parse_function: callable,
+    parser: HTMLParserProtocol,
 ) -> None:
     """
     Parse all HTML files under source_dir and write extracted data to a CSV.
 
     Args:
-        source_dir:  Directory containing year-partitioned HTML files.
-        output_csv:  Destination CSV path.
-        csv_columns: Ordered list of column names for the output CSV header
-                     and row mapping.
-        parse_function:
-                     Callable that accepts a ``Path`` to an HTML file and
-                     returns a ``dict`` mapping column names to extracted
-                     values.
+        source_dir: Directory containing year-partitioned HTML files.
+        output_csv: Destination CSV path.
+        parser:     Object implementing ``HTMLParserProtocol`` — supplies both
+                    the column schema (``parser.csv_columns``) and the per-file
+                    parse logic (``parser.parse``).
+
+    Raises:
+        FileNotFoundError: If no HTML files are found under ``source_dir``.
+        HTMLParseError:    If ``parser.parse`` raises for any HTML file;
+                           the original exception is chained via ``__cause__``.
     """
     html_files = _find_html_files(source_dir)
 
@@ -77,23 +89,19 @@ def extract_html_to_csv(
     rows_written = 0
 
     with open(output_csv, "w", newline="", encoding="utf-8") as csvfile:
-
-        writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+        writer = csv.DictWriter(csvfile, fieldnames=parser.csv_columns)
         writer.writeheader()
 
         for html_file in html_files:
-
             logger.debug("Parsing: %s", html_file)
-
             try:
-                parsed = parse_function(html_file, csv_columns)
-                writer.writerow({col: parsed.get(col, "") for col in csv_columns})
-
+                parsed = parser.parse(html_file)
+                writer.writerow(
+                    {col: parsed.get(col, "") for col in parser.csv_columns}
+                )
                 rows_written += 1
-
             except Exception as exc:
-
                 logger.exception("Failed to parse: %s", html_file)
                 raise HTMLParseError(f"Failed to parse: {html_file}") from exc
 
-        logger.info("Wrote %d rows to %s", rows_written, output_csv)
+    logger.info("Wrote %d rows to %s", rows_written, output_csv)
