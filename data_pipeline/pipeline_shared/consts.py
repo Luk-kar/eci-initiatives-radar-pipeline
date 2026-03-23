@@ -20,6 +20,10 @@ DATA_DIR_NAME = "data"
 LOG_DIR_NAME = "logs"
 DEBUGGING_DIR_NAME = "debugging"
 
+# ── Paths ──────────────────────────────────────────────────────────────────────
+
+DATA_DIR = PIPELINE_DIR / DATA_DIR_NAME
+
 # ── Scraper output subdirectory modules ────────────────────────────────────────
 INITIATIVES_DIR_NAME = "initiatives"
 RESPONSES_DIR_NAME = "responses"

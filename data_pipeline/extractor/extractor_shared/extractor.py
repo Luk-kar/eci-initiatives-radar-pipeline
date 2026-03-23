@@ -1,6 +1,23 @@
+"""
+Shared HTML-to-CSV extraction utilities for data pipeline extractor modules.
+
+Provides two building blocks used by domain-specific extractors:
+
+- ``_find_html_files`` — walks a year-partitioned directory tree and returns
+  all non-empty HTML files in deterministic order.
+- ``extract_html_to_csv`` — drives the full extraction loop: discovers files,
+  delegates parsing to a caller-supplied function, and writes results to a CSV.
+
+Domain extractors (e.g. ``data_pipeline.extractor.initiatives``) are expected
+to wrap ``extract_html_to_csv`` with their own column schema and parse function
+rather than calling it directly.
+"""
+
 import csv
 import logging
 from pathlib import Path
+
+from .errors import HTMLParseError
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +75,6 @@ def extract_html_to_csv(
     output_csv.parent.mkdir(parents=True, exist_ok=True)
 
     rows_written = 0
-    rows_failed = 0
 
     with open(output_csv, "w", newline="", encoding="utf-8") as csvfile:
 
@@ -72,13 +88,12 @@ def extract_html_to_csv(
             try:
                 parsed = parse_function(html_file, csv_columns)
                 writer.writerow({col: parsed.get(col, "") for col in csv_columns})
+
                 rows_written += 1
 
-            except Exception:
+            except Exception as exc:
+
                 logger.exception("Failed to parse: %s", html_file)
-                rows_failed += 1
+                raise HTMLParseError(f"Failed to parse: {html_file}") from exc
 
-    logger.info("Wrote %d rows to %s", rows_written, output_csv)
-
-    if rows_failed:
-        logger.warning("Failed to parse %d file(s)", rows_failed)
+        logger.info("Wrote %d rows to %s", rows_written, output_csv)

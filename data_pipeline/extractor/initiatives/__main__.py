@@ -18,6 +18,7 @@ from data_pipeline.pipeline_shared.consts import (
     PIPELINE_DIR,
     DATA_PIPELINE_DIR_NAME,
     TIMESTAMP_FORMAT,
+    DATA_DIR,
 )
 from ._logger import setup_logger
 from .extractor import extract_initiatives
@@ -35,10 +36,8 @@ def extract_eci_initiatives() -> str:
     """
     timestamp = datetime.now().strftime(TIMESTAMP_FORMAT)
 
-    data_dir = PIPELINE_DIR / DATA_DIR_NAME
-
     # ── 1. Resolve run directory ───────────────────────────────────────────────
-    run_dir = find_newest_scraped_data_dir(data_dir, INITIATIVES_DIR_NAME)
+    run_dir = find_newest_scraped_data_dir(DATA_DIR, INITIATIVES_DIR_NAME)
 
     # ── 2. Bootstrap logging into the run directory's logs/ folder ────────────
     log_dir_path = run_dir / LOG_DIR_NAME

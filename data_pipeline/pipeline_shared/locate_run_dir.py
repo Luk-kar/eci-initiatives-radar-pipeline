@@ -12,11 +12,7 @@ import logging
 from pathlib import Path
 
 from data_pipeline.pipeline_shared.consts import (
-    INITIATIVES_DIR_NAME,
-    RESPONSES_DIR_NAME,
-    RESPONSES_FOLLOWUP_DIR_NAME,
     LOG_DIR_NAME,
-    INITIATIVE_PAGE_FILENAME_PATTERN,
 )
 
 
