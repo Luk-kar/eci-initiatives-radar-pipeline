@@ -9,7 +9,7 @@ pyproject.toml
 ../data_pipeline/scraper/initiatives/consts.py
 ../data_pipeline/scraper/initiatives/css_selectors.py
 ../data_pipeline/scraper/initiatives/data_parser.py
-../data_pipeline/scraper/initiatives/file_ops.py
+../data_pipeline/scraper/initiatives/file_operations.py
 ../data_pipeline/scraper/initiatives/log_messages.py
 ../data_pipeline/scraper/initiatives/statistics.py
 ../data_pipeline/scraper/initiatives/fetchers/__init__.py
@@ -30,7 +30,7 @@ pyproject.toml
 ../data_pipeline/scraper/initiatives/tests/test_consts.py
 ../data_pipeline/scraper/initiatives/tests/test_css_selectors.py
 ../data_pipeline/scraper/initiatives/tests/test_data_parser.py
-../data_pipeline/scraper/initiatives/tests/test_file_ops.py
+../data_pipeline/scraper/initiatives/tests/test_file_operations.py
 ../data_pipeline/scraper/initiatives/tests/end_to_end/__init__.py
 ../data_pipeline/scraper/initiatives/tests/end_to_end/conftest.py
 ../data_pipeline/scraper/initiatives/tests/end_to_end/test_live_scrape.py
@@ -39,7 +39,7 @@ pyproject.toml
 ../data_pipeline/scraper/scraper_shared/consts.py
 ../data_pipeline/scraper/scraper_shared/exceptions.py
 ../data_pipeline/scraper/scraper_shared/fetch_utils.py
-../data_pipeline/scraper/scraper_shared/fs_utils.py
+../data_pipeline/scraper/scraper_shared/files_utils.py
 ../data_pipeline/scraper/scraper_shared/html_utils.py
 ../data_pipeline/scraper/scraper_shared/log_messages.py
 ../data_pipeline/scraper/scraper_shared/logger.py

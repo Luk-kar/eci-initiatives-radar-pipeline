@@ -16,7 +16,7 @@ from selenium import webdriver
 # Local
 from .fetchers.listings import scrape_all_listings
 from .fetchers.ecis import download_all_initiatives
-from .file_ops import setup_scraping_dirs, write_initiatives_csv
+from .file_operations import setup_scraping_dirs, write_initiatives_csv
 from .statistics import display_completion_summary
 from .browser import initialize_browser
 from .consts import (

@@ -31,7 +31,7 @@ from ...consts import (
     DEFAULT_MAX_RETRIES,
 )
 from ...log_messages import LOG_MESSAGES
-from ...file_ops import save_initiative_page
+from ...file_operations import save_initiative_page
 from ..._logger import logger
 from .waiter import wait_for_page_content
 

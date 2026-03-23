@@ -14,13 +14,13 @@ scraper/initiatives/crawler.py
 scraper/initiatives/css_selectors.py
 scraper/initiatives/data_parser.py
 scraper/initiatives/downloader.py
-scraper/initiatives/file_ops.py
+scraper/initiatives/file_operations.py
 scraper/initiatives/scraper_logger.py
 scraper/initiatives/statistics.py
 scraper/scraper_shared/__init__.py
 scraper/scraper_shared/browser.py
 scraper/scraper_shared/consts.py
 scraper/scraper_shared/downloader.py
-scraper/scraper_shared/fs_utils.py
+scraper/scraper_shared/files_utils.py
 scraper/scraper_shared/html_utils.py
 scraper/scraper_shared/logger.py

@@ -21,7 +21,7 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 # Shared
 from ....scraper_shared.fetch_utils import check_rate_limiting
 from ....scraper_shared.consts import DEBUGGING_DIR_NAME
-from ....scraper_shared.fs_utils import ensure_dirs
+from ....scraper_shared.files_utils import ensure_dirs
 
 # Local
 from ...css_selectors import ECIlistingSelectors

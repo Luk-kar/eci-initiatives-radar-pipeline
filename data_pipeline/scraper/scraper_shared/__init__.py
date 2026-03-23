@@ -1,7 +1,7 @@
 from .browser import initialize_browser
 from .logger import get_logger
 from .html_utils import validate_html, save_html
-from .fs_utils import ensure_dirs, build_timestamped_run_dirs, write_csv
+from .files_utils import ensure_dirs, build_timestamped_run_dirs, write_csv
 
 __all__ = [
     "initialize_browser",

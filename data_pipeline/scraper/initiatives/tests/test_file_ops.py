@@ -16,14 +16,14 @@ from unittest.mock import patch
 import pytest
 
 # Local
-from data_pipeline.scraper.initiatives.file_ops import (
+from data_pipeline.scraper.initiatives.file_operations import (
     save_initiative_page,
     save_listing_page,
 )
 from data_pipeline.scraper.initiatives.consts import LISTING_PAGE_FILENAME_PATTERN
 from data_pipeline.pipeline_shared.consts import DEBUGGING_DIR_NAME
 
-MODULE = "data_pipeline.scraper.initiatives.file_ops"
+MODULE = "data_pipeline.scraper.initiatives.file_operations"
 
 URL = "https://host/2023/000001_en"
 EXPECTED_FILENAME = "2023_000001_en.html"
@@ -42,7 +42,7 @@ def no_validation():
 
 @pytest.fixture
 def debug_name():
-    """Inject the missing DEBUGGING_DIR_NAME import into file_ops."""
+    """Inject the missing DEBUGGING_DIR_NAME import into file_operations."""
     with patch(f"{MODULE}.DEBUGGING_DIR_NAME", new=DEBUGGING_DIR_NAME, create=True):
         yield
 
