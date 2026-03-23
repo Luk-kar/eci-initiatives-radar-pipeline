@@ -28,7 +28,7 @@ from data_pipeline.pipeline_shared.consts import (
 from data_pipeline.extractor.initiatives.extractor import extract_initiatives
 from data_pipeline.extractor.initiatives.validator import (
     RunDirectoryValidationError,
-    find_newest_run_dir,
+    find_newest_scraped_data_dir,
     validate_run_dir,
 )
 
@@ -68,7 +68,7 @@ def extract_eci_initiatives() -> str:
     data_dir = PIPELINE_DIR / DATA_DIR_NAME
 
     # ── 1. Resolve run directory ───────────────────────────────────────────────
-    run_dir = find_newest_run_dir(data_dir)
+    run_dir = find_newest_scraped_data_dir(data_dir)
 
     # ── 2. Bootstrap logging into the run directory's logs/ folder ────────────
     log_path = (

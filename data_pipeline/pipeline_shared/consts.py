@@ -20,9 +20,13 @@ DATA_DIR_NAME = "data"
 LOG_DIR_NAME = "logs"
 DEBUGGING_DIR_NAME = "debugging"
 
+# ── Scraper output subdirectory modules ────────────────────────────────────────
+INITIATIVES_DIR_NAME = "initiatives"
+RESPONSES_DIR_NAME = "responses"
+RESPONSES_FOLLOWUP_DIR_NAME = "responses_followup_website"
+
 # ── Scraper output subdirectory names ──────────────────────────────────────────
 # Used by scraper to write, and by extractor/merger/renamer to read.
-INITIATIVES_DIR_NAME = "initiatives"
 LISTINGS_DIR_NAME = "listings"
 RESPONSES_DIR_NAME = "responses"
 RESPONSES_FOLLOWUP_DIR_NAME = "responses_followup"
