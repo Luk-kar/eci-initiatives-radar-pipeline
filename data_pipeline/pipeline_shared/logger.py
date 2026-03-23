@@ -1,60 +1,62 @@
 """
-Shared logger factory for scraper modules.
+Shared logger factory for data pipeline modules.
 """
 
-import datetime
 import logging
-import os
-from typing import Optional
-
-from .consts import LOG_DIR_NAME, DATA_DIR_NAME, PIPELINE_DIR
+from datetime import datetime
+from pathlib import Path
 
 
-def get_logger(name: str, log_dir: Optional[str] = None) -> logging.Logger:
+_TIMESTAMP_FORMAT = "%Y-%m-%d_%H-%M-%S"
+
+
+def get_logger(log_dir: Path, log_filename_pattern: str) -> logging.Logger:
     """Create or retrieve a configured logger with file and console handlers.
 
-    This function replaces the ScraperLogger singleton. It relies on
-    logging.getLogger(name) to ensure a single logger instance per name.
+    The logger name is derived from *log_filename_pattern* by stripping the
+    ``_{timestamp}.log`` suffix, e.g. ``scraper_initiatives_{timestamp}.log``
+    becomes ``scraper_initiatives``.  This keeps ``logging.getLogger`` idempotent:
+    calling ``get_logger`` twice with the same pattern returns the same instance
+    without adding duplicate handlers.
 
     Args:
-        name: Logger name (e.g. "ECIScraper", "ECIResponsesScraper").
-        log_dir: Directory where log files should be written. If not provided,
-            logs will be written under PIPELINE_DIR/data/<timestamp>/logs/ and
-            must be fully specified by the caller.
+        log_dir: Directory where the log file will be written.  Created
+            automatically if it does not exist.
+        log_filename_pattern: Filename template containing a ``{timestamp}``
+            placeholder, e.g. ``LOG_SCRAPER_INITIATIVES_PATTERN``.
 
     Returns:
-        Configured logging.Logger instance.
+        Configured ``logging.Logger`` instance.
     """
-
-    logger = logging.getLogger(name)
+    logger_name = log_filename_pattern.replace("_{timestamp}.log", "")
+    logger = logging.getLogger(logger_name)
     logger.setLevel(logging.DEBUG)
 
     if logger.handlers:
         return logger
 
-    if log_dir is None:
-        # Fallback: create a timestamped log directory under shared data dir.
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        log_dir = os.path.join(PIPELINE_DIR, DATA_DIR_NAME, timestamp, LOG_DIR_NAME)
+    log_dir = Path(log_dir)
+    log_dir.mkdir(parents=True, exist_ok=True)
 
-    os.makedirs(log_dir, exist_ok=True)
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    log_file = os.path.join(log_dir, f"{name}_{timestamp}.log")
+    timestamp = datetime.now().strftime(_TIMESTAMP_FORMAT)
+    log_file = log_dir / log_filename_pattern.format(timestamp=timestamp)
 
     # File handler (detailed)
     file_handler = logging.FileHandler(log_file, encoding="utf-8")
     file_handler.setLevel(logging.DEBUG)
-    file_formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - "
-        "%(funcName)s:%(lineno)d - %(message)s"
+    file_handler.setFormatter(
+        logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - "
+            "%(funcName)s:%(lineno)d - %(message)s"
+        )
     )
-    file_handler.setFormatter(file_formatter)
 
     # Console handler (simpler)
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
-    console_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-    console_handler.setFormatter(console_formatter)
+    console_handler.setFormatter(
+        logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    )
 
     logger.addHandler(file_handler)
     logger.addHandler(console_handler)

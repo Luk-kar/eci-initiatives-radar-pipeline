@@ -7,7 +7,8 @@ across the European Citizens' Initiative scraping pipeline.
 """
 
 from data_pipeline.pipeline_shared.logger import get_logger
+from data_pipeline.pipeline_shared.consts import LOG_SCRAPER_INITIATIVES_PATTERN
 from .consts import LOG_DIR
 
 
-logger = get_logger("ECIScraper", LOG_DIR)
+logger = get_logger(LOG_DIR, LOG_SCRAPER_INITIATIVES_PATTERN)
