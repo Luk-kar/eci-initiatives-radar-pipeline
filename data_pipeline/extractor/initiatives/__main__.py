@@ -26,10 +26,8 @@ from data_pipeline.pipeline_shared.consts import (
     DATA_PIPELINE_DIR_NAME,
 )
 from data_pipeline.extractor.initiatives.extractor import extract_initiatives
-from data_pipeline.extractor.initiatives.validator import (
-    RunDirectoryValidationError,
+from data_pipeline.pipeline_shared.locate_run_dir import (
     find_newest_scraped_data_dir,
-    validate_run_dir,
 )
 
 
@@ -59,16 +57,12 @@ def extract_eci_initiatives() -> str:
 
     Returns:
         Timestamp string used for output filenames.
-
-    Raises:
-        RunDirectoryValidationError: If the run directory fails validation.
-        SystemExit: On unrecoverable errors (logged before exit).
     """
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     data_dir = PIPELINE_DIR / DATA_DIR_NAME
 
     # ── 1. Resolve run directory ───────────────────────────────────────────────
-    run_dir = find_newest_scraped_data_dir(data_dir)
+    run_dir = find_newest_scraped_data_dir(data_dir, INITIATIVES_DIR_NAME)
 
     # ── 2. Bootstrap logging into the run directory's logs/ folder ────────────
     log_path = (
@@ -77,20 +71,12 @@ def extract_eci_initiatives() -> str:
         / LOG_EXTRACTOR_INITIATIVES_PATTERN.format(timestamp=timestamp)
     )
 
-    print(str(log_path))
     _setup_logging(log_path)
     logger = logging.getLogger(__name__)
 
     logger.info("Run directory : %s", run_dir)
 
-    # ── 3. Validate run directory structure and HTML content ───────────────────
-    try:
-        validate_run_dir(run_dir)
-    except RunDirectoryValidationError as exc:
-        logger.error("Run directory validation failed: %s", exc)
-        raise
-
-    # ── 4. Extract ─────────────────────────────────────────────────────────────
+    # ── 3. Extract ─────────────────────────────────────────────────────────────
     initiatives_dir = run_dir / INITIATIVES_DIR_NAME
     output_csv = data_dir / ECI_INITIATIVES_CSV_PATTERN.format(timestamp=timestamp)
 
@@ -105,7 +91,4 @@ def extract_eci_initiatives() -> str:
 
 if __name__ == "__main__":
 
-    try:
-        extract_eci_initiatives()
-    except RunDirectoryValidationError as exc:
-        sys.exit(f"[ERROR] {exc}")
+    extract_eci_initiatives()

@@ -1,8 +1,9 @@
 """
-Pre-extraction validator for the ECI initiatives run directory.
+Pre-extraction validator for the ECI scraper run directory.
 
 Checks that the newest data run contains:
-- a valid initiatives/ directory with year subdirectories
+- a valid content directory (initiatives/, responses/, or responses_followup/)
+  with year subdirectories
 - at least one HTML file per year directory, validated as real HTML
 - a logs/ directory
 """
@@ -12,11 +13,15 @@ from pathlib import Path
 
 from data_pipeline.pipeline_shared.consts import (
     INITIATIVES_DIR_NAME,
+    RESPONSES_DIR_NAME,
+    RESPONSES_FOLLOWUP_DIR_NAME,
     LOG_DIR_NAME,
     INITIATIVE_PAGE_FILENAME_PATTERN,
 )
 
+
 logger = logging.getLogger(__name__)
+
 
 # Minimum bytes to consider an HTML file non-trivially populated
 _MIN_HTML_BYTES = 256
@@ -29,23 +34,31 @@ class RunDirectoryValidationError(Exception):
     """Raised when the run directory fails structural or content validation."""
 
 
-def find_newest_scraped_data_dir(data_dir: Path) -> Path:
+def find_newest_scraped_data_dir(
+    data_dir: Path,
+    dir_name: str,
+) -> Path:
     """
-    Return the most recent timestamped run directory under *data_dir*.
+    Return the most recent timestamped run directory under *data_dir*
+    and validate its structure.
 
     Directories are expected to follow the ``YYYY-MM-DD_HH-MM-SS`` pattern,
     which sorts lexicographically in chronological order.
 
     Args:
         data_dir: Top-level data directory (e.g. ``data_pipeline/data``).
+        dir_name: Content subdirectory to validate inside the run directory.
+                  Must be one of ``INITIATIVES_DIR_NAME``,
+                  ``RESPONSES_DIR_NAME``, or ``RESPONSES_FOLLOWUP_DIR_NAME``.
+                  Defaults to ``INITIATIVES_DIR_NAME``.
 
     Returns:
-        Path to the newest run directory.
+        Path to the newest, validated run directory.
 
     Raises:
-        RunDirectoryValidationError: If no run directories are found.
+        RunDirectoryValidationError: If no run directories are found, or if
+                                     the newest directory fails validation.
     """
-
     candidates = [p for p in data_dir.iterdir() if p.is_dir()]
 
     if not candidates:
@@ -54,16 +67,25 @@ def find_newest_scraped_data_dir(data_dir: Path) -> Path:
     newest = max(candidates, key=lambda p: p.name)
     logger.info("Newest run directory: %s", newest)
 
+    try:
+        validate_run_dir(newest, dir_name)
+    except RunDirectoryValidationError as exc:
+        logger.error("Run directory validation failed: %s", exc)
+        raise
+
     return newest
 
 
-def validate_run_dir(run_dir: Path) -> None:
+def validate_run_dir(
+    run_dir: Path,
+    dir_name: str,
+) -> None:
     """
     Validate that *run_dir* has the expected structure and valid HTML content.
 
     Checks performed:
-    1. ``initiatives/`` subdirectory exists.
-    2. At least one year directory (4-digit name) exists inside ``initiatives/``.
+    1. Content subdirectory (*dir_name*) exists.
+    2. At least one year directory (4-digit name) exists inside that directory.
     3. Each year directory contains at least one HTML file.
     4. Every HTML file passes basic content validation.
     5. ``logs/`` subdirectory exists.
@@ -71,6 +93,9 @@ def validate_run_dir(run_dir: Path) -> None:
     Args:
         run_dir: A timestamped run directory, e.g.
                  ``data_pipeline/data/2026-03-22_15-51-04``.
+        dir_name: Name of the content subdirectory to validate.  Must be one of
+                  ``INITIATIVES_DIR_NAME``, ``RESPONSES_DIR_NAME``, or
+                  ``RESPONSES_FOLLOWUP_DIR_NAME``.
 
     Raises:
         RunDirectoryValidationError: On the first failed check encountered.
@@ -78,11 +103,10 @@ def validate_run_dir(run_dir: Path) -> None:
 
     _validate_logs_dir(run_dir)
 
-    initiatives_dir = _validate_initiatives_dir(run_dir)
-    year_dirs = _validate_year_dirs(initiatives_dir)
+    content_dir = _validate_content_dir(run_dir, dir_name)
+    year_dirs = _validate_year_dirs(content_dir)
 
     for year_dir in year_dirs:
-
         html_files = _validate_html_files_present(year_dir)
         for html_file in html_files:
             _validate_html_content(html_file)
@@ -104,30 +128,30 @@ def _validate_logs_dir(run_dir: Path) -> Path:
     return logs_dir
 
 
-def _validate_initiatives_dir(run_dir: Path) -> Path:
-    initiatives_dir = run_dir / INITIATIVES_DIR_NAME
+def _validate_content_dir(run_dir: Path, dir_name: str) -> Path:
 
-    if not initiatives_dir.is_dir():
+    content_dir = run_dir / dir_name
 
+    if not content_dir.is_dir():
         raise RunDirectoryValidationError(
-            f"Missing initiatives directory: {initiatives_dir}"
+            f"Missing {dir_name} directory: {content_dir}"
         )
 
-    logger.debug("initiatives/ directory present: %s", initiatives_dir)
-    return initiatives_dir
+    logger.debug("%s/ directory present: %s", dir_name, content_dir)
+    return content_dir
 
 
-def _validate_year_dirs(initiatives_dir: Path) -> list[Path]:
+def _validate_year_dirs(content_dir: Path) -> list[Path]:
 
     year_dirs = [
         p
-        for p in sorted(initiatives_dir.iterdir())
+        for p in sorted(content_dir.iterdir())
         if p.is_dir() and p.name.isdigit() and len(p.name) == 4
     ]
 
     if not year_dirs:
         raise RunDirectoryValidationError(
-            f"No year subdirectories found in: {initiatives_dir}"
+            f"No year subdirectories found in: {content_dir}"
         )
 
     logger.debug(
@@ -161,7 +185,6 @@ def _validate_html_content(html_file: Path) -> None:
         RunDirectoryValidationError: If the file is too small or lacks
                                      required content markers.
     """
-
     size = html_file.stat().st_size
 
     if size < _MIN_HTML_BYTES:
@@ -173,7 +196,6 @@ def _validate_html_content(html_file: Path) -> None:
         content = html_file.read_text(encoding="utf-8", errors="replace")
 
     except OSError as exc:
-
         raise RunDirectoryValidationError(
             f"Could not read HTML file: {html_file}"
         ) from exc
@@ -181,7 +203,6 @@ def _validate_html_content(html_file: Path) -> None:
     content_lower = content.lower()
 
     for token in _REQUIRED_HTML_TOKENS:
-
         if token.lower() not in content_lower:
             raise RunDirectoryValidationError(
                 f"HTML file missing expected token {token!r}: {html_file}"
