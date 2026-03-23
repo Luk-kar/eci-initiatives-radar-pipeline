@@ -1,3 +1,10 @@
-def construct_url(registration_number: str) -> str:
-    """Construct the canonical ECI URL from a registration number."""
-    ...
+def construct_url(self, reg_number: str) -> str:
+    """Construct English URL from registration number"""
+
+    if reg_number:
+        year, number = reg_number.split("/")
+
+        return URLConfig.INITIATIVE_DETAILS_URL_TEMPLATE.format(
+            base_url=URLConfig.BASE_URL, year=year, number=number
+        )
+    return ""
