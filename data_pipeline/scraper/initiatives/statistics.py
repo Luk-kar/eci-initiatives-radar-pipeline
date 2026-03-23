@@ -21,7 +21,7 @@ from .consts import (
     LISTINGS_DIR_NAME,
     PAGES_DIR_NAME,
 )
-from ._logger import logger
+from data_pipeline.pipeline_shared import logger
 from .log_messages import LOG_MESSAGES
 
 

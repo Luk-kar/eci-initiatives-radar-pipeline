@@ -6,7 +6,7 @@ specifically tailored for tracking the execution flow, warnings, and errors
 across the European Citizens' Initiative scraping pipeline.
 """
 
-from ..scraper_shared.logger import get_logger
+from data_pipeline.pipeline_shared.logger import get_logger
 from .consts import LOG_DIR
 
 
