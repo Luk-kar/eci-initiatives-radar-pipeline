@@ -12,6 +12,7 @@ def _soup(html: str) -> BeautifulSoup:
 
 
 def test_extract_current_status_happy_path():
+
     html = """
     <html><body>
       <ol class="ecl-timeline">
@@ -21,10 +22,12 @@ def test_extract_current_status_happy_path():
       </ol>
     </body></html>
     """
+
     assert extract_current_status(_soup(html)) == "Answered"
 
 
 def test_extract_current_status_raises_when_no_current_item():
+
     html = """
     <html><body>
       <ol class="ecl-timeline">
@@ -34,13 +37,16 @@ def test_extract_current_status_raises_when_no_current_item():
       </ol>
     </body></html>
     """
+
     with pytest.raises(FieldValueError) as excinfo:
         extract_current_status(_soup(html))
+
     msg = str(excinfo.value)
     assert "no active timeline item" in msg
 
 
 def test_extract_current_status_raises_when_title_missing():
+
     html = """
     <html><body>
       <ol class="ecl-timeline">
@@ -50,7 +56,9 @@ def test_extract_current_status_raises_when_title_missing():
       </ol>
     </body></html>
     """
+
     with pytest.raises(FieldValueError) as excinfo:
         extract_current_status(_soup(html))
+
     msg = str(excinfo.value)
     assert "contains no title element" in msg
