@@ -4,9 +4,16 @@ import json
 
 from bs4 import BeautifulSoup
 
+from ....extractor_shared.errors import FieldValueError
+
 
 def extract_timeline_data(soup: BeautifulSoup) -> dict[str, Optional[str]]:
-    """Extract timeline information from ECL timeline"""
+    """Extract timeline information from ECL timeline.
+
+    Raises:
+        FieldValueError: If no timeline element is found in the page, or if
+            the timeline contains no recognisable fields after processing.
+    """
 
     timeline_data = {}
 
@@ -56,6 +63,16 @@ def extract_timeline_data(soup: BeautifulSoup) -> dict[str, Optional[str]]:
     if timeline_json_data:
         timeline_data["timeline"] = json.dumps(
             timeline_json_data, ensure_ascii=False, separators=(",", ":")
+        )
+
+    if not timeline_data:
+        raise FieldValueError(
+            field="timeline",
+            message=(
+                "Cannot extract timeline: element was found but yielded no "
+                "recognisable fields. Check that timeline title mappings in "
+                "normalize_timeline_title() cover the titles present in this page."
+            ),
         )
 
     return timeline_data

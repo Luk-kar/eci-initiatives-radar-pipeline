@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Protocol
 
 from .errors import HTMLParseError
+from data_pipeline.pipeline_shared.consts import FilePatterns
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +34,7 @@ def _find_html_files(source_dir: Path) -> list[Path]:
                 {year}_{number}.html
                 ...
     """
+
     if not source_dir.exists():
         logger.warning("Directory not found: %s", source_dir)
         return []
@@ -72,17 +74,20 @@ def _write_rows_to_csv(
     rows_written = 0
 
     with open(output_csv, "w", newline="", encoding="utf-8") as csvfile:
+
         writer = csv.DictWriter(csvfile, fieldnames=parser.csv_columns)
         writer.writeheader()
 
         for html_file in html_files:
             logger.debug("Parsing: %s", html_file)
+
             try:
                 parsed = parser.parse(html_file)
                 writer.writerow(
                     {col: parsed.get(col, "") for col in parser.csv_columns}
                 )
                 rows_written += 1
+
             except Exception as exc:
                 logger.exception("Failed to parse: %s", html_file)
                 raise HTMLParseError(f"Failed to parse: {html_file}") from exc

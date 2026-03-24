@@ -1,5 +1,7 @@
 from bs4 import BeautifulSoup
 
+from ....extractor_shared.errors import FieldValueError
+
 
 def extract_title(soup: BeautifulSoup) -> str:
     """Extract initiative title"""
@@ -14,4 +16,4 @@ def extract_title(soup: BeautifulSoup) -> str:
     if h1_title:
         return h1_title.get_text().strip()
 
-    return ""
+    raise FieldValueError(field="title", source=source)

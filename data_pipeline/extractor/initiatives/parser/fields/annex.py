@@ -27,4 +27,5 @@ def extract_annex(soup: BeautifulSoup) -> Optional[str]:
         node = node.find_next_sibling()
 
     joined = " ".join(texts).strip()
+
     return joined or None

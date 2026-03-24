@@ -41,6 +41,24 @@ RESPONSES_FOLLOWUP_DIR_NAME = "responses_followup"
 # {number} includes the language slug (e.g. "000009_en")
 INITIATIVE_PAGE_FILENAME_PATTERN = "{year}_{number}.html"
 
+# ============================================================================
+# File Patterns and Naming
+# ============================================================================
+
+
+class FilePatterns:
+    """Common file naming patterns and regex for matching files."""
+
+    # HTML filename regex for extracting registration number
+    # Matches: YYYY_NNNNNN_en.html (e.g., 2019_000007_en.html)
+    FILENAME_REGEX = r"(\d{4})_(\d{6})_en\.html"
+    HTML_FILENAME_PATTERN = r"(\d{4})_(\d{6})_([a-z]{2})\.html"  # More flexible version
+
+    # Timestamp directory pattern for finding scraper session directories
+    # Matches: YYYY-MM-DD_HH-MM-SS (e.g., 2026-02-05_18-30-45)
+    TIMESTAMP_DIR_PATTERN = r"\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}"
+
+
 # ── Extractor CSV output filename patterns ─────────────────────────────────────
 # Produced by extractor, consumed by merger and renamer.
 ECI_INITIATIVES_CSV_PATTERN = "eci_initiatives_{timestamp}.csv"

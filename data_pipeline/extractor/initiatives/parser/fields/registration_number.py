@@ -1,18 +1,36 @@
 from pathlib import Path
 import re
 
-from ...consts import FilePatterns
+from ...consts import RegistrationNumberFormat
+
+from data_pipeline.pipeline_shared.consts import FilePatterns
+from ....extractor_shared.errors import FieldValueError
 
 
 def extract_registration_number(filename: str) -> str:
-    """Extract registration number from filename pattern YYYY_NNNNNN_en.html"""
+    """Extract registration number from filename. Mandatory — raises if unresolvable."""
 
-    pattern = FilePatterns.FILENAME_REGEX
-    match = re.match(pattern, filename)
+    for pattern in (FilePatterns.FILENAME_REGEX, FilePatterns.HTML_FILENAME_PATTERN):
 
-    if match:
+        match = re.match(pattern, filename)
 
-        year, number = match.groups()
-        return f"{year}/{number}"
+        if match:
 
-    return ""
+            year, number = match.groups()
+            if year and number:
+                return RegistrationNumberFormat.FORMAT_TEMPLATE.format(
+                    year=year,
+                    separator=RegistrationNumberFormat.SEPARATOR,
+                    number=number,
+                )
+
+    raise FieldValueError(
+        field="registration_number",
+        value=filename,
+        source=filename,
+        message=(
+            f"Cannot extract registration number from filename {filename!r}. "
+            f"Expected pattern matching {FilePatterns.FILENAME_REGEX!r} "
+            f"or {FilePatterns.HTML_FILENAME_PATTERN!r}."
+        ),
+    )
