@@ -16,7 +16,14 @@ def extract_registration_number(filename: str) -> str:
 
         if match:
 
-            year, number = match.groups()
+            groups = match.groups()
+
+            # Only accept patterns that produce exactly (year, number).
+            if len(groups) != 2:
+                # Pattern matched but has an unexpected shape (e.g. extra lang code)
+                break
+
+            year, number = groups
             if year and number:
                 return RegistrationNumberFormat.FORMAT_TEMPLATE.format(
                     year=year,
