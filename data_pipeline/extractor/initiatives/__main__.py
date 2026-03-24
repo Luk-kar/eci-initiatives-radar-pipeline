@@ -3,7 +3,6 @@ Entry point for the ECI initiatives extractor.
 ...
 """
 
-import argparse
 import logging
 import sys
 from datetime import datetime
@@ -27,26 +26,26 @@ from data_pipeline.pipeline_shared.locate_run_dir import (
 )
 
 
-def extract_eci_initiatives() -> str:
-    """
-    Run the initiatives extraction pipeline.
+# ── Step functions ─────────────────────────────────────────────────────────────
 
-    Returns:
-        Timestamp string used for output filenames.
-    """
-    timestamp = datetime.now().strftime(TIMESTAMP_FORMAT)
 
-    # ── 1. Resolve run directory ───────────────────────────────────────────────
-    run_dir = find_newest_scraped_data_dir(DATA_DIR, INITIATIVES_DIR_NAME)
+def _resolve_run_dir() -> Path:
+    """Locate the newest scraped data directory for initiatives."""
+    return find_newest_scraped_data_dir(DATA_DIR, INITIATIVES_DIR_NAME)
 
-    # ── 2. Bootstrap logging into the run directory's logs/ folder ────────────
+
+def _setup_logging(run_dir: Path, timestamp: str) -> logging.Logger:
+    """Bootstrap logging into the run directory's logs/ folder."""
     log_dir_path = run_dir / LOG_DIR_NAME
+    return setup_logger(log_dir_path, timestamp)
 
-    logger = setup_logger(log_dir_path, timestamp)
 
-    logger.info("Run directory : %s", run_dir)
-
-    # ── 3. Extract ─────────────────────────────────────────────────────────────
+def _run_extraction(
+    run_dir: Path,
+    timestamp: str,
+    logger: logging.Logger,
+) -> None:
+    """Resolve I/O paths and run the initiatives extractor."""
     initiatives_dir = run_dir / INITIATIVES_DIR_NAME
     output_csv = run_dir / ECI_INITIATIVES_CSV_PATTERN.format(timestamp=timestamp)
 
@@ -54,6 +53,21 @@ def extract_eci_initiatives() -> str:
     logger.info("Output : %s", output_csv)
 
     extract_initiatives(initiatives_dir, output_csv)
+
+
+# ── Entry point ────────────────────────────────────────────────────────────────
+
+
+def extract_eci_initiatives() -> None:
+    """Run the initiatives extraction pipeline."""
+    timestamp = datetime.now().strftime(TIMESTAMP_FORMAT)
+
+    run_dir = _resolve_run_dir()
+    logger = _setup_logging(run_dir, timestamp)
+
+    logger.info("Run directory : %s", run_dir)
+
+    _run_extraction(run_dir, timestamp, logger)
 
     logger.info("Extraction complete")
 
