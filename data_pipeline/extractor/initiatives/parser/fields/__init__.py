@@ -5,12 +5,14 @@ from .funding_total import extract_funding_total
 from .objective import extract_objective
 from .registration_number import extract_registration_number
 from .response_commission_url import extract_response_commission_url
-from .signatures_by_country import extract_signatures_by_country
-from .signatures_collected import extract_signatures_collected
-from .signatures_threshold_met import extract_signatures_threshold_met
 from .timeline import extract_timeline_data
 from .title import extract_title
 from .url import construct_url
+from .signatures import (
+    extract_signatures_by_country,
+    extract_signatures_collected,
+    extract_signatures_threshold_met,
+)
 
 __all__ = [
     "extract_annex",
