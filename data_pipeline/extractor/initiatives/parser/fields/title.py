@@ -16,4 +16,11 @@ def extract_title(soup: BeautifulSoup) -> str:
     if h1_title:
         return h1_title.get_text().strip()
 
-    raise FieldValueError(field="title", source=source)
+    raise FieldValueError(
+        field="title",
+        source="html",
+        message=(
+            "Cannot extract title: neither 'dcterms.title' meta nor "
+            "H1 ('ecl-page-header-core__title') header found."
+        ),
+    )

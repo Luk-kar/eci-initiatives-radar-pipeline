@@ -1,5 +1,3 @@
-# data_pipeline/extractor/initiatives/tests/fields/test_signatures_threshold_met.py
-
 from bs4 import BeautifulSoup
 
 from data_pipeline.extractor.initiatives.parser.fields.signatures.threshold_met import (

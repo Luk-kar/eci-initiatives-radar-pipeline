@@ -1,5 +1,3 @@
-# data_pipeline/extractor/initiatives/tests/fields/test_signatures_by_country.py
-
 import json
 from pathlib import Path
 

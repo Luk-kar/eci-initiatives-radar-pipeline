@@ -1,5 +1,3 @@
-# data_pipeline/extractor/initiatives/tests/fields/test_registration_number.py
-
 import pytest
 
 from data_pipeline.extractor.initiatives.parser.fields.registration_number import (

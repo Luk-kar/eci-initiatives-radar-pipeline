@@ -59,20 +59,22 @@ def extract_timeline_data(soup: BeautifulSoup) -> dict[str, Optional[str]]:
     # Post-process timeline_verification_end based on sequence
     timeline_data = _process_verification_end(timeline_sequence, timeline_data)
 
-    # Add full timeline as JSON string
-    if timeline_json_data:
-        timeline_data["timeline"] = json.dumps(
-            timeline_json_data, ensure_ascii=False, separators=(",", ":")
-        )
-
+    # If we still have no recognised timeline fields, raise an error
     if not timeline_data:
         raise FieldValueError(
             field="timeline",
             message=(
                 "Cannot extract timeline: element was found but yielded no "
                 "recognisable fields. Check that timeline title mappings in "
-                "normalize_timeline_title() cover the titles present in this page."
+                "_normalize_timeline_title() cover the titles present in this page."
             ),
+        )
+
+    # Only now add full timeline JSON, once we know there is at least one
+    # recognised field.
+    if timeline_json_data:
+        timeline_data["timeline"] = json.dumps(
+            timeline_json_data, ensure_ascii=False, separators=(",", ":")
         )
 
     return timeline_data
@@ -101,42 +103,53 @@ def _process_verification_end(
 ) -> Dict[str, Optional[str]]:
     """
     Determine timeline_verification_end based on sequence rules:
-    - Accept 'Valid initiative'
-    - Accept any step containing 'initiative' that comes after 'Verification'
-    and is last OR comes before 'Answered initiative'
+    - Prefer "Valid initiative" if present after "Verification"
+    - Otherwise, take the first step containing "initiative" that comes after
+      "Verification" and is either before "Answered initiative" or is the last item
     """
-
-    # Find indices in timeline
     verification_idx = None
     answered_idx = None
-    verification_end_candidate = None
 
-    for idx, (title, date) in enumerate(timeline_sequence):
-        title_lower = title.lower()
-
-        # Track Verification position
+    # First pass: locate Verification and Answered initiative indices
+    for idx, (title, _date) in enumerate(timeline_sequence):
         if title == "Verification":
             verification_idx = idx
-
-        # Track Answered initiative position
         if title == "Answered initiative":
             answered_idx = idx
 
-        # Check for any title containing 'initiative' after verification
-        if verification_idx is not None and "initiative" in title_lower:
+    if verification_idx is None:
+        return timeline_data
 
-            # Only consider if it's after Verification
-            if idx > verification_idx:
+    verification_end_candidate: Optional[Tuple[str, Optional[str]]] = None
 
-                # Check if it's before Answered or is the last item
-                if (
-                    answered_idx is None
-                    or idx < answered_idx
-                    or idx == len(timeline_sequence) - 1
-                ):
-                    verification_end_candidate = (title, date)
+    # Second pass: find the best candidate after Verification
+    for idx, (title, date) in enumerate(timeline_sequence):
+        if idx <= verification_idx:
+            continue
 
-    # Set timeline_verification_end if we found a valid candidate
+        title_lower = title.lower()
+
+        # Only consider steps mentioning "initiative"
+        if "initiative" not in title_lower:
+            continue
+
+        # Must be before Answered (if present) or be the last item
+        if (
+            answered_idx is not None
+            and idx >= answered_idx
+            and idx != len(timeline_sequence) - 1
+        ):
+            continue
+
+        # Prefer "Valid initiative" explicitly if found
+        if title == "Valid initiative":
+            verification_end_candidate = (title, date)
+            break
+
+        # Otherwise, if no candidate yet, take the first suitable one
+        if verification_end_candidate is None:
+            verification_end_candidate = (title, date)
+
     if verification_end_candidate:
         timeline_data["timeline_verification_end"] = verification_end_candidate[1]
 

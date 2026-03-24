@@ -1,5 +1,3 @@
-# data_pipeline/extractor/initiatives/tests/fields/test_response_commission_url.py
-
 from bs4 import BeautifulSoup
 
 from data_pipeline.extractor.initiatives.parser.fields.response_commission_url import (
