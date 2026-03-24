@@ -4,12 +4,14 @@ ECI Data Models
 Data structures for ECI initiative information
 """
 
-from dataclasses import dataclass
 from typing import Optional
 
+from pydantic import BaseModel, ConfigDict, field_validator
 
-@dataclass
-class ECIInitiativeDetailsRecord:
+from .consts import ContentLimits
+
+
+class ECIInitiativeDetailsRecord(BaseModel):
     """Data structure for ECI initiative information"""
 
     registration_number: str

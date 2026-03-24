@@ -2,7 +2,6 @@ import re
 
 from bs4 import BeautifulSoup
 
-from ...consts import ContentLimits
 from ....extractor_shared.errors import FieldValueError
 
 
@@ -44,4 +43,4 @@ def extract_objective(soup: BeautifulSoup) -> str:
             ),
         )
 
-    return objective_text[: ContentLimits.OBJECTIVE_MAX_LENGTH]
+    return objective_text

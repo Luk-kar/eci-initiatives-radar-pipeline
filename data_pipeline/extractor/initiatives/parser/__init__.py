@@ -39,9 +39,7 @@ class ECIHTMLParser:
     field names, staying in sync with the model automatically.
     """
 
-    csv_columns: list[str] = [
-        f.name for f in dataclasses.fields(ECIInitiativeDetailsRecord)
-    ]
+    csv_columns: list[str] = list(ECIInitiativeDetailsRecord.model_fields)
 
     def __init__(self) -> None:
         self.logger = logging.getLogger(__name__)
@@ -72,7 +70,7 @@ class ECIHTMLParser:
             title = extract_title(soup)
             url = construct_url(reg_number)
 
-            initiative_data = ECIInitiativeDetailsRecord(
+            record = ECIInitiativeDetailsRecord(
                 registration_number=reg_number,
                 title=title,
                 objective=extract_objective(soup),
@@ -107,7 +105,7 @@ class ECIHTMLParser:
             )
 
             self.logger.info("Successfully parsed %s", html_file.name)
-            return dataclasses.asdict(initiative_data)
+            return record.model_dump()
 
         except Exception as exc:
             raise ValueError(f"Error parsing {html_file}") from exc

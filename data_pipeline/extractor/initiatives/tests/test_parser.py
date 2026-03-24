@@ -2,7 +2,6 @@
 Tests for data_pipeline.extractor.initiatives.parser.ECIHTMLParser.
 """
 
-import dataclasses
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -23,7 +22,7 @@ class TestECIHTMLParserCsvColumns:
 
     def test_csv_columns_matches_model_fields(self):
 
-        expected = [f.name for f in dataclasses.fields(ECIInitiativeDetailsRecord)]
+        expected = list(ECIInitiativeDetailsRecord.model_fields)
 
         assert ECIHTMLParser.csv_columns == expected
 
