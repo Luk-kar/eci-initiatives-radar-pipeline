@@ -67,14 +67,16 @@ class ECIHTMLParser:
 
             reg_number = extract_registration_number(html_file.name)
             timeline_data = extract_timeline_data(soup)
+            title = extract_title(soup)
+            url = construct_url(reg_number)
 
             initiative_data = ECIInitiativeDetailsRecord(
                 registration_number=reg_number,
-                title=extract_title(soup),
+                title=title,
                 objective=extract_objective(soup),
                 annex=extract_annex(soup),
                 current_status=extract_current_status(soup),
-                url=construct_url(reg_number),
+                url=url,
                 timeline_registered=timeline_data.get("timeline_registered"),
                 timeline_collection_start_date=timeline_data.get(
                     "timeline_collection_start_date"
@@ -93,10 +95,10 @@ class ECIHTMLParser:
                 ),
                 timeline=timeline_data.get("timeline"),
                 funding_total=extract_funding_total(soup),
-                funding_by=extract_funding_by(soup, html_file),
+                funding_by=extract_funding_by(soup, html_file, title, url),
                 signatures_collected=extract_signatures_collected(soup),
                 signatures_collected_by_country=extract_signatures_by_country(
-                    soup, html_file
+                    soup, html_file, title, url
                 ),
                 signatures_threshold_met=extract_signatures_threshold_met(soup),
                 response_commission_url=extract_response_commission_url(soup),

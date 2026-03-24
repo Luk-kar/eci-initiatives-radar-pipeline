@@ -1,5 +1,7 @@
 from pathlib import Path
 from typing import Optional
+import re
+
 from bs4 import BeautifulSoup
 
 

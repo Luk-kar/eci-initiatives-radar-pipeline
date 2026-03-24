@@ -1,3 +1,6 @@
+from ...consts import URLConfig
+
+
 def construct_url(reg_number: str) -> str:
     """Construct English URL from registration number"""
 

@@ -1,4 +1,6 @@
 from typing import Optional
+import re
+
 from bs4 import BeautifulSoup
 
 
@@ -16,7 +18,7 @@ def extract_signatures_collected(soup: BeautifulSoup) -> Optional[str]:
     """
 
     # Use common function to get table
-    signatures_table = self._find_signatures_table(soup)
+    signatures_table = find_signatures_table(soup)
 
     if signatures_table:
 
@@ -53,3 +55,17 @@ def extract_signatures_collected(soup: BeautifulSoup) -> Optional[str]:
             return "".join(numbers)
 
     return None
+
+
+def find_signatures_table(soup: BeautifulSoup) -> Optional[BeautifulSoup]:
+    """Common inner function to find the signatures table with zebra styling"""
+    # Look for table with specific classes
+    signatures_table = soup.find(
+        "table", class_="ecl-table ecl-table--zebra ecl-u-type-paragraph"
+    )
+
+    # Fallback to basic ecl-table if not found
+    if not signatures_table:
+        signatures_table = soup.find("table", class_="ecl-table")
+
+    return signatures_table

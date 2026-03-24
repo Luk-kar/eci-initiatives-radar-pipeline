@@ -1,4 +1,8 @@
+import re
+
 from bs4 import BeautifulSoup
+
+from ...consts import ContentLimits
 
 
 def extract_objective(soup: BeautifulSoup) -> str:
