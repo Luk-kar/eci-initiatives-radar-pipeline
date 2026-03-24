@@ -23,12 +23,12 @@ def extract_signatures_by_country(
 
         country_data = {}
 
-        for country_text, statements_of_support, threshold, percentage in rows_data:
+        for country_text, signatures, threshold, percentage in rows_data:
 
             missing_fields = []
 
-            if not statements_of_support:
-                missing_fields.append("statements_of_support")
+            if not signatures:
+                missing_fields.append("signatures")
             if not threshold:
                 missing_fields.append("threshold")
             if not percentage:
@@ -42,7 +42,7 @@ def extract_signatures_by_country(
                 )
 
             country_data[country_text] = {
-                "statements_of_support": statements_of_support,
+                "signatures": signatures,
                 "threshold": threshold,
                 "percentage": percentage,
             }

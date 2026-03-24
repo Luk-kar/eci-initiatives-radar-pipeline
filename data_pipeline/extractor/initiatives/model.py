@@ -4,11 +4,79 @@ ECI Data Models
 Data structures for ECI initiative information
 """
 
-from typing import Optional
+from typing import Optional, Any
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, Json, Field, field_validator
 
 from .consts import ContentLimits
+
+
+class TimelineEvent(BaseModel):
+    """
+    Represents a single event in the ECI initiative's lifecycle timeline.
+
+    Example JSON data:
+    {
+        "step": "Registered",
+        "date": "10/05/2012"
+    }
+
+    If the date is not yet known, `date` may be null / missing.
+    For example for `Collection ongoing` step
+    """
+
+    step: str
+    date: Optional[str] = None
+
+
+class Sponsor(BaseModel):
+    """
+    Represents a financial sponsor or donor supporting the initiative.
+
+    Example JSON data:
+    {
+        "name_of_sponsor": "European Federation of Public Service Unions (EPSU)",
+        "date": "28/11/2013",
+        "amount_in_eur": "20,000"
+    }
+    """
+
+    name_of_sponsor: str
+    date: str
+    amount_in_eur: str
+
+
+class CountrySignatureStats(BaseModel):
+    """
+    Represents the signature collection statistics for a specific EU member state.
+
+    Example JSON data (typically nested under a country code like "DE"):
+    {
+        "signatures": 150430,
+        "threshold": 71695,
+        "percentage": 209.82
+    }
+    """
+
+    signatures: int
+    threshold: int
+    percentage: float
+
+    @field_validator("signatures", "threshold", mode="before")
+    @classmethod
+    def clean_integer_strings(cls, value: Any) -> Any:
+        if isinstance(value, str):
+            # Remove commas, asterisks, and whitespace before casting to int
+            return value.replace(",", "").replace("*", "").strip()
+        return value
+
+    @field_validator("percentage", mode="before")
+    @classmethod
+    def clean_float_strings(cls, value: Any) -> Any:
+        if isinstance(value, str):
+            # Remove commas, percent signs, and whitespace before casting to float
+            return value.replace(",", "").replace("%", "").strip()
+        return value
 
 
 class ECIInitiativeDetailsRecord(BaseModel):
@@ -21,20 +89,22 @@ class ECIInitiativeDetailsRecord(BaseModel):
     current_status: str
     url: str
 
-    timeline_registered: Optional[str]
+    timeline_registered: str
     timeline_collection_start_date: Optional[str]
     timeline_collection_closed: Optional[str]
     timeline_verification_start: Optional[str]
     timeline_verification_end: Optional[str]
     timeline_response_commission_date: Optional[str]
 
-    timeline: Optional[str]
+    timeline: Json[list[TimelineEvent]]
 
     funding_total: Optional[str]
-    funding_by: Optional[str]
+    funding_by: Optional[Json[list[Sponsor]]] = None
 
     signatures_collected: Optional[str]
-    signatures_collected_by_country: Optional[str]
+    signatures_collected_by_country: Optional[
+        Json[dict[str, CountrySignatureStats]]
+    ] = None
     signatures_threshold_met: Optional[str]
 
     response_commission_url: Optional[str]
