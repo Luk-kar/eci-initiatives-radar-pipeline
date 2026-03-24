@@ -66,5 +66,6 @@ LOG_EXTRACTOR_RESPONSES_FOLLOWUP_PATTERN = (
 LOG_MERGER_PATTERN = "merger_responses_and_followup_{timestamp}.log"
 LOG_DASHBOARD_PATTERN = "dashboard_{timestamp}.log"
 
-
+# Formats
 TIMESTAMP_FORMAT = "%Y-%m-%d_%H-%M-%S"
+FILE_ENCODING = "utf-8"

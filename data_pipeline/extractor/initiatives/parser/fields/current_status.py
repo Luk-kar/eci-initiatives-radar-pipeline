@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
 
-def extract_current_status(self, soup: BeautifulSoup) -> str:
+def extract_current_status(soup: BeautifulSoup) -> str:
     """Extract current initiative current_status"""
 
     # Find the currently active timeline item

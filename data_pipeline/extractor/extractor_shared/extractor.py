@@ -1,16 +1,6 @@
 """
 Shared HTML-to-CSV extraction utilities for data pipeline extractor modules.
-
-Provides two building blocks used by domain-specific extractors:
-
-- ``_find_html_files`` — walks a year-partitioned directory tree and returns
-  all non-empty HTML files in deterministic order.
-- ``extract_html_to_csv`` — drives the full extraction loop: discovers files,
-  delegates parsing to a caller-supplied parser, and writes results to a CSV.
-
-Domain extractors (e.g. ``data_pipeline.extractor.initiatives``) are expected
-to wrap ``extract_html_to_csv`` with their own ``HTMLParserProtocol``
-implementation rather than calling it directly.
+...
 """
 
 import csv
@@ -59,6 +49,47 @@ def _find_html_files(source_dir: Path) -> list[Path]:
     return html_files
 
 
+def _write_rows_to_csv(
+    output_csv: Path,
+    html_files: list[Path],
+    parser: HTMLParserProtocol,
+) -> int:
+    """
+    Open output_csv, parse each HTML file via parser, and write results as rows.
+
+    Args:
+        output_csv: Destination CSV path (parent directory must already exist).
+        html_files: Ordered list of HTML files to process.
+        parser:     Object implementing ``HTMLParserProtocol``.
+
+    Returns:
+        Number of rows written.
+
+    Raises:
+        HTMLParseError: If ``parser.parse`` raises for any HTML file;
+                        the original exception is chained via ``__cause__``.
+    """
+    rows_written = 0
+
+    with open(output_csv, "w", newline="", encoding="utf-8") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=parser.csv_columns)
+        writer.writeheader()
+
+        for html_file in html_files:
+            logger.debug("Parsing: %s", html_file)
+            try:
+                parsed = parser.parse(html_file)
+                writer.writerow(
+                    {col: parsed.get(col, "") for col in parser.csv_columns}
+                )
+                rows_written += 1
+            except Exception as exc:
+                logger.exception("Failed to parse: %s", html_file)
+                raise HTMLParseError(f"Failed to parse: {html_file}") from exc
+
+    return rows_written
+
+
 def extract_html_to_csv(
     source_dir: Path,
     output_csv: Path,
@@ -86,22 +117,6 @@ def extract_html_to_csv(
 
     output_csv.parent.mkdir(parents=True, exist_ok=True)
 
-    rows_written = 0
-
-    with open(output_csv, "w", newline="", encoding="utf-8") as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=parser.csv_columns)
-        writer.writeheader()
-
-        for html_file in html_files:
-            logger.debug("Parsing: %s", html_file)
-            try:
-                parsed = parser.parse(html_file)
-                writer.writerow(
-                    {col: parsed.get(col, "") for col in parser.csv_columns}
-                )
-                rows_written += 1
-            except Exception as exc:
-                logger.exception("Failed to parse: %s", html_file)
-                raise HTMLParseError(f"Failed to parse: {html_file}") from exc
+    rows_written = _write_rows_to_csv(output_csv, html_files, parser)
 
     logger.info("Wrote %d rows to %s", rows_written, output_csv)

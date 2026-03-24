@@ -1,4 +1,4 @@
-def construct_url(self, reg_number: str) -> str:
+def construct_url(reg_number: str) -> str:
     """Construct English URL from registration number"""
 
     if reg_number:

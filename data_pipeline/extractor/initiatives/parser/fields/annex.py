@@ -2,7 +2,7 @@ from typing import Optional
 from bs4 import BeautifulSoup
 
 
-def extract_annex(self, soup: BeautifulSoup) -> Optional[str]:
+def extract_annex(soup: BeautifulSoup) -> Optional[str]:
     """Return full Annex text (concatenated paragraphs) or None."""
 
     # Find the Annex h2 header (case insensitive)

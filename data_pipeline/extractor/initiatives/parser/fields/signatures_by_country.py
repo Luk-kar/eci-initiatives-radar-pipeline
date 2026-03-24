@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 
 def extract_signatures_by_country(
-    self, soup: BeautifulSoup, file_path: Path, title: str, url: str
+    soup: BeautifulSoup, file_path: Path, title: str, url: str
 ) -> Optional[str]:
     """Extract country-level signature data as JSON using common function"""
 

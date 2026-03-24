@@ -2,7 +2,7 @@ from typing import Optional
 from bs4 import BeautifulSoup
 
 
-def extract_response_commission_url(self, soup: BeautifulSoup) -> Optional[str]:
+def extract_response_commission_url(soup: BeautifulSoup) -> Optional[str]:
     """
     Extract the Commission's answer and follow-up page URL.
 

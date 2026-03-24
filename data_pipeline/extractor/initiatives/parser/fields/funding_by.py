@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 
 def extract_funding_by(
-    self, soup: BeautifulSoup, file_path: Path, title: str, url: str
+    soup: BeautifulSoup, file_path: Path, title: str, url: str
 ) -> Optional[str]:
     """Extract funding sponsors data as JSON"""
 

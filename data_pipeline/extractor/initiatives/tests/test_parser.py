@@ -128,4 +128,8 @@ class TestECIHTMLParserParse:
         ):
             with pytest.raises(ValueError) as exc_info:
                 parser.parse(bad_html)
+
+        if exc_info.value.__cause__ is not original:
+            raise exc_info.value.__cause__
+
         assert exc_info.value.__cause__ is original

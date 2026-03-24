@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
 
-def extract_title(self, soup: BeautifulSoup) -> str:
+def extract_title(soup: BeautifulSoup) -> str:
     """Extract initiative title"""
 
     # Try meta tag first

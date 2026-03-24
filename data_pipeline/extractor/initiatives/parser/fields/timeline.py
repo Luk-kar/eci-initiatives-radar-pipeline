@@ -2,7 +2,7 @@ from typing import Optional
 from bs4 import BeautifulSoup
 
 
-def extract_timeline_data(self, soup: BeautifulSoup) -> dict[str, Optional[str]]:
+def extract_timeline_data(soup: BeautifulSoup) -> dict[str, Optional[str]]:
     """Extract timeline information from ECL timeline"""
 
     timeline_data = {}

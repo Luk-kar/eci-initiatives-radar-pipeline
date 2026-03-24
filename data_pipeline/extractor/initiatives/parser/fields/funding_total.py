@@ -2,7 +2,7 @@ from typing import Optional
 from bs4 import BeautifulSoup
 
 
-def extract_funding_total(self, soup: BeautifulSoup) -> Optional[str]:
+def extract_funding_total(soup: BeautifulSoup) -> Optional[str]:
     """Extract total funding amount from paragraph"""
 
     # Look for paragraph containing total funding text

@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
 
-def extract_objective(self, soup: BeautifulSoup) -> str:
+def extract_objective(soup: BeautifulSoup) -> str:
     """Extract initiative objectives (max 1,100 characters)"""
 
     # Find objectives section
