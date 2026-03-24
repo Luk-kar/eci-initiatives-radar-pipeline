@@ -1,7 +1,6 @@
 from .annex import extract_annex
 from .current_status import extract_current_status
-from .funding_by import extract_funding_by
-from .funding_total import extract_funding_total
+from .funding import extract_funding_by, extract_funding_total
 from .objective import extract_objective
 from .registration_number import extract_registration_number
 from .response_commission_url import extract_response_commission_url
