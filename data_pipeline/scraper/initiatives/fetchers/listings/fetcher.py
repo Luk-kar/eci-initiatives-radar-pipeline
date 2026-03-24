@@ -21,6 +21,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 
 # Shared
+from data_pipeline.pipeline_shared.consts import FILE_ENCODING
+
 from ....scraper_shared.fetch_utils import (
     check_rate_limiting,
     download_with_retry,
@@ -213,7 +215,7 @@ def save_main_listing_page(
         page_source = driver.page_source
         main_page_path = os.path.join(list_dir, LISTING_PAGE_MAIN_FILENAME)
 
-        with open(main_page_path, "w", encoding="utf-8") as f:
+        with open(main_page_path, "w", encoding=FILE_ENCODING) as f:
             f.write(BeautifulSoup(page_source, "html.parser").prettify())
 
         logger.info(LOG_MESSAGES["main_page_saved"].format(path=main_page_path))

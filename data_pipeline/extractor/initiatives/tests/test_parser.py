@@ -12,6 +12,8 @@ from bs4 import BeautifulSoup
 from data_pipeline.extractor.initiatives.model import ECIInitiativeDetailsRecord
 from data_pipeline.extractor.initiatives.parser import ECIHTMLParser
 
+from data_pipeline.pipeline_shared.consts import FILE_ENCODING
+
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 _PARSER_MODULE = "data_pipeline.extractor.initiatives.parser"
@@ -46,7 +48,7 @@ class TestECIHTMLParserParse:
         src = FIXTURES_DIR / "2020_000001_en.html"
         dest = tmp_path / "2023" / "2023_000008.html"
         dest.parent.mkdir(parents=True)
-        dest.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+        dest.write_text(src.read_text(encoding=FILE_ENCODING), encoding=FILE_ENCODING)
 
         return dest
 
@@ -105,7 +107,7 @@ class TestECIHTMLParserParse:
 
         bad_html = tmp_path / "2023" / "2023_000001_en.html"
         bad_html.parent.mkdir(parents=True)
-        bad_html.write_text("<not valid", encoding="utf-8")
+        bad_html.write_text("<not valid", encoding=FILE_ENCODING)
 
         with patch(
             f"{_PARSER_MODULE}.extract_title",
@@ -118,7 +120,7 @@ class TestECIHTMLParserParse:
 
         bad_html = tmp_path / "2023" / "2023_000001_en.html"
         bad_html.parent.mkdir(parents=True)
-        bad_html.write_text("<html></html>", encoding="utf-8")
+        bad_html.write_text("<html></html>", encoding=FILE_ENCODING)
 
         original = RuntimeError("original cause")
 

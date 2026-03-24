@@ -14,6 +14,8 @@ from collections import Counter
 from typing import Dict
 
 # Local modules
+from data_pipeline.pipeline_shared.consts import FILE_ENCODING
+
 from .consts import (
     CSV_FILENAME,
     PIPELINE_DIR,
@@ -53,7 +55,7 @@ def gather_scraping_statistics(
     url_list_file = os.path.join(run_dir, LISTINGS_DIR_NAME, CSV_FILENAME)
 
     if os.path.exists(url_list_file):
-        with open(url_list_file, "r", encoding="utf-8") as file:
+        with open(url_list_file, "r", encoding=FILE_ENCODING) as file:
             reader = csv.DictReader(file)
             for row in reader:
                 if row["current_status"]:

@@ -17,6 +17,7 @@ from data_pipeline.scraper.initiatives.fetchers.listings.page_ops import (
     load_listing_url,
     save_debug_listing_page,
 )
+from data_pipeline.pipeline_shared.consts import FILE_ENCODING
 
 MODULE = "data_pipeline.scraper.initiatives.fetchers.listings.page_ops"
 
@@ -165,7 +166,7 @@ class TestSaveDebugListingPage:
             str(list_dir), current_page=2, page_source=page_source
         )
         content = (tmp_path / "debugging" / "listings" / filename).read_text(
-            encoding="utf-8"
+            encoding=FILE_ENCODING
         )
         assert content == page_source
 

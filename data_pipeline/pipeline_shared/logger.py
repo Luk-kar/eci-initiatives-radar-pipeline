@@ -6,7 +6,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
-from .consts import TIMESTAMP_FORMAT
+from .consts import TIMESTAMP_FORMAT, FILE_ENCODING
 
 
 def get_logger(log_dir: Path, log_filename_pattern: str) -> logging.Logger:
@@ -63,7 +63,7 @@ def set_logger_and_its_level(log_filename_pattern: str) -> logging.Logger:
 def set_file_handler(log_file: Path) -> logging.FileHandler:
     """Create a DEBUG-level file handler with a detailed formatter."""
 
-    file_handler = logging.FileHandler(log_file, encoding="utf-8")
+    file_handler = logging.FileHandler(log_file, encoding=FILE_ENCODING)
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(
         logging.Formatter(

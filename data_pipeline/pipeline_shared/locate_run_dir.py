@@ -11,10 +11,7 @@ Checks that the newest data run contains:
 import logging
 from pathlib import Path
 
-from data_pipeline.pipeline_shared.consts import (
-    LOG_DIR_NAME,
-)
-
+from data_pipeline.pipeline_shared.consts import LOG_DIR_NAME, FILE_ENCODING
 
 logger = logging.getLogger(__name__)
 
@@ -189,7 +186,7 @@ def _validate_html_content(html_file: Path) -> None:
         )
 
     try:
-        content = html_file.read_text(encoding="utf-8", errors="replace")
+        content = html_file.read_text(encoding=FILE_ENCODING, errors="replace")
 
     except OSError as exc:
         raise RunDirectoryValidationError(

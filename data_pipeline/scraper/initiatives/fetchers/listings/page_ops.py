@@ -23,6 +23,8 @@ from ....scraper_shared.fetch_utils import check_rate_limiting
 from ....scraper_shared.consts import DEBUGGING_DIR_NAME
 from ....scraper_shared.files_utils import ensure_dirs
 
+from data_pipeline.pipeline_shared.consts import FILE_ENCODING
+
 # Local
 from ...css_selectors import ECIlistingSelectors
 from ...consts import (
@@ -119,7 +121,7 @@ def save_debug_listing_page(list_dir: str, current_page: int, page_source: str) 
     file_name = LISTING_PAGE_FILENAME_PATTERN.format(current_page)
     file_path = os.path.join(debug_dir, file_name)
 
-    with open(file_path, "w", encoding="utf-8") as f:
+    with open(file_path, "w", encoding=FILE_ENCODING) as f:
         f.write(page_source)
 
     return file_name

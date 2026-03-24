@@ -10,6 +10,8 @@ from bs4 import BeautifulSoup
 
 from .consts import MIN_HTML_LENGTH
 
+from data_pipeline.pipeline_shared.consts import FILE_ENCODING
+
 
 def validate_html(page_source: str, min_length: int | None = None) -> None:
     """Validate HTML using html5lib.
@@ -51,5 +53,5 @@ def save_html(path: str, page_source: str) -> None:
     soup = BeautifulSoup(page_source, "html.parser")
     pretty_html = soup.prettify()
 
-    with open(path, "w", encoding="utf-8") as f:
+    with open(path, "w", encoding=FILE_ENCODING) as f:
         f.write(pretty_html)

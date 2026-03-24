@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Protocol
 
 from .errors import HTMLParseError
-from data_pipeline.pipeline_shared.consts import FilePatterns
+from data_pipeline.pipeline_shared.consts import FilePatterns, FILE_ENCODING
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +73,7 @@ def _write_rows_to_csv(
     """
     rows_written = 0
 
-    with open(output_csv, "w", newline="", encoding="utf-8") as csvfile:
+    with open(output_csv, "w", newline="", encoding=FILE_ENCODING) as csvfile:
 
         writer = csv.DictWriter(csvfile, fieldnames=parser.csv_columns)
         writer.writeheader()

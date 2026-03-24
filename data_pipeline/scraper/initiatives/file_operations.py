@@ -20,6 +20,8 @@ from ..scraper_shared.files_utils import ensure_dirs, write_csv
 from ..scraper_shared.html_utils import validate_html, save_html
 from ..scraper_shared.exceptions import RateLimitError
 
+from data_pipeline.pipeline_shared.consts import FILE_ENCODING
+
 # Local
 from .consts import (
     CSV_FIELDNAMES,
@@ -117,7 +119,7 @@ def save_initiative_page(
         logger.warning(
             LOG_MESSAGES["html_prettify_failed"].format(filename=file_name, error=e)
         )
-        with open(file_path, "w", encoding="utf-8") as f:
+        with open(file_path, "w", encoding=FILE_ENCODING) as f:
             f.write(page_source)
 
     return file_name

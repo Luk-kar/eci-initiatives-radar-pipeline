@@ -23,6 +23,8 @@ from data_pipeline.scraper.initiatives.file_operations import (
 from data_pipeline.scraper.initiatives.consts import LISTING_PAGE_FILENAME_PATTERN
 from data_pipeline.pipeline_shared.consts import DEBUGGING_DIR_NAME
 
+from data_pipeline.pipeline_shared.consts import FILE_ENCODING
+
 MODULE = "data_pipeline.scraper.initiatives.file_operations"
 
 URL = "https://host/2023/000001_en"
@@ -72,7 +74,7 @@ class TestSaveInitiativePage:
     def test_file_content_contains_source(self, tmp_path):
         save_initiative_page(str(tmp_path), URL, HTML)
         written = (tmp_path / YEAR / EXPECTED_FILENAME).read_text(
-            encoding="utf-8"
+            encoding=FILE_ENCODING
         )  # ← year subdir
         assert "initiative content" in written
 
@@ -166,7 +168,7 @@ class TestSaveListingPage:
         mock_driver.page_source = HTML
         _, path = save_listing_page(mock_driver, str(tmp_path), 1)
 
-        with open(path, encoding="utf-8") as f:
+        with open(path, encoding=FILE_ENCODING) as f:
             written = f.read()
 
         assert "initiative content" in written

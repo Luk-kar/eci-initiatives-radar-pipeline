@@ -9,6 +9,8 @@ from typing import List
 
 from bs4 import BeautifulSoup
 
+from data_pipeline.pipeline_shared.consts import FILE_ENCODING
+
 from ..model import ECIInitiativeDetailsRecord
 from .fields import (
     construct_url,
@@ -62,7 +64,7 @@ class ECIHTMLParser:
                         exception is chained via ``__cause__``.
         """
         try:
-            with open(html_file, "r", encoding="utf-8") as f:
+            with open(html_file, "r", encoding=FILE_ENCODING) as f:
                 soup = BeautifulSoup(f.read(), "html.parser")
 
             reg_number = extract_registration_number(html_file.name)

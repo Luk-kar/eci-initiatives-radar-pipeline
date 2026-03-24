@@ -6,6 +6,8 @@ import csv
 import os
 from typing import Iterable, List, Dict
 
+from data_pipeline.pipeline_shared.consts import FILE_ENCODING
+
 
 def ensure_dirs(*paths: str) -> None:
     """Create all given directories if they do not exist."""
@@ -55,7 +57,7 @@ def write_csv(
 
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-    with open(file_path, "w", encoding="utf-8", newline="") as f:
+    with open(file_path, "w", encoding=FILE_ENCODING, newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)

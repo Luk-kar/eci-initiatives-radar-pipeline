@@ -33,6 +33,8 @@ import pytest
 from data_pipeline.scraper.initiatives.consts import CSV_FIELDNAMES, CSV_FILENAME
 from data_pipeline.scraper.scraper_shared.consts import BASE_URL
 
+from data_pipeline.pipeline_shared.consts import FILE_ENCODING
+
 pytestmark = pytest.mark.e2e
 
 
@@ -56,7 +58,7 @@ def _collect_initiative_html_files(pages_path: Path) -> list[Path]:
 
 
 def _read_csv_rows(csv_path: Path) -> list[dict]:
-    with open(csv_path, encoding="utf-8") as f:
+    with open(csv_path, encoding=FILE_ENCODING) as f:
         return list(csv.DictReader(f))
 
 
@@ -123,7 +125,7 @@ class TestListingArtifacts:
     def test_csv_has_all_required_columns(self, e2e_scrape):
 
         csv_path = e2e_scrape.listings_path / CSV_FILENAME
-        with open(csv_path, encoding="utf-8") as f:
+        with open(csv_path, encoding=FILE_ENCODING) as f:
             reader = csv.DictReader(f)
             actual = reader.fieldnames or []
         for col in CSV_FIELDNAMES:
@@ -200,7 +202,7 @@ class TestInitiativePageArtifacts:
 
         for html_path in _collect_initiative_html_files(e2e_scrape.pages_path):
 
-            content = html_path.read_text(encoding="utf-8")
+            content = html_path.read_text(encoding=FILE_ENCODING)
             assert (
                 len(content) > 1_000
             ), f"HTML file suspiciously small ({len(content)} chars): {html_path.name}"
@@ -209,7 +211,7 @@ class TestInitiativePageArtifacts:
 
         for html_path in _collect_initiative_html_files(e2e_scrape.pages_path):
 
-            content = html_path.read_text(encoding="utf-8").lower()
+            content = html_path.read_text(encoding=FILE_ENCODING).lower()
             assert "<html" in content, f"No <html> tag in {html_path.name}"
             assert "</html>" in content, f"No </html> tag in {html_path.name}"
 
@@ -223,7 +225,7 @@ class TestInitiativePageArtifacts:
 
         for html_path in _collect_initiative_html_files(e2e_scrape.pages_path):
 
-            content = html_path.read_text(encoding="utf-8")
+            content = html_path.read_text(encoding=FILE_ENCODING)
             assert any(
                 m in content for m in eci_markers
             ), f"No ECI domain marker found in {html_path.name}"

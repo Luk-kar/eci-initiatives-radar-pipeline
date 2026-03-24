@@ -13,6 +13,8 @@ from data_pipeline.extractor.extractor_shared.errors import HTMLParseError
 from data_pipeline.extractor.initiatives.extractor import extract_initiatives
 from data_pipeline.extractor.initiatives.model import ECIInitiativeDetailsRecord
 
+from data_pipeline.pipeline_shared.consts import FILE_ENCODING
+
 _PARSER_PARSE = "data_pipeline.extractor.initiatives.parser.ECIHTMLParser.parse"
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -26,7 +28,7 @@ def _make_year_dir(base: Path, year: str = "2023") -> Path:
 
 def _write_html(year_dir: Path, name: str, content: str = "<html></html>") -> Path:
     html_file = year_dir / name
-    html_file.write_text(content, encoding="utf-8")
+    html_file.write_text(content, encoding=FILE_ENCODING)
     return html_file
 
 
@@ -89,7 +91,7 @@ class TestExtractInitiatives:
             extract_initiatives(source_dir, output_csv)
 
         assert output_csv.exists()
-        with open(output_csv, encoding="utf-8") as f:
+        with open(output_csv, encoding=FILE_ENCODING) as f:
             reader = csv.DictReader(f)
             assert reader.fieldnames == expected_columns
 
@@ -109,7 +111,7 @@ class TestExtractInitiatives:
         ):
             extract_initiatives(source_dir, output_csv)
 
-        with open(output_csv, encoding="utf-8") as f:
+        with open(output_csv, encoding=FILE_ENCODING) as f:
             rows = list(csv.DictReader(f))
 
         assert len(rows) == 2
@@ -170,7 +172,7 @@ class TestExtractInitiatives:
         ):
             extract_initiatives(source_dir, output_csv)
 
-        with open(output_csv, encoding="utf-8") as f:
+        with open(output_csv, encoding=FILE_ENCODING) as f:
             rows = list(csv.DictReader(f))
 
         assert len(rows) == 2
@@ -189,7 +191,7 @@ class TestExtractInitiatives:
         ):
             extract_initiatives(source_dir, output_csv)
 
-        with open(output_csv, encoding="utf-8") as f:
+        with open(output_csv, encoding=FILE_ENCODING) as f:
             row = list(csv.DictReader(f))[0]
 
         assert row["title"] == ""
