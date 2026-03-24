@@ -61,7 +61,12 @@ class TestECIHTMLParserParse:
             extract_annex=MagicMock(return_value=None),
             extract_current_status=MagicMock(return_value="Answer given"),
             construct_url=MagicMock(return_value="https://europa.eu/eci/000008"),
-            extract_timeline_data=MagicMock(return_value={}),
+            extract_timeline_data=MagicMock(
+                return_value={
+                    "timeline_registered": "10/05/2018",
+                    "timeline": '[{"step":"Registered","date":"10/05/2018"}]',
+                }
+            ),
             extract_funding_total=MagicMock(return_value=None),
             extract_funding_by=MagicMock(return_value=None),
             extract_signatures_collected=MagicMock(return_value="1145525"),
@@ -74,7 +79,6 @@ class TestECIHTMLParserParse:
         assert isinstance(result, dict)
 
     def test_parse_result_contains_all_csv_columns(self, parser, sample_html):
-
         with patch.multiple(
             _PARSER_MODULE,
             extract_registration_number=MagicMock(return_value="ECI(2018)000008"),
@@ -83,7 +87,12 @@ class TestECIHTMLParserParse:
             extract_annex=MagicMock(return_value=None),
             extract_current_status=MagicMock(return_value="Answer given"),
             construct_url=MagicMock(return_value="https://europa.eu/eci/000008"),
-            extract_timeline_data=MagicMock(return_value={}),
+            extract_timeline_data=MagicMock(
+                return_value={
+                    "timeline_registered": "10/05/2018",
+                    "timeline": '[{"step":"Registered","date":"10/05/2018"}]',
+                }
+            ),
             extract_funding_total=MagicMock(return_value=None),
             extract_funding_by=MagicMock(return_value=None),
             extract_signatures_collected=MagicMock(return_value="1145525"),
@@ -93,7 +102,9 @@ class TestECIHTMLParserParse:
         ):
             result = parser.parse(sample_html)
 
-        assert set(ECIHTMLParser.csv_columns).issubset(result.keys())
+        # All CSV columns should be present in the result
+        for column in parser.csv_columns:
+            assert column in result
 
     def test_parse_raises_value_error_on_missing_file(self, parser, tmp_path):
 

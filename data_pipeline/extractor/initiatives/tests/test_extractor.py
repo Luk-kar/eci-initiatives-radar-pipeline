@@ -3,7 +3,6 @@ Tests for data_pipeline.extractor.initiatives.extractor.
 """
 
 import csv
-import dataclasses
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -33,10 +32,7 @@ def _write_html(year_dir: Path, name: str, content: str = "<html></html>") -> Pa
 
 
 def _minimal_record() -> dict:
-    return {
-        f.name: f"value_{f.name}"
-        for f in dataclasses.fields(ECIInitiativeDetailsRecord)
-    }
+    return {name: "" for name in ECIInitiativeDetailsRecord.model_fields}
 
 
 # ── extract_initiatives ────────────────────────────────────────────────────────
@@ -80,9 +76,7 @@ class TestExtractInitiatives:
         _write_html(year_dir, "2023_000001.html")
         output_csv = tmp_path / "out.csv"
 
-        expected_columns = [
-            f.name for f in dataclasses.fields(ECIInitiativeDetailsRecord)
-        ]
+        expected_columns = [name for name in ECIInitiativeDetailsRecord.model_fields]
 
         with patch(
             _PARSER_PARSE,
