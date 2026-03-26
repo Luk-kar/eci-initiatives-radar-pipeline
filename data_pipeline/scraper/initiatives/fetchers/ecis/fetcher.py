@@ -1,37 +1,28 @@
 """
-Main orchestration module for fetching individual ECI detail pages.
-
-This module coordinates the scraping workflow for specific European
-Citizens' Initiative (ECI) records. It navigates to provided URLs,
-handles browser interactions and dynamic waits, and saves the fully
-rendered HTML pages for downstream data extraction.
+Fetcher for individual ECI detail pages.
 """
 
-# Python Standard Library
 import datetime
-import random
 import time
+import random
 from typing import Tuple
 
-# Third-party
 from selenium import webdriver
 
-# Shared
 from ....scraper_shared.fetch_utils import (
     check_rate_limiting,
+    download_pages,
     download_with_retry,
     save_debug_page,
 )
-
-# Local
 from ...consts import (
-    WAIT_DYNAMIC_CONTENT,
-    WAIT_BETWEEN_DOWNLOADS,
-    RETRY_WAIT_BASE,
     DEFAULT_MAX_RETRIES,
+    RETRY_WAIT_BASE,
+    WAIT_BETWEEN_DOWNLOADS,
+    WAIT_DYNAMIC_CONTENT,
 )
-from ...log_messages import LOG_MESSAGES
 from ...file_operations import save_initiative_page
+from ...log_messages import LOG_MESSAGES
 from ..._logger import logger
 from .waiter import wait_for_page_content
 
@@ -41,42 +32,18 @@ def download_all_initiatives(
     pages_dir: str,
     initiative_data: list,
 ) -> Tuple[list, list]:
-    """Download individual initiative pages using Selenium, reusing an existing driver.
-
-    Args:
-        driver: Existing Chrome WebDriver instance
-        pages_dir: Directory path for saving HTML pages
-        initiative_data: List of initiative dictionaries
-
-    Returns:
-        Tuple containing updated data list and list of failed URLs
-    """
-    updated_data: list = []
-    failed_urls: list = []
-
-    for i, row in enumerate(initiative_data):
-        url = row["url"]
-        logger.info(
-            LOG_MESSAGES["processing_initiative"].format(
-                index=i + 1, total=len(initiative_data), url=url
-            )
-        )
-
-        success = download_single_initiative(driver, pages_dir, url)
-
-        if success:
-            row["datetime"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        else:
-            failed_urls.append(url)
-
-        updated_data.append(row)
-
-        wait_time = random.uniform(*WAIT_BETWEEN_DOWNLOADS)
-        logger.info(LOG_MESSAGES["awaiting_next_page"].format(wait_time=wait_time))
-        time.sleep(wait_time)
-
-    logger.info(LOG_MESSAGES["download_complete"].format(failed_count=len(failed_urls)))
-    return updated_data, failed_urls
+    """Download individual initiative pages using an existing driver."""
+    return download_pages(
+        driver=driver,
+        output_dir=pages_dir,
+        items=initiative_data,
+        get_url=lambda row: row["url"],
+        single_download_fn=_download_single,
+        build_record=_build_record,
+        wait_between=WAIT_BETWEEN_DOWNLOADS,
+        log_messages=LOG_MESSAGES,
+        logger=logger,
+    )
 
 
 def download_single_initiative(
@@ -85,11 +52,7 @@ def download_single_initiative(
     url: str,
     max_retries: int = DEFAULT_MAX_RETRIES,
 ) -> bool:
-    """Download a single initiative page with retry logic.
-
-    Returns:
-        bool: True if successful, False if all retries exhausted.
-    """
+    """Download a single initiative page with retry logic."""
     return download_with_retry(
         attempt_fn=lambda: _attempt_download(driver, pages_dir, url),
         debug_fn=lambda: save_debug_page(
@@ -103,6 +66,23 @@ def download_single_initiative(
         retry_wait_base=random.uniform(*RETRY_WAIT_BASE),
         logger=logger,
     )
+
+
+# ── Private helpers ────────────────────────────────────────────────────────────
+
+
+def _download_single(
+    driver: webdriver.Chrome,
+    pages_dir: str,
+    row: dict,
+) -> bool:
+    return download_single_initiative(driver, pages_dir, row["url"])
+
+
+def _build_record(row: dict, success: bool) -> dict:
+    if success:
+        row["datetime"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return row
 
 
 def _attempt_download(

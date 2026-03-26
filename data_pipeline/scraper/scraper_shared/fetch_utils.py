@@ -1,8 +1,9 @@
 # Python Standard Library
 import time
+import random
 import logging
 from enum import Enum, auto
-from typing import Callable
+from typing import Callable, TypeVar
 
 # Third-party
 from selenium import webdriver
@@ -150,3 +151,59 @@ def download_with_retry(
     debug_fn()
 
     return False
+
+
+T = TypeVar("T")
+
+
+def download_pages(
+    driver: webdriver.Chrome,
+    output_dir: str,
+    items: list[T],
+    get_url: Callable[[T], str],
+    single_download_fn: Callable[[webdriver.Chrome, str, T], bool],
+    build_record: Callable[[T, bool], dict],
+    wait_between: tuple[float, float],
+    log_messages: dict,
+    logger: logging.Logger,
+) -> tuple[list[dict], list[str]]:
+    """Generic page-download loop shared by all detail-page fetchers.
+
+    Args:
+        driver: Existing Chrome WebDriver instance.
+        output_dir: Base directory for saving HTML files.
+        items: List of items to download (one page each).
+        get_url: Extracts the URL string from an item.
+        single_download_fn: Downloads one page; returns True on success.
+        build_record: Builds the output dict from (item, success).
+        wait_between: (min, max) seconds to sleep between downloads.
+        log_messages: Dict containing 'processing_item', 'awaiting_next_page',
+                      'download_complete' keys.
+        logger: Module-level logger.
+
+    Returns:
+        Tuple of (updated_records, failed_urls).
+    """
+    updated_data: list[dict] = []
+    failed_urls: list[str] = []
+
+    for i, item in enumerate(items):
+        url = get_url(item)
+        logger.info(
+            log_messages["processing_item"].format(
+                index=i + 1, total=len(items), url=url
+            )
+        )
+
+        success = single_download_fn(driver, output_dir, item)
+        updated_data.append(build_record(item, success))
+
+        if not success:
+            failed_urls.append(url)
+
+        wait_time = random.uniform(*wait_between)
+        logger.info(log_messages["awaiting_next_page"].format(wait_time=wait_time))
+        time.sleep(wait_time)
+
+    logger.info(log_messages["download_complete"].format(failed_count=len(failed_urls)))
+    return updated_data, failed_urls
