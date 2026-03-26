@@ -17,7 +17,6 @@ from .consts import (
     CSV_FILENAME,
 )
 from .log_messages import LOG_MESSAGES
-from .errors import MissingDataDirectoryError
 from .html_parser import ResponseLinkExtractor
 from .fetchers.responses import download_all_responses
 from .browser import initialize_browser
@@ -27,8 +26,14 @@ from ._logger import logger
 
 from ..scraper_shared.files_utils import ensure_dirs
 
-from data_pipeline.pipeline_shared.consts import LOG_SCRAPER_RESPONSES_PATTERN
+from data_pipeline.pipeline_shared.consts import (
+    LOG_SCRAPER_RESPONSES_PATTERN,
+    DATA_DIR,
+    INITIATIVES_DIR_NAME,
+)
 from data_pipeline.pipeline_shared.logger import get_logger
+from data_pipeline.pipeline_shared.errors import RunDirectoryValidationError
+from data_pipeline.pipeline_shared.locate_run_dir import find_newest_scraped_data_dir
 
 
 def scrape_commission_responses() -> str:
@@ -83,11 +88,14 @@ def _resolve_run_dir() -> str:
         MissingDataDirectoryError: If the data dir or timestamp dirs are absent.
     """
     try:
-        return _find_latest_timestamp_directory()
-    except FileNotFoundError as e:
-        raise MissingDataDirectoryError(
-            expected_path=os.path.join(PIPELINE_DIR, DATA_DIR_NAME),
-        ) from e
+        return find_newest_scraped_data_dir(DATA_DIR, INITIATIVES_DIR_NAME)
+    except RunDirectoryValidationError:
+        logger.error(
+            "No valid initiatives run directory found under: %s — "
+            "run the initiatives scraper first.",
+            DATA_DIR,
+        )
+        raise
 
 
 def _find_initiative_pages_dir(timestamp_dir: str) -> str | None:
@@ -173,28 +181,6 @@ def _finalise_csv(csv_path: str, updated_data: list) -> None:
 def _setup_file_logging(log_dir: str) -> None:
     """Attach file and console handlers via the shared logger factory."""
     get_logger(Path(log_dir), LOG_SCRAPER_RESPONSES_PATTERN)
-
-
-def _find_latest_timestamp_directory() -> str:
-    """Return the path to the most recent timestamped run directory.
-
-    Raises:
-        FileNotFoundError: If the data dir or any timestamp dirs are absent.
-    """
-    data_dir = os.path.join(PIPELINE_DIR, DATA_DIR_NAME)
-
-    if not os.path.exists(data_dir):
-        raise FileNotFoundError(f"Data directory does not exist: {data_dir}")
-
-    entries = [
-        d for d in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, d))
-    ]
-
-    if not entries:
-        raise FileNotFoundError(f"No timestamp directories found in: {data_dir}")
-
-    entries.sort(reverse=True)
-    return os.path.join(data_dir, entries[0])
 
 
 def _write_initial_csv(csv_path: str, response_links: List[dict]) -> None:

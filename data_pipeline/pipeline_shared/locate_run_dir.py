@@ -12,6 +12,7 @@ import logging
 from pathlib import Path
 
 from data_pipeline.pipeline_shared.consts import LOG_DIR_NAME, FILE_ENCODING
+from .errors import RunDirectoryValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -21,10 +22,6 @@ _MIN_HTML_BYTES = 256
 
 # Tokens that must appear in a valid ECI initiative HTML page
 _REQUIRED_HTML_TOKENS = ("<html", "citizens-initiative.europa.eu")
-
-
-class RunDirectoryValidationError(Exception):
-    """Raised when the run directory fails structural or content validation."""
 
 
 def find_newest_scraped_data_dir(
