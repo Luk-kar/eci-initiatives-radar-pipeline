@@ -12,6 +12,7 @@ eci-scrape-initiatives
 # or
 python -m data_pipeline.scraper.initiatives
 python -m data_pipeline.extractor.initiatives
+python -m data_pipeline.scraper.responses
 
 # 5. For tests:
 uv pip install -e data_pipeline[dev]
