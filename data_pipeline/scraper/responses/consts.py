@@ -28,6 +28,7 @@ from ..scraper_shared.consts import (
     MIN_HTML_LENGTH,
     RATE_LIMIT_INDICATORS,
     DEBUGGING_DIR_NAME,
+    DEFAULT_MAX_RETRIES,
 )
 
 # Module-specific Directory Names
@@ -50,7 +51,3 @@ RETRY_WAIT_BASE = (2.0, 2.5)  # Base time for retry exponential backoff
 
 # Module-specific File Naming Patterns
 RESPONSE_PAGE_FILENAME_PATTERN = "{year}/{number}_en.html"
-
-# Retry Configuration
-# Adjust based on network stability and server reliability
-DEFAULT_MAX_RETRIES = 5

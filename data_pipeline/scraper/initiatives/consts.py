@@ -33,6 +33,7 @@ from ..scraper_shared.consts import (
     PIPELINE_DIR,
     DEBUGGING_DIR_NAME,
     INITIATIVE_PAGE_FILENAME_PATTERN,
+    DEFAULT_MAX_RETRIES,
 )
 
 # Scraping timestamp (unique to initiatives scraper as it runs first)
@@ -69,7 +70,3 @@ CSV_FIELDNAMES = [
     "datetime",
 ]
 CSV_FILENAME = "initiatives_list.csv"
-
-# Retry Configuration
-# Adjust based on network stability and server reliability
-DEFAULT_MAX_RETRIES = 5
