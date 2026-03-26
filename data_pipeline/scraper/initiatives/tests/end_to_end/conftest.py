@@ -39,10 +39,10 @@ def e2e_scrape(tmp_path_factory) -> ScrapeArtifacts:
 
     import data_pipeline.scraper.initiatives.consts as initiatives_consts
     from data_pipeline.scraper.initiatives.__main__ import scrape_eci_initiatives
-    from data_pipeline.scraper.initiatives import data_parser
+    from data_pipeline.scraper.initiatives import html_parser
 
     tmp_root = tmp_path_factory.mktemp("eci_e2e")
-    original_parse = data_parser.parse_initiatives_list_data
+    original_parse = html_parser.parse_initiatives_list_data
 
     def limited_parse(pagesource: str, baseurl: str) -> list:
         return original_parse(pagesource, baseurl)[:MAX_INITIATIVES_E2E]

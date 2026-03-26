@@ -7,7 +7,7 @@ cards, and formats the extracted data into the expected structures.
 """
 
 # Local
-from data_pipeline.scraper.initiatives.data_parser import parse_initiatives_list_data
+from data_pipeline.scraper.initiatives.html_parser import parse_initiatives_list_data
 
 BASE_URL = "https://citizens-initiative.europa.eu"
 

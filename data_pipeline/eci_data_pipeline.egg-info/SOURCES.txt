@@ -12,7 +12,7 @@ scraper/initiatives/browser.py
 scraper/initiatives/consts.py
 scraper/initiatives/crawler.py
 scraper/initiatives/css_selectors.py
-scraper/initiatives/data_parser.py
+scraper/initiatives/html_parser.py
 scraper/initiatives/downloader.py
 scraper/initiatives/file_operations.py
 scraper/initiatives/scraper_logger.py
