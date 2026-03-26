@@ -5,7 +5,7 @@ Main entry point for the Commission responses scraper.
 import datetime
 import logging
 import os
-from typing import List
+from typing import List, Tuple
 
 from .consts import (
     PIPELINE_DIR,
@@ -38,62 +38,29 @@ def scrape_commission_responses() -> str:
     Raises:
         MissingDataDirectoryError: If no initiatives run directory is found.
     """
-    # Step 1: Find existing timestamp directory from initiatives scraper
-    try:
-        timestamp_dir = _find_latest_timestamp_directory()
-    except FileNotFoundError as e:
-        raise MissingDataDirectoryError(
-            expected_path=os.path.join(PIPELINE_DIR, DATA_DIR_NAME),
-        ) from e
-
-    # Step 2: Attach file handler to the shared logger
+    timestamp_dir = _resolve_run_dir()
     _setup_file_logging(os.path.join(timestamp_dir, LOG_DIR_NAME))
 
-    logger.info(LOG_MESSAGES["scraping_start"].format(timestamp=timestamp_dir))
     start_scraping = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    logger.info(LOG_MESSAGES["scraping_start"].format(timestamp=timestamp_dir))
 
-    # Step 3: Locate initiative pages directory
-    initiative_pages_dir = os.path.join(timestamp_dir, INITIATIVE_PAGES_DIR_NAME)
-    if not os.path.isdir(initiative_pages_dir):
-        logger.error(
-            LOG_MESSAGES["initiative_pages_missing"].format(path=initiative_pages_dir)
-        )
+    initiative_pages_dir = _resolve_initiative_pages_dir(timestamp_dir)
+    if not initiative_pages_dir:
         return start_scraping
 
-    # Step 4: Setup responses output directory
-    responses_dir = os.path.join(timestamp_dir, RESPONSES_DIR_NAME)
-    ensure_dirs(responses_dir)
+    responses_dir = _setup_responses_dir(timestamp_dir)
 
-    # Step 5: Extract Commission response links from initiative HTML files
-    response_links = ResponseLinkExtractor().extract_links_from_directory(
-        initiative_pages_dir
-    )
-
+    response_links = _extract_response_links(initiative_pages_dir)
     if not response_links:
-        logger.warning(LOG_MESSAGES["no_links_found"])
         return start_scraping
 
-    logger.info(LOG_MESSAGES["links_found"].format(count=len(response_links)))
-
-    # Step 6: Write initial CSV (empty datetimes — checkpoint before download)
     csv_path = os.path.join(responses_dir, CSV_FILENAME)
     _write_initial_csv(csv_path, response_links)
 
-    # Step 7: Download response pages
-    driver = initialize_browser()
-    try:
-        updated_data, failed_urls = download_all_responses(
-            driver, responses_dir, response_links
-        )
-    finally:
-        driver.quit()
-        logger.info(LOG_MESSAGES["browser_closed"])
+    updated_data, failed_urls = _run_downloads(responses_dir, response_links)
 
-    # Step 8: Overwrite CSV with download timestamps
-    write_responses_csv(csv_path, updated_data)
-    logger.info(LOG_MESSAGES["csv_timestamps_updated"].format(path=csv_path))
+    _finalise_csv(csv_path, updated_data)
 
-    # Step 9: Display completion summary
     display_completion_summary(
         start_scraping, response_links, failed_urls, len(updated_data), responses_dir
     )
@@ -101,7 +68,101 @@ def scrape_commission_responses() -> str:
     return start_scraping
 
 
-# ── Helpers ────────────────────────────────────────────────────────────────────
+# ── Step functions ─────────────────────────────────────────────────────────────
+
+
+def _resolve_run_dir() -> str:
+    """Locate the newest timestamped run directory from the initiatives scraper.
+
+    Raises:
+        MissingDataDirectoryError: If the data dir or timestamp dirs are absent.
+    """
+    try:
+        return _find_latest_timestamp_directory()
+    except FileNotFoundError as e:
+        raise MissingDataDirectoryError(
+            expected_path=os.path.join(PIPELINE_DIR, DATA_DIR_NAME),
+        ) from e
+
+
+def _resolve_initiative_pages_dir(timestamp_dir: str) -> str | None:
+    """Return the initiative pages directory path, or None if it does not exist.
+
+    Args:
+        timestamp_dir: Root of the current scraping run.
+    """
+    path = os.path.join(timestamp_dir, INITIATIVE_PAGES_DIR_NAME)
+
+    if not os.path.isdir(path):
+        logger.error(LOG_MESSAGES["initiative_pages_missing"].format(path=path))
+        return None
+
+    return path
+
+
+def _setup_responses_dir(timestamp_dir: str) -> str:
+    """Create and return the responses output directory.
+
+    Args:
+        timestamp_dir: Root of the current scraping run.
+    """
+    responses_dir = os.path.join(timestamp_dir, RESPONSES_DIR_NAME)
+    ensure_dirs(responses_dir)
+    return responses_dir
+
+
+def _extract_response_links(initiative_pages_dir: str) -> list:
+    """Extract Commission response links from all initiative HTML files.
+
+    Args:
+        initiative_pages_dir: Directory containing year-partitioned HTML files.
+    """
+    response_links = ResponseLinkExtractor().extract_links_from_directory(
+        initiative_pages_dir
+    )
+
+    if not response_links:
+        logger.warning(LOG_MESSAGES["no_links_found"])
+    else:
+        logger.info(LOG_MESSAGES["links_found"].format(count=len(response_links)))
+
+    return response_links
+
+
+def _run_downloads(
+    responses_dir: str,
+    response_links: list,
+) -> Tuple[list, list]:
+    """Initialise a browser, download all response pages, and close the browser.
+
+    Args:
+        responses_dir: Base directory for saving HTML files.
+        response_links: List of dicts with 'url', 'year', 'reg_number', 'title'.
+
+    Returns:
+        Tuple of (updated_data, failed_urls).
+    """
+    driver = initialize_browser()
+
+    try:
+        return download_all_responses(driver, responses_dir, response_links)
+    finally:
+        driver.quit()
+        logger.info(LOG_MESSAGES["browser_closed"])
+
+
+def _finalise_csv(csv_path: str, updated_data: list) -> None:
+    """Overwrite the CSV with download timestamps from a completed run.
+
+    Args:
+        csv_path: Path to the responses CSV file.
+        updated_data: List of response dicts including populated datetimes.
+    """
+    write_responses_csv(csv_path, updated_data)
+    logger.info(LOG_MESSAGES["csv_timestamps_updated"].format(path=csv_path))
+
+
+# ── Internal helpers ───────────────────────────────────────────────────────────
 
 
 def _setup_file_logging(log_dir: str) -> None:
