@@ -2,14 +2,10 @@
 WebDriver wait utilities for Commission response pages.
 """
 
-# Third-party
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
 
-# Local
+from ....scraper_shared.wait_utils import wait_for_any_selector
 from ...css_selectors import ResponsePageSelectors
 from ...consts import WEBDRIVER_TIMEOUT_CONTENT
 from ..._logger import logger
@@ -25,20 +21,15 @@ def wait_for_page_content(driver: webdriver.Chrome) -> bool:
     Returns:
         bool: True if any content element was found, False otherwise.
     """
-    wait = WebDriverWait(driver, WEBDRIVER_TIMEOUT_CONTENT)
-
-    for selector in [
-        ResponsePageSelectors.MAIN_CONTENT,
-        ResponsePageSelectors.PAGE_HEADER_TITLE,
-        ResponsePageSelectors.INITIATIVE_PROGRESS,
-    ]:
-        try:
-            wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, selector)))
-            logger.debug(LOG_MESSAGES["content_loaded"].format(selector=selector))
-            return True
-
-        except TimeoutException:
-            continue
-
-    logger.warning(LOG_MESSAGES["no_content_found"])
-    return False
+    return wait_for_any_selector(
+        driver=driver,
+        selectors=[
+            ResponsePageSelectors.MAIN_CONTENT,
+            ResponsePageSelectors.PAGE_HEADER_TITLE,
+            ResponsePageSelectors.INITIATIVE_PROGRESS,
+        ],
+        timeout=WEBDRIVER_TIMEOUT_CONTENT,
+        by=By.CSS_SELECTOR,
+        logger=logger,
+        log_messages=LOG_MESSAGES,
+    )
