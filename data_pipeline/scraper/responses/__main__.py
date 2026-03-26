@@ -2,6 +2,7 @@
 Main entry point for the Commission responses scraper.
 """
 
+from pathlib import Path
 import datetime
 import logging
 import os
@@ -23,7 +24,11 @@ from .browser import initialize_browser
 from .file_operations.csv import write_responses_csv
 from .statistics import display_completion_summary
 from ._logger import logger
+
 from ..scraper_shared.files_utils import ensure_dirs
+
+from data_pipeline.pipeline_shared.consts import LOG_SCRAPER_RESPONSES_PATTERN
+from data_pipeline.pipeline_shared.logger import get_logger
 
 
 def scrape_commission_responses() -> str:
@@ -44,7 +49,7 @@ def scrape_commission_responses() -> str:
     start_scraping = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     logger.info(LOG_MESSAGES["scraping_start"].format(timestamp=timestamp_dir))
 
-    initiative_pages_dir = _resolve_initiative_pages_dir(timestamp_dir)
+    initiative_pages_dir = _find_initiative_pages_dir(timestamp_dir)
     if not initiative_pages_dir:
         return start_scraping
 
@@ -85,7 +90,7 @@ def _resolve_run_dir() -> str:
         ) from e
 
 
-def _resolve_initiative_pages_dir(timestamp_dir: str) -> str | None:
+def _find_initiative_pages_dir(timestamp_dir: str) -> str | None:
     """Return the initiative pages directory path, or None if it does not exist.
 
     Args:
@@ -166,28 +171,8 @@ def _finalise_csv(csv_path: str, updated_data: list) -> None:
 
 
 def _setup_file_logging(log_dir: str) -> None:
-    """Attach a file handler and (if absent) a console handler to the logger."""
-    ensure_dirs(log_dir)
-
-    if not any(isinstance(h, logging.StreamHandler) for h in logger.handlers):
-        console = logging.StreamHandler()
-        console.setLevel(logging.INFO)
-        console.setFormatter(
-            logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-        )
-        logger.addHandler(console)
-
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    log_file = os.path.join(log_dir, f"scraper_responses_{timestamp}.log")
-    file_handler = logging.FileHandler(log_file, encoding="utf-8")
-    file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(
-        logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s"
-        )
-    )
-    logger.addHandler(file_handler)
-    logger.info(f"Log file created: {log_file}")
+    """Attach file and console handlers via the shared logger factory."""
+    get_logger(Path(log_dir), LOG_SCRAPER_RESPONSES_PATTERN)
 
 
 def _find_latest_timestamp_directory() -> str:
