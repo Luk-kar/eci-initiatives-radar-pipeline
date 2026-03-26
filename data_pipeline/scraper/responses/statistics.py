@@ -21,7 +21,7 @@ def display_completion_summary(
     Args:
         start_scraping: Timestamp string when scraping began.
         response_links: All response link dicts collected before download.
-        failed_urls: URLs that could not be downloaded.
+        failed_urls: List of URLs that could not be downloaded.
         downloaded_count: Number of successfully saved pages.
         responses_dir: Filesystem path where responses were saved.
     """
@@ -30,7 +30,6 @@ def display_completion_summary(
     logger.info(LOG_MESSAGES["divider_line"])
     logger.info(LOG_MESSAGES["scraping_complete"])
     logger.info(LOG_MESSAGES["divider_line"])
-
     logger.info(
         LOG_MESSAGES["completion_timestamp"].format(
             timestamp=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

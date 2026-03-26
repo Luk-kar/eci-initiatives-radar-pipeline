@@ -1,7 +1,7 @@
 """
 Orchestration module for fetching Commission response pages.
 
-Mirrors the structure of scraper/initiatives/fetchers/ecis/fetcher.py:
+Mirrors scraper/initiatives/fetchers/ecis/fetcher.py:
 functional helpers, shared retry/debug utilities, module-level logger.
 """
 
@@ -128,7 +128,7 @@ def _attempt_download(
     year: str,
     reg_number: str,
 ) -> str:
-    """Single download attempt. Returns the saved filename on success.
+    """Single download attempt. Returns saved filename on success.
 
     Raises:
         Exception: On rate limiting or any page/save failure.

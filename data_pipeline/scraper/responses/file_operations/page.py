@@ -31,13 +31,15 @@ def save_response_page(
         debug: If True, save under a debugging subdirectory instead.
 
     Returns:
-        Relative filename of the saved file (e.g. "2019/000007_en.html").
+        Relative filename (e.g. "2019/000007_en.html").
 
     Raises:
         ValueError: If the HTML is too short.
         ParseError: If the HTML fails html5lib validation.
     """
     validate_html(page_source)
+
+    filename = RESPONSE_PAGE_FILENAME_PATTERN.format(year=year, number=reg_number)
 
     if debug:
         target_dir = os.path.join(
@@ -49,15 +51,9 @@ def save_response_page(
     else:
         target_dir = os.path.join(responses_dir, year)
 
+    full_path = os.path.join(target_dir, os.path.basename(filename))
+
     ensure_dirs(target_dir)
-
-    filename = RESPONSE_PAGE_FILENAME_PATTERN.format(year=year, number=reg_number)
-    full_path = (
-        os.path.join(responses_dir, filename)
-        if not debug
-        else os.path.join(target_dir, f"{reg_number}_en.html")
-    )
-
     save_html(full_path, page_source)
     logger.debug(f"Saved response page: {filename}")
 

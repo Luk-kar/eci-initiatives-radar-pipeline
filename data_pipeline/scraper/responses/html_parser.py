@@ -9,6 +9,7 @@ from typing import Dict, List, Optional
 from bs4 import BeautifulSoup
 
 from data_pipeline.pipeline_shared.consts import FILE_ENCODING
+
 from ._logger import logger
 from .log_messages import LOG_MESSAGES
 
@@ -51,20 +52,19 @@ class ResponseLinkExtractor:
         """
         try:
             with open(file_path, "r", encoding=FILE_ENCODING) as f:
-                html_content = f.read()
+                soup = BeautifulSoup(f.read(), "html.parser")
 
-            soup = BeautifulSoup(html_content, "html.parser")
             url = self._extract_response_commission_url(soup)
 
             if not url:
                 return None
 
-            metadata = self._extract_metadata_from_path(file_path)
+            path = Path(file_path)
 
             return {
                 "url": url,
-                "year": metadata["year"],
-                "reg_number": metadata["reg_number"],
+                "year": path.parent.name,
+                "reg_number": path.stem.replace("_en", ""),
                 "title": self._extract_title(soup),
                 "datetime": "",
             }
@@ -75,23 +75,8 @@ class ResponseLinkExtractor:
 
     def _extract_title(self, soup: BeautifulSoup) -> str:
         """Extract initiative title from parsed HTML."""
-        title_el = soup.select_one("h1.ecl-page-header-core__title")
-        if title_el:
-            return title_el.get_text(strip=True)
-
-        h1 = soup.find("h1")
-        return h1.get_text(strip=True) if h1 else ""
-
-    def _extract_metadata_from_path(self, file_path: str) -> Dict[str, str]:
-        """Extract year and registration number from file path.
-
-        E.g. initiatives/2019/000007_en.html → year='2019', reg_number='000007'
-        """
-        path = Path(file_path)
-        return {
-            "year": path.parent.name,
-            "reg_number": path.stem.replace("_en", ""),
-        }
+        el = soup.select_one("h1.ecl-page-header-core__title") or soup.find("h1")
+        return el.get_text(strip=True) if el else ""
 
     def _extract_response_commission_url(self, soup: BeautifulSoup) -> Optional[str]:
         """Find the 'Commission's answer and follow-up' anchor href.
@@ -103,7 +88,4 @@ class ResponseLinkExtractor:
             string=re.compile(r"Commission['\u2019]s answer and follow-up", re.I),
         )
 
-        if link and link.get("href"):
-            return link.get("href")
-
-        return None
+        return link.get("href") if link and link.get("href") else None

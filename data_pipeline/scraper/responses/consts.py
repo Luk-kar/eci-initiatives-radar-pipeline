@@ -10,7 +10,6 @@ Note on Fine-Tuning:
     - Server load and response times
     - Rate limiting policies of the target website
     - Network conditions and infrastructure changes
-    - Other development teams' usage patterns
 
     If you experience frequent rate limiting or timeouts, consider increasing
     wait times and retry intervals. For faster, more stable servers, you may

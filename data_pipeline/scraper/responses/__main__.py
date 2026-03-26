@@ -44,12 +44,10 @@ def scrape_commission_responses() -> str:
     except FileNotFoundError as e:
         raise MissingDataDirectoryError(
             expected_path=os.path.join(PIPELINE_DIR, DATA_DIR_NAME),
-            hint="Run the initiatives scraper first to create the timestamp directory.",
         ) from e
 
     # Step 2: Attach file handler to the shared logger
-    log_dir = os.path.join(timestamp_dir, LOG_DIR_NAME)
-    _setup_file_logging(log_dir)
+    _setup_file_logging(os.path.join(timestamp_dir, LOG_DIR_NAME))
 
     logger.info(LOG_MESSAGES["scraping_start"].format(timestamp=timestamp_dir))
     start_scraping = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -67,8 +65,9 @@ def scrape_commission_responses() -> str:
     ensure_dirs(responses_dir)
 
     # Step 5: Extract Commission response links from initiative HTML files
-    extractor = ResponseLinkExtractor()
-    response_links = extractor.extract_links_from_directory(initiative_pages_dir)
+    response_links = ResponseLinkExtractor().extract_links_from_directory(
+        initiative_pages_dir
+    )
 
     if not response_links:
         logger.warning(LOG_MESSAGES["no_links_found"])
@@ -76,9 +75,9 @@ def scrape_commission_responses() -> str:
 
     logger.info(LOG_MESSAGES["links_found"].format(count=len(response_links)))
 
-    # Step 6: Write initial CSV (empty datetimes)
+    # Step 6: Write initial CSV (empty datetimes — checkpoint before download)
     csv_path = os.path.join(responses_dir, CSV_FILENAME)
-    _write_csv_from_links(csv_path, response_links, timestamps={})
+    _write_initial_csv(csv_path, response_links)
 
     # Step 7: Download response pages
     driver = initialize_browser()
@@ -152,23 +151,21 @@ def _find_latest_timestamp_directory() -> str:
     return os.path.join(data_dir, entries[0])
 
 
-def _write_csv_from_links(
-    csv_path: str,
-    response_links: List[dict],
-    timestamps: dict,
-) -> None:
-    """Serialize response_links to CSV, optionally filling datetimes."""
-    csv_data = [
-        {
-            "url_find_initiative": link["url"],
-            "registration_number": link["reg_number"],
-            "title": link.get("title", ""),
-            "datetime": timestamps.get(link["url"], ""),
-        }
-        for link in response_links
-    ]
-    write_responses_csv(csv_path, csv_data)
-    logger.info(f"CSV written: {csv_path}")
+def _write_initial_csv(csv_path: str, response_links: List[dict]) -> None:
+    """Write initial CSV with empty datetimes as a pre-download checkpoint."""
+    write_responses_csv(
+        csv_path,
+        [
+            {
+                "url_find_initiative": link["url"],
+                "registration_number": link["reg_number"],
+                "title": link.get("title", ""),
+                "datetime": "",
+            }
+            for link in response_links
+        ],
+    )
+    logger.info(f"Initial CSV created: {csv_path}")
 
 
 if __name__ == "__main__":

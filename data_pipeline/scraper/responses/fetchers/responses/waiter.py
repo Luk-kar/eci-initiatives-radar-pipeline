@@ -27,13 +27,11 @@ def wait_for_page_content(driver: webdriver.Chrome) -> bool:
     """
     wait = WebDriverWait(driver, WEBDRIVER_TIMEOUT_CONTENT)
 
-    selectors_to_try = [
+    for selector in [
         ResponsePageSelectors.MAIN_CONTENT,
         ResponsePageSelectors.PAGE_HEADER_TITLE,
         ResponsePageSelectors.INITIATIVE_PROGRESS,
-    ]
-
-    for selector in selectors_to_try:
+    ]:
         try:
             wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, selector)))
             logger.debug(LOG_MESSAGES["content_loaded"].format(selector=selector))

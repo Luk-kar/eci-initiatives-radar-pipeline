@@ -1,8 +1,8 @@
 """
 Log messages for the Commission responses scraper.
 
-Module-specific keys live here. Shared keys (browser lifecycle, retry,
-content waiter, etc.) are inherited from scraper_shared.log_messages.
+Module-specific keys only. Shared keys (browser lifecycle, retry,
+content waiter, download flow) are inherited from scraper_shared.
 """
 
 from ..scraper_shared.log_messages import SHARED_LOG_MESSAGES
@@ -15,8 +15,6 @@ LOG_MESSAGES: dict = {
     # ── Link extraction ────────────────────────────────────────────────────────
     "links_found": "Found {count} Commission response links",
     "no_links_found": "No Commission response links found in initiative pages",
-    # ── Orchestration ──────────────────────────────────────────────────────────
-    "processing_response": "Processing {index}/{total}: {url}",
     "initiative_pages_missing": "Initiative pages directory not found: {path}",
     # ── Summary ────────────────────────────────────────────────────────────────
     "divider_line": "=" * 60,
