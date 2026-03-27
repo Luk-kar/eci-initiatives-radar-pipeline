@@ -29,28 +29,23 @@ from .._logger import setup_logger
 
 
 logger: Optional[logging.Logger] = None
-data_root: Path = DATA_DIR
-timestamp: Optional[str] = None
-output_csv_name: Optional[str] = None
 
 
-def configure(timestamp_value: str, data_root_override: Optional[Path] = None) -> None:
+def configure(timestamp: str) -> None:
     """
     Configure module-level extractor context.
 
     Must be called before run().
 
     Args:
-        timestamp_value: Timestamp string used in output filenames and logging.
-        data_root_override: Optional override for the pipeline data root.
+        timestamp: Timestamp string used in output filenames and logging.
+        DATA_DIR_override: Optional override for the pipeline data root.
     """
-    global timestamp, data_root, output_csv_name
-    timestamp = timestamp_value
-    data_root = data_root_override or DATA_DIR
-    output_csv_name = ECI_RESPONSES_CSV_PATTERN.format(timestamp=timestamp_value)
+    output_csv_name = ECI_RESPONSES_CSV_PATTERN.format(timestamp=timestamp)
+    return output_csv_name
 
 
-def run() -> None:
+def run(output_csv_name, timestamp) -> None:
     """Main execution function."""
     global logger
 
@@ -60,7 +55,7 @@ def run() -> None:
     session_path = _find_latest_scrape_session()
 
     if not session_path:
-        raise FileNotFoundError(f"No scraping session found in: {data_root}")
+        raise FileNotFoundError(f"No scraping session found in: {DATA_DIR}")
 
     log_dir = session_path / LOG_DIR_NAME
     logger = setup_logger(log_dir_path=log_dir, timestamp=timestamp)
@@ -136,6 +131,7 @@ def _process_single(
     reg_number: str, csv_record: dict, html_path: Path
 ) -> Optional[ECIResponseRecord]:
     """Parse one HTML file and return a populated record."""
+
     try:
         metadata = extract_metadata(csv_record)
         parsed = parse_HTML(html_path, reg_number)
@@ -166,13 +162,17 @@ def _collect_html_files(html_dir: Path) -> Dict[str, Path]:
     Returns:
         Dict mapping registration_number → Path for every matched file.
     """
+
     result: Dict[str, Path] = {}
 
     for html_file in html_dir.glob("*/*.html"):
+
         match = re.match(FilePatterns.FILENAME_REGEX, html_file.name)
+
         if not match:
             logger.debug(f"Skipping unrecognised filename: {html_file.name}")
             continue
+
         year, number = match.group(1), match.group(2)
         reg_number = f"{year}/{number}"
         result[reg_number] = html_file
@@ -182,15 +182,18 @@ def _collect_html_files(html_dir: Path) -> Dict[str, Path]:
 
 def _find_latest_scrape_session() -> Optional[Path]:
     """Return the most recent session directory."""
+
     try:
+
         session_dirs = [
             d
-            for d in data_root.iterdir()
+            for d in DATA_DIR.iterdir()
             if d.is_dir() and re.match(FilePatterns.TIMESTAMP_DIR_PATTERN, d.name)
         ]
         return max(session_dirs, key=lambda x: x.name) if session_dirs else None
 
     except Exception as e:
+
         if logger:
             logger.error(f"Error finding session: {e}")
         return None

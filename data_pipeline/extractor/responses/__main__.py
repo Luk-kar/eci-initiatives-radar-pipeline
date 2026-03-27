@@ -10,9 +10,9 @@ from .extractor import configure, run
 
 
 def main():
-    ts = datetime.now().strftime(TIMESTAMP_FORMAT)
-    configure(timestamp_value=ts)
-    run()
+    timestamp = datetime.now().strftime(TIMESTAMP_FORMAT)
+    output_csv_name = configure(timestamp=timestamp)
+    run(output_csv_name, timestamp)
 
 
 if __name__ == "__main__":
