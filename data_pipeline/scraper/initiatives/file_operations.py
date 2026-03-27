@@ -18,7 +18,7 @@ from html5lib.html5parser import ParseError
 # Shared
 from ..scraper_shared.files_utils import ensure_dirs, write_csv
 from ..scraper_shared.html_utils import validate_html, save_html
-from ..scraper_shared.exceptions import RateLimitError
+from ..scraper_shared.errors import RateLimitError
 
 from data_pipeline.pipeline_shared.consts import FILE_ENCODING
 

@@ -8,8 +8,6 @@ and other configuration values common to all scraper modules:
 - responses_followup
 """
 
-from pathlib import Path
-
 from ...pipeline_shared.consts import (  # data_pipeline
     PIPELINE_DIR,
     INITIATIVES_DIR_NAME,

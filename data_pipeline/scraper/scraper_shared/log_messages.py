@@ -26,14 +26,20 @@ SHARED_LOG_MESSAGES: dict = {
     "download_complete": "Download completed. Failed URLs: {failed_count}",
     "downloading_html": "Downloading the html file...",
     "download_success": "✅ Successfully downloaded: {filename}",
-    "rate_limit_retry": "⚠️ Received rate limiting. Retrying {retry}/{max_retries} in {wait_time:.1f} seconds...",
+    "rate_limit_retry": (
+        "⚠️ Received rate limiting. "
+        "Retrying {retry}/{max_retries} in {wait_time:.1f} seconds..."
+    ),
     # ── Content waiter ─────────────────────────────────────────────────────────
     "content_loaded": "Content loaded: {selector}",
     "no_content_found": "No main content elements found, but proceeding...",
     # ── File operations ────────────────────────────────────────────────────────
     "dirs_created": "Created directories: {list_dir}, {pages_dir}",
     "html_validation_warning": "⚠️ HTML validation warning for {filename}: {error_type}: {error}",
-    "html_prettify_failed": "⚠️ Failed to prettify HTML for {filename}: {error}. Saving raw HTML without prettification.",
+    "html_prettify_failed": (
+        "⚠️ Failed to prettify HTML for {filename}: {error}. "
+        "Saving raw HTML without prettification."
+    ),
     # ── Data parser ────────────────────────────────────────────────────────────
     "parsing_complete": "✅ Found {count} entries",
 }

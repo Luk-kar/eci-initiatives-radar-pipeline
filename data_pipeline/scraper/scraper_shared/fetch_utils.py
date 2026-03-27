@@ -1,3 +1,9 @@
+"""
+Selenium-based fetch utilities providing rate-limit detection, categorised
+error logging, quadratic back-off retry logic, and a generic batch download
+loop shared across all ECI scraper detail-page fetchers.
+"""
+
 # Python Standard Library
 import time
 import random
@@ -7,9 +13,11 @@ from typing import Callable, TypeVar
 
 # Third-party
 from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
 
 # Shared
 from .consts import RATE_LIMIT_INDICATORS, MIN_HTML_LENGTH
+from ..scraper_shared.errors import RateLimitError
 
 
 class RetryOutcome(Enum):
@@ -21,8 +29,9 @@ class RetryOutcome(Enum):
 def check_rate_limiting(driver: webdriver.Chrome) -> None:
     """Raise if the current page shows rate limiting indicators."""
 
-    if any(indicator in driver.page_source for indicator in RATE_LIMIT_INDICATORS):
-        raise Exception(RATE_LIMIT_INDICATORS[3])
+    for indicator in RATE_LIMIT_INDICATORS:
+        if indicator in driver.page_source:
+            raise RateLimitError(indicator)
 
 
 def log_download_error(url: str, e: Exception, logger: logging.Logger) -> None:
@@ -135,7 +144,7 @@ def download_with_retry(
             attempt_fn()
             return True
 
-        except Exception as e:
+        except (RateLimitError, WebDriverException) as e:
 
             outcome, retry_count = handle_retry_exception(
                 e, url, retry_count, max_retries, retry_wait_base, logger

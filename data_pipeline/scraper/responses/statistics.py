@@ -26,31 +26,22 @@ def display_completion_summary(
         responses_dir: Filesystem path where responses were saved.
     """
     total = len(response_links)
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     logger.info(LOG_MESSAGES["divider_line"])
     logger.info(LOG_MESSAGES["scraping_complete"])
     logger.info(LOG_MESSAGES["divider_line"])
-    logger.info(
-        LOG_MESSAGES["completion_timestamp"].format(
-            timestamp=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        )
-    )
-    logger.info(LOG_MESSAGES["start_time"].format(start_scraping=start_scraping))
-    logger.info(LOG_MESSAGES["total_links_found"].format(count=total))
-    logger.info(
-        LOG_MESSAGES["pages_downloaded"].format(
-            downloaded_count=downloaded_count, total_count=total
-        )
-    )
+    logger.info(LOG_MESSAGES["completion_timestamp"], now)
+    logger.info(LOG_MESSAGES["start_time"], start_scraping)
+    logger.info(LOG_MESSAGES["total_links_found"], total)
+    logger.info(LOG_MESSAGES["pages_downloaded"], downloaded_count, total)
 
     if failed_urls:
-        logger.error(
-            LOG_MESSAGES["failed_downloads"].format(failed_count=len(failed_urls))
-        )
+        logger.error(LOG_MESSAGES["failed_downloads"], len(failed_urls))
         for url in failed_urls:
-            logger.error(LOG_MESSAGES["failed_url"].format(failed_url=url))
+            logger.error(LOG_MESSAGES["failed_url"], url)
     else:
         logger.info(LOG_MESSAGES["all_downloads_successful"])
 
-    logger.info(LOG_MESSAGES["files_saved_in"].format(path=responses_dir))
+    logger.info(LOG_MESSAGES["files_saved_in"], responses_dir)
     logger.info(LOG_MESSAGES["divider_line"])
