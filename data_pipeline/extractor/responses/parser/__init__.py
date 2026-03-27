@@ -11,9 +11,10 @@ from data_pipeline.pipeline_shared.consts import FILE_ENCODING
 
 from .model import ECIResponseParseHTMLRecord
 from .fields import (
-    CommissionAnswerExtractor,
-    FollowUpDetailsExtractor,
-    LegislationPassedExtractor,
+    extract_commission_answer,
+    extract_followup_additional_website,
+    extract_followup_events,
+    extract_legislation_passed,
 )
 
 
@@ -44,18 +45,12 @@ def parse_HTML(html_file: Path, registration_number: str) -> dict:
         soup = BeautifulSoup(f.read(), "html.parser")
 
     record = ECIResponseParseHTMLRecord(
-        commission_answer_text=CommissionAnswerExtractor.extract(
+        commission_answer_text=extract_commission_answer(soup, registration_number),
+        followup_additional_website=extract_followup_additional_website(
             soup, registration_number
         ),
-        followup_additional_website=FollowUpDetailsExtractor.extract_additional_website(
-            soup, registration_number
-        ),
-        followup_events=FollowUpDetailsExtractor.extract_events(
-            soup, registration_number
-        ),
-        legislation_passed=LegislationPassedExtractor.extract(
-            soup, registration_number
-        ),
+        followup_events=extract_followup_events(soup, registration_number),
+        legislation_passed=extract_legislation_passed(soup, registration_number),
     )
 
     logger.info("Successfully parsed %s", html_file.name)

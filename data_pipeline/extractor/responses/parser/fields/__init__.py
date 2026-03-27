@@ -1,13 +1,18 @@
+# data_pipeline/extractor/responses/parser/fields/__init__.py
 """
-Focused extractor classes for the ECI response page sections.
+Focused extractor functions for the ECI response page sections.
 """
 
-from .commission_answer import CommissionAnswerExtractor
-from .followup_details import FollowUpDetailsExtractor
-from .legislation import LegislationPassedExtractor
+from .commission_answer import extract_commission_answer
+from .followup_details import (
+    extract_followup_additional_website,
+    extract_followup_events,
+)
+from .legislation import extract_legislation_passed
 
 __all__ = [
-    "CommissionAnswerExtractor",
-    "FollowUpDetailsExtractor",
-    "LegislationPassedExtractor",
+    "extract_commission_answer",
+    "extract_followup_additional_website",
+    "extract_followup_events",
+    "extract_legislation_passed",
 ]
