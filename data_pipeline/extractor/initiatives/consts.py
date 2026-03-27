@@ -32,15 +32,3 @@ class RegistrationNumberFormat:
 
     # Regex pattern to match registration numbers
     PATTERN = r"(\d{4})/(\d{6})"
-
-
-# ============================================================================
-# Content Extraction Limits
-# ============================================================================
-
-
-class ContentLimits:
-    """Character limits for extracted content fields."""
-
-    # Maximum characters for objective/description fields
-    OBJECTIVE_MAX_LENGTH = 1100

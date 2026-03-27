@@ -8,8 +8,6 @@ from typing import Optional, Any
 
 from pydantic import BaseModel, Json, Field, field_validator
 
-from .consts import ContentLimits
-
 
 class TimelineEvent(BaseModel):
     """

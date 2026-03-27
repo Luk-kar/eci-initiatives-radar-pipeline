@@ -18,7 +18,7 @@ class FieldValueError(ValueError):
 
     Attributes:
         field:  Canonical name of the failed field — matches the
-                corresponding ``ECIInitiativeDetailsRecord`` attribute name
+                corresponding ``ECIRecord`` attribute name
                 (e.g. ``"registration_number"``, ``"title"``).
         value:  The raw fragment, filename, or extracted text that triggered
                 the error.  ``None`` when nothing could be found at all.
