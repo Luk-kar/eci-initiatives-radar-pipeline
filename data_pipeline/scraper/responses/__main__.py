@@ -4,13 +4,10 @@ Main entry point for the Commission responses scraper.
 
 from pathlib import Path
 import datetime
-import logging
 import os
 from typing import List, Tuple
 
 from .consts import (
-    PIPELINE_DIR,
-    DATA_DIR_NAME,
     LOG_DIR_NAME,
     RESPONSES_DIR_NAME,
     INITIATIVE_PAGES_DIR_NAME,

@@ -3,6 +3,7 @@ Fetcher for Commission response pages.
 """
 
 import datetime
+import time
 import random
 from typing import Tuple
 
@@ -111,8 +112,6 @@ def _attempt_download(
     """Single download attempt. Returns saved filename on success."""
     logger.info(LOG_MESSAGES["downloading_html"])
     driver.get(url)
-
-    import time
 
     time.sleep(random.uniform(*WAIT_DYNAMIC_CONTENT))
     check_rate_limiting(driver)

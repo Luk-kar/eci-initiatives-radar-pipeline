@@ -69,7 +69,7 @@ class ResponseLinkExtractor:
                 "datetime": "",
             }
 
-        except Exception as e:
+        except (OSError, ValueError) as e:
             logger.error(f"Error extracting link from {file_path}: {e}")
             return None
 

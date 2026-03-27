@@ -6,9 +6,6 @@ from typing import Dict, List
 
 # Shared
 from ...scraper_shared.files_utils import write_csv
-from data_pipeline.pipeline_shared.consts import (
-    FILE_ENCODING,
-)  # noqa: F401 (re-exported via write_csv)
 
 # Local
 from ..consts import CSV_FIELDNAMES
