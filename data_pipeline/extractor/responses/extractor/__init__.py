@@ -141,10 +141,10 @@ def _process_single(
         parsed = parse_HTML(html_path, reg_number)
 
         return ECIResponseRecord(
-            response_url=metadata.get("response_commission_url", ""),
-            initiative_url=metadata.get("initiative_url", ""),
+            response_url=metadata["response_commission_url"],
+            initiative_url=metadata["url"],
             registration_number=reg_number,
-            title=metadata.get("title", ""),
+            title=metadata["title"],
             **parsed,
         )
 
