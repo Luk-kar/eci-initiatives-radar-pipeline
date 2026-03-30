@@ -72,6 +72,11 @@ def extract_commission_answer(
             current = current.find_next_sibling()
             continue
 
+        # skip navigation/banner wrapper divs
+        if current.name == "div" and current.get("data-inpage-navigation-source-area"):
+            current = current.find_next_sibling()
+            continue
+
         # Skip <ul> elements that only contain document links (Communication, Annex, etc.)
         if current.name == "ul" and _is_document_links_list(current):
             current = current.find_next_sibling()
