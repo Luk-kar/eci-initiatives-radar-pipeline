@@ -146,7 +146,7 @@ def _scan_html_files(html_dir: Path) -> Dict[str, Path]:
 
 def _load_metadata(
     initiatives_csv: Path,
-    html_files_by_reg: Dict[str, Path],
+    html_files: Dict[str, Path],
 ) -> Dict[str, dict]:
     """
     Load initiatives CSV rows filtered to reg numbers found on disk,
@@ -158,18 +158,18 @@ def _load_metadata(
     Raises:
         FileNotFoundError: If any HTML file has no matching CSV record.
     """
-    metadata_by_reg = _load_responses_metadata(
-        initiatives_csv, reg_numbers=set(html_files_by_reg.keys())
+    metadata = _load_responses_metadata(
+        initiatives_csv, reg_numbers=set(html_files.keys())
     )
-    logger.info("Matched %d CSV records to HTML files", len(metadata_by_reg))
+    logger.info("Matched %d CSV records to HTML files", len(metadata))
 
-    unmatched = set(html_files_by_reg.keys()) - set(metadata_by_reg.keys())
+    unmatched = set(html_files.keys()) - set(metadata.keys())
     if unmatched:
         raise FileNotFoundError(
             f"{len(unmatched)} HTML files have no matching CSV record: {sorted(unmatched)}"
         )
 
-    return metadata_by_reg
+    return metadata
 
 
 # ── Step 3 — parse HTML and assemble records ───────────────────────────────────
