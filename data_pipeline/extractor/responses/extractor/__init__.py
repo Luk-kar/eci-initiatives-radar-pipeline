@@ -201,15 +201,15 @@ def _parse_html_files(html_files: Dict[str, Path]) -> Dict[str, dict]:
 
 
 def _build_records(
-    metadata_by_reg: Dict[str, dict],
-    parsed_by_reg: Dict[str, dict],
+    metadata: Dict[str, dict],
+    parsed_data: Dict[str, dict],
 ) -> List[ECIResponseRecord]:
     """
     Merge loaded CSV metadata with parsed HTML fields into ECIResponseRecords.
 
     Args:
-        metadata_by_reg: Raw CSV row dicts keyed by registration_number.
-        parsed_by_reg:   HTML-extracted fields keyed by registration_number.
+        metadata: Raw CSV row dicts keyed by registration_number.
+        parsed_data:   HTML-extracted fields keyed by registration_number.
 
     Returns:
         List of fully assembled ECIResponseRecords.
@@ -217,12 +217,12 @@ def _build_records(
 
     records: List[ECIResponseRecord] = []
 
-    for reg_number, parsed in parsed_by_reg.items():
+    for register_number, parsed in parsed_data.items():
 
-        csv_row = metadata_by_reg[reg_number]
-        metadata = extract_metadata(csv_row)
+        csv_row = metadata[register_number]
+        relevant_metadata = extract_metadata(csv_row)
 
-        records.append(ECIResponseRecord(**metadata.model_dump(), **parsed))
+        records.append(ECIResponseRecord(**relevant_metadata.model_dump(), **parsed))
 
     return records
 
