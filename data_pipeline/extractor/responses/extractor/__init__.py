@@ -55,12 +55,12 @@ def run(output_csv_name: str, timestamp: str) -> None:
 
     html_dir, output_csv, initiatives_csv = _setup(timestamp, output_csv_name)
 
-    html_files_by_reg = _collect_html_files(html_dir)
+    html_files = _collect_html_files(html_dir)
 
-    metadata_by_reg = _load_metadata(initiatives_csv, html_files_by_reg)
-    parsed_by_reg = _parse_html_files(html_files_by_reg)
+    metadata = _load_metadata(initiatives_csv, html_files)
+    parsed_data = _parse_html_files(html_files)
 
-    records = _build_records(metadata_by_reg, parsed_by_reg)
+    records = _build_records(metadata, parsed_data)
 
     _write_csv(records, output_csv)
     logger.info("Done. %d records written to %s", len(records), output_csv)
