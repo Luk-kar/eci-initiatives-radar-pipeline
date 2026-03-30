@@ -1,12 +1,13 @@
 """Tests for responses.extractor.collect."""
 
-import pytest
-
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+
 from data_pipeline.extractor.responses.extractor.collect import (
     collect_html_files,
+    _scan_html_files,
 )
 
 # Redefined here instead of imported from FilePatterns to decouple collect tests
@@ -50,9 +51,6 @@ class TestCollectHtmlFiles:
             "data_pipeline.extractor.responses.extractor.collect.FilePatterns.FILENAME_REGEX",
             FILENAME_REGEX,
         ):
-            from data_pipeline.extractor.responses.extractor.collect import (
-                collect_html_files,
-            )
 
             with pytest.raises(FileNotFoundError, match="No HTML response files found"):
                 collect_html_files(tmp_path)
@@ -64,9 +62,6 @@ class TestCollectHtmlFiles:
             "data_pipeline.extractor.responses.extractor.collect.FilePatterns.FILENAME_REGEX",
             FILENAME_REGEX,
         ):
-            from data_pipeline.extractor.responses.extractor.collect import (
-                collect_html_files,
-            )
 
             with pytest.raises(FileNotFoundError):
                 collect_html_files(tmp_path)
@@ -82,9 +77,6 @@ class TestScanHtmlFiles:
             "data_pipeline.extractor.responses.extractor.collect.FilePatterns.FILENAME_REGEX",
             FILENAME_REGEX,
         ):
-            from data_pipeline.extractor.responses.extractor.collect import (
-                _scan_html_files,
-            )
 
             result = _scan_html_files(tmp_path)
 
@@ -97,9 +89,6 @@ class TestScanHtmlFiles:
             "data_pipeline.extractor.responses.extractor.collect.FilePatterns.FILENAME_REGEX",
             FILENAME_REGEX,
         ):
-            from data_pipeline.extractor.responses.extractor.collect import (
-                _scan_html_files,
-            )
 
             result = _scan_html_files(tmp_path)
 
@@ -114,9 +103,6 @@ class TestScanHtmlFiles:
             "data_pipeline.extractor.responses.extractor.collect.FilePatterns.FILENAME_REGEX",
             FILENAME_REGEX,
         ):
-            from data_pipeline.extractor.responses.extractor.collect import (
-                _scan_html_files,
-            )
 
             result = _scan_html_files(tmp_path)
 

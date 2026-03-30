@@ -76,7 +76,9 @@ class TestBuildRecords:
 
     def test_empty_parsed_returns_empty_list(self):
 
-        assert build_records(METADATA, {}) == []
+        result = build_records(METADATA, {})
+
+        assert result == []
 
     def test_missing_metadata_key_raises(self):
 

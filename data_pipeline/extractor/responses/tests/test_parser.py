@@ -1,7 +1,6 @@
 """Tests for responses.extractor.parser (parse_HTML)."""
 
 from contextlib import contextmanager, ExitStack
-from pathlib import Path
 from unittest.mock import patch
 
 import pytest

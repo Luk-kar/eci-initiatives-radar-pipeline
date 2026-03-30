@@ -79,5 +79,6 @@ class TestParseHtmlFiles:
     def test_empty_html_files_returns_empty_dict(self):
 
         with patch("data_pipeline.extractor.responses.extractor.parse.parse_HTML"):
+            result = parse_html_files({})
 
-            assert parse_html_files({}) == {}
+        assert not result

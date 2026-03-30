@@ -1,7 +1,6 @@
 """Tests for responses.extractor.load_metadata."""
 
 import csv
-from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -74,9 +73,6 @@ class TestLoadResponsesMetadata:
             "data_pipeline.extractor.responses.extractor.load_metadata.FILE_ENCODING",
             FILE_ENCODING,
         ):
-            from data_pipeline.extractor.responses.extractor.load_metadata import (
-                _load_responses_metadata,
-            )
 
             result = _load_responses_metadata(csv_path, reg_numbers={"2020/000001"})
 
@@ -103,9 +99,6 @@ class TestLoadResponsesMetadata:
             "data_pipeline.extractor.responses.extractor.load_metadata.FILE_ENCODING",
             FILE_ENCODING,
         ):
-            from data_pipeline.extractor.responses.extractor.load_metadata import (
-                _load_responses_metadata,
-            )
 
             result = _load_responses_metadata(csv_path, reg_numbers=set())
 

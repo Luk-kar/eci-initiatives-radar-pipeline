@@ -7,12 +7,12 @@ import pytest
 from data_pipeline.extractor.responses.model import ECIResponseRecord
 
 
-MINIMAL = dict(
-    registration_number="2020/000001",
-    initiative_url="https://ec.europa.eu/initiative/1",
-    response_url="https://ec.europa.eu/response/1",
-    title="Test Initiative",
-)
+MINIMAL = {
+    "registration_number": "2020/000001",
+    "initiative_url": "https://ec.europa.eu/initiative/1",
+    "response_url": "https://ec.europa.eu/response/1",
+    "title": "Test Initiative",
+}
 
 
 class TestECIResponseRecord:
