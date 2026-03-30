@@ -1,4 +1,3 @@
-# data_pipeline/extractor/responses/_logger.py
 """
 Logger factory for the responses extractor module.
 """

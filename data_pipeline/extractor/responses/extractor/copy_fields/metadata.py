@@ -7,7 +7,7 @@ responses_list.csv.
 
 from typing import Dict
 
-from ..consts import CSV_INITIATIVES_FIELDNAMES_TO_EXTRACT
+from ...consts import CSV_INITIATIVES_FIELDNAMES_TO_EXTRACT
 
 
 def extract_metadata(csv_record: dict) -> Dict[str, str]:

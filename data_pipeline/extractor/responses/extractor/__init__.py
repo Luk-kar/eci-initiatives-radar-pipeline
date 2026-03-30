@@ -14,8 +14,8 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set
 
 from ..model import ECIResponseRecord
-from .metadata import extract_metadata
-from ..parser import parse_HTML
+from .copy_fields.metadata import extract_metadata
+from .parser import parse_HTML
 from ..consts import OUTPUT_CSV_FIELDNAMES
 from data_pipeline.pipeline_shared.consts import (
     DATA_DIR,

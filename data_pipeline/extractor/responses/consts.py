@@ -1,4 +1,3 @@
-# data_pipeline/extractor/responses/const.py
 """
 Constants and configuration for the Commission responses extractor.
 """
