@@ -175,7 +175,7 @@ def _load_metadata(
 # ── Step 3 — parse HTML and assemble records ───────────────────────────────────
 
 
-def _parse_html_files(html_files_by_reg: Dict[str, Path]) -> Dict[str, dict]:
+def _parse_html_files(html_files: Dict[str, Path]) -> Dict[str, dict]:
     """
     Parse each HTML response file and return extracted field dicts keyed by
     registration number.
@@ -186,15 +186,15 @@ def _parse_html_files(html_files_by_reg: Dict[str, Path]) -> Dict[str, dict]:
     Raises:
         HTMLParseError: If any HTML file fails to parse.
     """
-    parsed_by_reg: Dict[str, dict] = {}
+    parsed_data: Dict[str, dict] = {}
 
-    for reg_number, html_path in html_files_by_reg.items():
+    for reg_number, html_path in html_files.items():
         try:
-            parsed_by_reg[reg_number] = parse_HTML(html_path, reg_number)
+            parsed_data[reg_number] = parse_HTML(html_path, reg_number)
         except Exception as exc:
             raise HTMLParseError(f"Failed to parse HTML for {reg_number}") from exc
 
-    return parsed_by_reg
+    return parsed_data
 
 
 # ── Step 4 — assemble records ─────────────────────────────────────────────────
