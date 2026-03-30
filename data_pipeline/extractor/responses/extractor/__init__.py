@@ -20,17 +20,21 @@ from data_pipeline.pipeline_shared.consts import (
     DATA_DIR,
     LOG_DIR_NAME,
     RESPONSES_DIR_NAME,
-    ECI_INITIATIVES_CSV_PATTERN,  # kept for consistency, even if pattern not used directly
     ECI_RESPONSES_CSV_PATTERN,
+    LOG_EXTRACTOR_RESPONSES_PATTERN,
     FilePatterns,
+    FILE_ENCODING,
 )
-from .._logger import setup_logger
+from data_pipeline.pipeline_shared.logger import get_logger
+from data_pipeline.pipeline_shared.locate_run_dir import find_newest_scraped_data_dir
+from data_pipeline.pipeline_shared.errors import RunDirectoryValidationError
+from data_pipeline.extractor.extractor_shared.errors import HTMLParseError
 
 
-logger: Optional[logging.Logger] = None
+logger = logging.getLogger(__name__)
 
 
-def configure(timestamp: str) -> None:
+def configure(timestamp: str) -> str:
     """
     Configure module-level extractor context.
 
@@ -38,83 +42,192 @@ def configure(timestamp: str) -> None:
 
     Args:
         timestamp: Timestamp string used in output filenames and logging.
-        DATA_DIR_override: Optional override for the pipeline data root.
     """
-    output_csv_name = ECI_RESPONSES_CSV_PATTERN.format(timestamp=timestamp)
-    return output_csv_name
+    return ECI_RESPONSES_CSV_PATTERN.format(timestamp=timestamp)
 
 
-def run(output_csv_name, timestamp) -> None:
-    """Main execution function."""
+def run(output_csv_name: str, timestamp: str) -> None:
+    """Main execution function — orchestrates the four extraction steps."""
     global logger
 
     if timestamp is None or output_csv_name is None:
         raise RuntimeError("Extractor is not configured. Call configure() first.")
 
-    session_path = _find_latest_scrape_session()
+    html_dir, output_csv, initiatives_csv = _setup(timestamp, output_csv_name)
 
-    if not session_path:
-        raise FileNotFoundError(f"No scraping session found in: {DATA_DIR}")
+    html_files_by_reg = _collect_html_files(html_dir)
 
-    log_dir = session_path / LOG_DIR_NAME
-    logger = setup_logger(log_dir_path=log_dir, timestamp=timestamp)
+    metadata_by_reg = _load_metadata(initiatives_csv, html_files_by_reg)
+    parsed_by_reg = _parse_html_files(html_files_by_reg)
 
-    logger.info("Starting ECI initiative details extraction")
-    logger.info(f"Session: {session_path.name}")
+    records = _build_records(metadata_by_reg, parsed_by_reg)
+
+    _write_csv(records, output_csv)
+    logger.info("Done. %d records written to %s", len(records), output_csv)
+
+
+# ── Setup ──────────────────────────────────────────────────────────────────────
+
+
+def _setup(timestamp: str, output_csv_name: str) -> tuple[Path, Path, Path]:
+    """
+    Locate the latest scrape session, configure logging, build all relevant
+    paths, and validate that required inputs exist.
+
+    Returns:
+        (html_dir, output_csv, initiatives_csv)
+    """
+    global logger
+
+    session_path = find_newest_scraped_data_dir(DATA_DIR, RESPONSES_DIR_NAME)
+
+    logger = get_logger(session_path / LOG_DIR_NAME, LOG_EXTRACTOR_RESPONSES_PATTERN)
+    logger.info("Starting ECI responses extraction")
+    logger.info("Session: %s", session_path.name)
 
     html_dir = session_path / RESPONSES_DIR_NAME
     output_csv = session_path / output_csv_name
-
     initiatives_csv = _find_latest_initiatives_csv(session_path)
-
-    logger.info(html_dir)
 
     if not html_dir.exists():
         raise FileNotFoundError(f"HTML directory not found: {html_dir}")
 
-    logger.info(initiatives_csv)
-
     if not initiatives_csv or not initiatives_csv.exists():
         raise FileNotFoundError(f"No initiatives CSV found in: {session_path}")
 
-    # Step 1: scan HTML files, derive reg numbers from filenames
-    html_files_by_reg = _collect_html_files(html_dir)
-    number_of_responses = len(html_files_by_reg)
+    return html_dir, output_csv, initiatives_csv
 
-    if not number_of_responses:
+
+# ── Step 1 — collect HTML files ───────────────────────────────────────────────
+
+
+def _collect_html_files(html_dir: Path) -> Dict[str, Path]:
+    """
+    Scan html_dir for response HTML files and derive reg numbers from filenames.
+
+    Returns:
+        Dict mapping registration_number → Path.
+
+    Raises:
+        FileNotFoundError: If no matching HTML files are found.
+    """
+    html_files_by_reg = _scan_html_files(html_dir)
+
+    if not html_files_by_reg:
         raise FileNotFoundError(f"No HTML response files found in: {html_dir}")
 
-    logger.info(f"Found {number_of_responses} HTML response files")
+    logger.info("Found %d HTML response files", len(html_files_by_reg))
+    return html_files_by_reg
 
-    # Step 2: filter CSV metadata to only the reg numbers found on disk
+
+def _scan_html_files(html_dir: Path) -> Dict[str, Path]:
+    """
+    Walk year subdirectories under html_dir and map reg numbers to file paths.
+
+    Filename pattern : ``2020_000001.html``
+    Reg number       : ``2020/000001``
+    """
+    result: Dict[str, Path] = {}
+
+    for html_file in html_dir.glob("*/*.html"):
+        match = re.match(FilePatterns.FILENAME_REGEX, html_file.name)
+
+        if not match:
+            raise NameError("Unrecognised filename: %s", html_file.name)
+
+        year, number = match.group(1), match.group(2)
+        result[f"{year}/{number}"] = html_file
+
+    return result
+
+
+# ── Step 2 — load and validate metadata ───────────────────────────────────────
+
+
+def _load_metadata(
+    initiatives_csv: Path,
+    html_files_by_reg: Dict[str, Path],
+) -> Dict[str, dict]:
+    """
+    Load initiatives CSV rows filtered to reg numbers found on disk,
+    then assert every HTML file has a matching CSV record.
+
+    Returns:
+        Dict mapping registration_number → CSV row dict.
+
+    Raises:
+        FileNotFoundError: If any HTML file has no matching CSV record.
+    """
     metadata_by_reg = _load_responses_metadata(
         initiatives_csv, reg_numbers=set(html_files_by_reg.keys())
     )
-    logger.info(f"Matched {len(metadata_by_reg)} CSV records to HTML files")
+    logger.info("Matched %d CSV records to HTML files", len(metadata_by_reg))
 
     unmatched = set(html_files_by_reg.keys()) - set(metadata_by_reg.keys())
-
     if unmatched:
         raise FileNotFoundError(
             f"{len(unmatched)} HTML files have no matching CSV record: {sorted(unmatched)}"
         )
 
-    # Steps 3–5: parse, extract, assemble records
-    records: List[ECIResponseRecord] = []
+    return metadata_by_reg
+
+
+# ── Step 3 — parse HTML and assemble records ───────────────────────────────────
+
+
+def _parse_html_files(html_files_by_reg: Dict[str, Path]) -> Dict[str, dict]:
+    """
+    Parse each HTML response file and return extracted field dicts keyed by
+    registration number.
+
+    Returns:
+        Dict mapping registration_number → parsed field dict.
+
+    Raises:
+        HTMLParseError: If any HTML file fails to parse.
+    """
+    parsed_by_reg: Dict[str, dict] = {}
 
     for reg_number, html_path in html_files_by_reg.items():
-        csv_record = metadata_by_reg.get(reg_number)
+        try:
+            parsed_by_reg[reg_number] = parse_HTML(html_path, reg_number)
+        except Exception as exc:
+            raise HTMLParseError(f"Failed to parse HTML for {reg_number}") from exc
 
-        if not csv_record:
-            raise ValueError(f"No CSV metadata for {reg_number}, skipping")
+    return parsed_by_reg
 
-        record = _process_single(reg_number, csv_record, html_path)
 
-        if record:
-            records.append(record)
+# ── Step 4 — assemble records ─────────────────────────────────────────────────
 
-    _write_csv(records, output_csv)
-    logger.info(f"Done. {len(records)} records written to {output_csv}")
+
+def _build_records(
+    metadata_by_reg: Dict[str, dict],
+    parsed_by_reg: Dict[str, dict],
+) -> List[ECIResponseRecord]:
+    """
+    Merge loaded CSV metadata with parsed HTML fields into ECIResponseRecords.
+
+    Args:
+        metadata_by_reg: Raw CSV row dicts keyed by registration_number.
+        parsed_by_reg:   HTML-extracted fields keyed by registration_number.
+
+    Returns:
+        List of fully assembled ECIResponseRecords.
+    """
+
+    records: List[ECIResponseRecord] = []
+
+    for reg_number, parsed in parsed_by_reg.items():
+
+        csv_row = metadata_by_reg[reg_number]
+        metadata = extract_metadata(csv_row)
+
+        records.append(ECIResponseRecord(**metadata.model_dump(), **parsed))
+
+    return records
+
+
+# ── Private helpers ────────────────────────────────────────────────────────────
 
 
 def _find_latest_initiatives_csv(session_path: Path) -> Optional[Path]:
@@ -142,58 +255,8 @@ def _process_single(
             **parsed,
         )
 
-    except Exception as e:
-        raise ValueError(f"Failed to process {reg_number}: {e}", exc_info=True)
-
-
-def _collect_html_files(html_dir: Path) -> Dict[str, Path]:
-    """
-    Scan html_dir for response HTML files and derive reg numbers from filenames.
-
-    Files are organised in year subdirectories:
-        ``responses/2021/2021_000006.html``
-
-    Filename pattern: ``2020_000001.html``
-    Reg number:       ``2020/000001``
-
-    Returns:
-        Dict mapping registration_number → Path for every matched file.
-    """
-
-    result: Dict[str, Path] = {}
-
-    for html_file in html_dir.glob("*/*.html"):
-
-        match = re.match(FilePatterns.FILENAME_REGEX, html_file.name)
-
-        if not match:
-            logger.debug(f"Skipping unrecognised filename: {html_file.name}")
-            continue
-
-        year, number = match.group(1), match.group(2)
-        reg_number = f"{year}/{number}"
-        result[reg_number] = html_file
-
-    return result
-
-
-def _find_latest_scrape_session() -> Optional[Path]:
-    """Return the most recent session directory."""
-
-    try:
-
-        session_dirs = [
-            d
-            for d in DATA_DIR.iterdir()
-            if d.is_dir() and re.match(FilePatterns.TIMESTAMP_DIR_PATTERN, d.name)
-        ]
-        return max(session_dirs, key=lambda x: x.name) if session_dirs else None
-
-    except Exception as e:
-
-        if logger:
-            logger.error(f"Error finding session: {e}")
-        return None
+    except Exception as exc:
+        raise HTMLParseError(f"Failed to process {reg_number}") from exc
 
 
 def _load_responses_metadata(csv_path: Path, reg_numbers: Set[str]) -> Dict[str, dict]:
@@ -212,7 +275,7 @@ def _load_responses_metadata(csv_path: Path, reg_numbers: Set[str]) -> Dict[str,
     """
     metadata: Dict[str, dict] = {}
 
-    with open(csv_path, encoding="utf-8") as f:
+    with open(csv_path, encoding=FILE_ENCODING) as f:
         for row in csv.DictReader(f):
             reg_num = row["registration_number"]
             if reg_num and reg_num in reg_numbers:
@@ -225,7 +288,6 @@ def _write_csv(records: List[ECIResponseRecord], output_csv: Path) -> None:
     """Serialize records and write to CSV."""
     if not records:
         raise ValueError("No records to write.")
-        return
 
     output_csv.parent.mkdir(parents=True, exist_ok=True)
 
@@ -236,4 +298,4 @@ def _write_csv(records: List[ECIResponseRecord], output_csv: Path) -> None:
         for record in records:
             writer.writerow(record.model_dump())
 
-    logger.info(f"Wrote {len(records)} rows to {output_csv}")
+    logger.info("Wrote %d rows to %s", len(records), output_csv)
