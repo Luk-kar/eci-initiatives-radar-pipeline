@@ -16,7 +16,6 @@ from typing import Dict, List, Optional, Set
 from ..model import ECIResponseRecord
 from .copy_fields.metadata import extract_metadata
 from .parser import parse_HTML
-from ..consts import OUTPUT_CSV_FIELDNAMES
 from data_pipeline.pipeline_shared.consts import (
     DATA_DIR,
     LOG_DIR_NAME,
@@ -81,8 +80,10 @@ def run(output_csv_name, timestamp) -> None:
     # Step 1: scan HTML files, derive reg numbers from filenames
     html_files_by_reg = _collect_html_files(html_dir)
     number_of_responses = len(html_files_by_reg)
+
     if not number_of_responses:
         raise FileNotFoundError(f"No HTML response files found in: {html_dir}")
+
     logger.info(f"Found {number_of_responses} HTML response files")
 
     # Step 2: filter CSV metadata to only the reg numbers found on disk
@@ -137,16 +138,12 @@ def _process_single(
         parsed = parse_HTML(html_path, reg_number)
 
         return ECIResponseRecord(
-            response_url=metadata["response_commission_url"],
-            initiative_url=metadata["url"],
-            registration_number=reg_number,
-            title=metadata["title"],
+            **metadata.model_dump(),
             **parsed,
         )
 
     except Exception as e:
-        logger.error(f"Failed to process {reg_number}: {e}", exc_info=True)
-        return None
+        raise ValueError(f"Failed to process {reg_number}: {e}", exc_info=True)
 
 
 def _collect_html_files(html_dir: Path) -> Dict[str, Path]:
@@ -154,9 +151,9 @@ def _collect_html_files(html_dir: Path) -> Dict[str, Path]:
     Scan html_dir for response HTML files and derive reg numbers from filenames.
 
     Files are organised in year subdirectories:
-        ``responses/2021/2021_000006_en.html``
+        ``responses/2021/2021_000006.html``
 
-    Filename pattern: ``2020_000001_en.html``
+    Filename pattern: ``2020_000001.html``
     Reg number:       ``2020/000001``
 
     Returns:
@@ -227,13 +224,13 @@ def _load_responses_metadata(csv_path: Path, reg_numbers: Set[str]) -> Dict[str,
 def _write_csv(records: List[ECIResponseRecord], output_csv: Path) -> None:
     """Serialize records and write to CSV."""
     if not records:
-        logger.warning("No records to write.")
+        raise ValueError("No records to write.")
         return
 
     output_csv.parent.mkdir(parents=True, exist_ok=True)
 
     with open(output_csv, "w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=OUTPUT_CSV_FIELDNAMES)
+        writer = csv.DictWriter(f, fieldnames=list(ECIResponseRecord.model_fields))
         writer.writeheader()
 
         for record in records:

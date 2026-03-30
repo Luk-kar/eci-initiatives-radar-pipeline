@@ -10,7 +10,7 @@ from ...scraper_shared.files_utils import ensure_dirs
 from ...scraper_shared.consts import DEBUGGING_DIR_NAME
 
 # Local
-from ..consts import RESPONSE_PAGE_FILENAME_PATTERN
+from ..consts import INITIATIVE_PAGE_FILENAME_PATTERN
 from .._logger import logger
 
 
@@ -39,7 +39,7 @@ def save_response_page(
     """
     validate_html(page_source)
 
-    filename = RESPONSE_PAGE_FILENAME_PATTERN.format(year=year, number=reg_number)
+    filename = INITIATIVE_PAGE_FILENAME_PATTERN.format(year=year, number=reg_number)
 
     if debug:
         target_dir = os.path.join(

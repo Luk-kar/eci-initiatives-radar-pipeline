@@ -42,19 +42,19 @@ class TestSaveResponsePage:
     def test_returns_relative_filename(self, tmp_path):
         result = save_response_page(str(tmp_path), YEAR, REG_NUMBER, HTML)
 
-        assert result == f"{YEAR}/{REG_NUMBER}_en.html"
+        assert result == f"{YEAR}_{REG_NUMBER}.html"
 
     def test_file_is_written_to_year_subdirectory(self, tmp_path):
 
         save_response_page(str(tmp_path), YEAR, REG_NUMBER, HTML)
-        expected = tmp_path / YEAR / f"{REG_NUMBER}_en.html"
+        expected = tmp_path / YEAR / f"{YEAR}_{REG_NUMBER}.html"
 
         assert expected.exists()
 
     def test_written_file_contains_page_source(self, tmp_path):
 
         save_response_page(str(tmp_path), YEAR, REG_NUMBER, HTML)
-        path = tmp_path / YEAR / f"{REG_NUMBER}_en.html"
+        path = tmp_path / YEAR / f"{YEAR}_{REG_NUMBER}.html"
 
         content = path.read_text(encoding=FILE_ENCODING)
         assert "Commission response content" in content
@@ -70,8 +70,8 @@ class TestSaveResponsePage:
         save_response_page(str(tmp_path), YEAR, "000001", HTML)
         save_response_page(str(tmp_path), YEAR, "000002", HTML)
 
-        assert (tmp_path / YEAR / "000001_en.html").exists()
-        assert (tmp_path / YEAR / "000002_en.html").exists()
+        assert (tmp_path / YEAR / f"{YEAR}_000001.html").exists()
+        assert (tmp_path / YEAR / f"{YEAR}_000002.html").exists()
 
 
 @pytest.mark.usefixtures("no_validation")
@@ -89,7 +89,7 @@ class TestSaveResponsePageDebug:
         save_response_page(str(responses_dir), YEAR, REG_NUMBER, HTML, debug=True)
 
         debug_path = (
-            tmp_path / "debugging" / "responses" / YEAR / f"{REG_NUMBER}_en.html"
+            tmp_path / "debugging" / "responses" / YEAR / f"{YEAR}_{REG_NUMBER}.html"
         )
         assert debug_path.exists()
 
@@ -100,7 +100,7 @@ class TestSaveResponsePageDebug:
 
         save_response_page(str(responses_dir), YEAR, REG_NUMBER, HTML, debug=True)
 
-        normal_path = responses_dir / YEAR / f"{REG_NUMBER}_en.html"
+        normal_path = responses_dir / YEAR / f"{REG_NUMBER}.html"
         assert not normal_path.exists()
 
     def test_debug_returns_same_relative_filename(self, tmp_path):
@@ -112,4 +112,4 @@ class TestSaveResponsePageDebug:
             str(responses_dir), YEAR, REG_NUMBER, HTML, debug=True
         )
 
-        assert result == f"{YEAR}/{REG_NUMBER}_en.html"
+        assert result == f"{YEAR}_{REG_NUMBER}.html"

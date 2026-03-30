@@ -13,9 +13,9 @@ class ECIResponseRecord(BaseModel):
     """Analysis-ready record for one ECI initiative's response page."""
 
     # --- Core metadata (copied from responses_list.csv) ---
-    response_url: str
-    initiative_url: str
     registration_number: str
+    initiative_url: str
+    response_url: str
     title: str
 
     # --- Extracted from response HTML ---

@@ -7,20 +7,13 @@ responses_list.csv.
 
 from typing import Dict
 
-from ...consts import CSV_INITIATIVES_FIELDNAMES_TO_EXTRACT
+from .model import ECIInitiativeInheritedRecord
 
 
-def extract_metadata(csv_record: dict) -> Dict[str, str]:
-    """
-    Extract metadata fields from a responses_list.csv row.
-
-    Args:
-        csv_record: Row dict loaded from responses_list.csv.
-
-    Returns:
-        Dict containing only the keys defined in
-        ``CSV_INITIATIVES_FIELDNAMES_TO_EXTRACT``, falling back to an
-        empty string for any missing key.
-    """
-
-    return {field: csv_record[field] for field in CSV_INITIATIVES_FIELDNAMES_TO_EXTRACT}
+def extract_metadata(csv_record: dict) -> ECIInitiativeInheritedRecord:
+    return ECIInitiativeInheritedRecord(
+        registration_number=csv_record["registration_number"],
+        initiative_url=csv_record["url"],
+        response_url=csv_record["response_commission_url"],
+        title=csv_record["title"],
+    )

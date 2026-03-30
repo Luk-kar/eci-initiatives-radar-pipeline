@@ -51,7 +51,7 @@ class FilePatterns:
 
     # HTML filename regex for extracting registration number
     # Matches: YYYY_NNNNNN_en.html (e.g., 2019_000007_en.html)
-    FILENAME_REGEX = r"(\d{4})_(\d{6})_en\.html"
+    FILENAME_REGEX = r"(\d{4})_(\d{6})\.html"
     HTML_FILENAME_PATTERN = r"(\d{4})_(\d{6})_([a-z]{2})\.html"  # More flexible version
 
     # Timestamp directory pattern for finding scraper session directories

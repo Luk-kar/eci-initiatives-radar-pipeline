@@ -29,6 +29,7 @@ from ..scraper_shared.consts import (
     RATE_LIMIT_INDICATORS,
     DEBUGGING_DIR_NAME,
     DEFAULT_MAX_RETRIES,
+    INITIATIVE_PAGE_FILENAME_PATTERN,
 )
 
 # Module-specific Directory Names
@@ -48,6 +49,3 @@ CSV_FIELDNAMES = [
 # Fine-tune these based on server response times and rate limiting behavior
 WAIT_BETWEEN_DOWNLOADS = (1.5, 1.9)  # Delay between downloading response pages
 RETRY_WAIT_BASE = (2.0, 2.5)  # Base time for retry exponential backoff
-
-# Module-specific File Naming Patterns
-RESPONSE_PAGE_FILENAME_PATTERN = "{year}/{number}_en.html"
