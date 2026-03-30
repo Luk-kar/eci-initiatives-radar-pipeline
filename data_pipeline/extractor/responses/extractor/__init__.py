@@ -111,13 +111,13 @@ def _collect_html_files(html_dir: Path) -> Dict[str, Path]:
     Raises:
         FileNotFoundError: If no matching HTML files are found.
     """
-    html_files_by_reg = _scan_html_files(html_dir)
+    html_files = _scan_html_files(html_dir)
 
-    if not html_files_by_reg:
+    if not html_files:
         raise FileNotFoundError(f"No HTML response files found in: {html_dir}")
 
-    logger.info("Found %d HTML response files", len(html_files_by_reg))
-    return html_files_by_reg
+    logger.info("Found %d HTML response files", len(html_files))
+    return html_files
 
 
 def _scan_html_files(html_dir: Path) -> Dict[str, Path]:
