@@ -1,6 +1,50 @@
+"""
+HTML fixtures covering the full lifespan of ECI response pages on the EU
+Commission website. The schema has changed substantially over the years —
+from bare HTML fragments to ECL-wrapped, component-driven layouts — and
+individual pages may reflect different snapshots of the site at the time
+they were scraped, so no single structural assumption holds universally.
+Parsers must treat every field as optional and handle legacy patterns
+alongside current ones without breaking.
+"""
+
 import pytest
 
 from bs4 import BeautifulSoup
+
+# HTML SCHEMA EVOLUTION
+# ──────────────────────────────────────────────────────────────────────────
+# 2012  Bare HTML fragments — no ECL wrapper, plain <h2> headings (no id,
+#       no <strong>). Section names vary ("More information" vs "Other
+#       information"). A footer banner is always present, either as a bare
+#       <figure> or inside a <div data-inpage-navigation-source-area>.
+#       No "Submission and examination" section yet.
+#
+# 2017  Two scraped versions exist per initiative (old and new page).
+#       v1: still no ECL wrapper, banner still present. Sub-headings appear
+#           (<h6> in 000002, <h4> in 000004). 000004 introduces <h2 id=…>
+#           with a combined "Answer … and follow-up" title and SVG link icons.
+#           Note the persistent typo: id="Answer-of-the-European-Commision".
+#       v2: <div class="ecl"> wrapper added, banner gone. 000004 gains a
+#           "Submission and examination" section and starts nesting <p> tags
+#           inside <h2>.
+#
+# 2018–2020  ECL wrapper is now universal. Headings standardise to
+#       <h2><strong>…</strong></h2> (id still absent on most). "Submission
+#       and examination" becomes a standard section. From 2019/000016 onward,
+#       an ecl-file download component appears after the Answer heading.
+#       2020/000001 is an outlier: an extra outer <div> wraps the ECL div,
+#       and some bullet lists use a "●" Unicode character in <p> tags instead
+#       of <ul><li>. Empty <p></p> whitespace artefacts appear throughout.
+#
+# 2021–2022  id attributes return consistently on <h2><strong> headings,
+#       starting with "Submission and examination". The ecl-file component
+#       moves from the Answer section into the Submission section.
+#
+# 2024  ecl-file gains publication metadata (<ul class="ecl-file__detail-meta">)
+#       and a file-format label (<div class="ecl-file__meta">, e.g. "(HTML)").
+#       All <h2> headings now carry both id and <strong>.
+# ──────────────────────────────────────────────────────────────────────────
 
 # fmt: off
 _ECI_HTML = [
@@ -166,6 +210,15 @@ EU regulatory approval is based only on published studies [...]'):</strong></h6>
 of the European Parliament and the Council</a> was published on 6 September 2019 and became applicable
 on 27 March 2021.</p>
 </div>
+<div data-inpage-navigation-source-area="h2">
+  <section class="ecl-banner ecl-banner--m">
+    <figure class="ecl-banner__picture-container">
+      <picture class="ecl-picture ecl-banner__picture">
+        <img alt="Footer banner" src="/hero-banner-bg.png">
+      </picture>
+    </figure>
+  </section>
+</div>
 """),
     ("2017/000004", """
 <div class="ecl">
@@ -205,6 +258,15 @@ of 9 November 2022, the General Court dismissed the request to annul C(2021) 171
 dismissed by the <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:62023CJ0026">Court
 judgment</a> of 5 June 2025.</p>
 </div>
+<div data-inpage-navigation-source-area="h2">
+  <section class="ecl-banner ecl-banner--m">
+    <figure class="ecl-banner__picture-container">
+      <picture class="ecl-picture ecl-banner__picture">
+        <img alt="Footer banner" src="/hero-banner-bg.png">
+      </picture>
+    </figure>
+  </section>
+</div>
 """),
     ("2018/000004", """
 <div class="ecl">
@@ -231,6 +293,15 @@ consultation</a> open until 12 December 2025. For further updates, check the
 <a href="https://food.ec.europa.eu/animals/animal-welfare/eci/eci-end-cage-age_en">dedicated web
 page</a>.</p>
 </div>
+<div data-inpage-navigation-source-area="h2">
+  <section class="ecl-banner ecl-banner--m">
+    <figure class="ecl-banner__picture-container">
+      <picture class="ecl-picture ecl-banner__picture">
+        <img alt="Footer banner" src="/hero-banner-bg.png">
+      </picture>
+    </figure>
+  </section>
+</div>
 """),
 ("2019/000007", """
 <div class="ecl">
@@ -242,6 +313,15 @@ its robust safeguards promoting inclusion and equal treatment of minorities.</p>
 <p>Consequently, no new legislation will be proposed in response to this ECI. However, the Commission
 will continue to ensure non-discriminatory access to Union funding and to monitor Member States'
 actions to guarantee equal treatment in the implementation of Cohesion policy.</p>
+</div>
+<div data-inpage-navigation-source-area="h2">
+  <section class="ecl-banner ecl-banner--m">
+    <figure class="ecl-banner__picture-container">
+      <picture class="ecl-picture ecl-banner__picture">
+        <img alt="Footer banner" src="/hero-banner-bg.png">
+      </picture>
+    </figure>
+  </section>
 </div>
 """),
 ("2019/000016", """
@@ -291,6 +371,15 @@ actions to guarantee equal treatment in the implementation of Cohesion policy.</
  <p>The Commission <a href="https://eur-lex.europa.eu/eli/C/2024/3117/oj">withdrew</a> its
  proposal on Sustainable Use of Plant Protection Products on 27 March 2024.</p>
  <p></p>
+</div>
+<div data-inpage-navigation-source-area="h2">
+  <section class="ecl-banner ecl-banner--m">
+    <figure class="ecl-banner__picture-container">
+      <picture class="ecl-picture ecl-banner__picture">
+        <img alt="Footer banner" src="/hero-banner-bg.png">
+      </picture>
+    </figure>
+  </section>
 </div>
 """),
 ("2020/000001", """
@@ -353,6 +442,15 @@ actions to guarantee equal treatment in the implementation of Cohesion policy.</
   <p></p>
  </div>
 </div>
+<div data-inpage-navigation-source-area="h2">
+  <section class="ecl-banner ecl-banner--m">
+    <figure class="ecl-banner__picture-container">
+      <picture class="ecl-picture ecl-banner__picture">
+        <img alt="Footer banner" src="/hero-banner-bg.png">
+      </picture>
+    </figure>
+  </section>
+</div>
 """),
 ("2021/000006", """
 <div class="ecl">
@@ -406,6 +504,15 @@ actions to guarantee equal treatment in the implementation of Cohesion policy.</
  <p>The General Court issued its judgments on 22 November 2023. The Commission will consider
  them in view of<strong></strong> any potential future measures.</p>
 </div>
+<div data-inpage-navigation-source-area="h2">
+  <section class="ecl-banner ecl-banner--m">
+    <figure class="ecl-banner__picture-container">
+      <picture class="ecl-picture ecl-banner__picture">
+        <img alt="Footer banner" src="/hero-banner-bg.png">
+      </picture>
+    </figure>
+  </section>
+</div>
 """),
 ("2022/000002", """
 <div class="ecl">
@@ -456,6 +563,15 @@ actions to guarantee equal treatment in the implementation of Cohesion policy.</
  <a href="https://food.ec.europa.eu/animals/animal-welfare/eci/eci-fur-free-europe_en">dedicated
  website</a> for details.</p>
  <p></p>
+</div>
+<div data-inpage-navigation-source-area="h2">
+  <section class="ecl-banner ecl-banner--m">
+    <figure class="ecl-banner__picture-container">
+      <picture class="ecl-picture ecl-banner__picture">
+        <img alt="Footer banner" src="/hero-banner-bg.png">
+      </picture>
+    </figure>
+  </section>
 </div>
 """),
 ("2024/000004", """
@@ -511,6 +627,15 @@ actions to guarantee equal treatment in the implementation of Cohesion policy.</
  provide such support.</p>
  <p>As EU support can already be provided under existing instruments, it is not necessary to
  propose a new legal instrument.</p>
+</div>
+<div data-inpage-navigation-source-area="h2">
+  <section class="ecl-banner ecl-banner--m">
+    <figure class="ecl-banner__picture-container">
+      <picture class="ecl-picture ecl-banner__picture">
+        <img alt="Footer banner" src="/hero-banner-bg.png">
+      </picture>
+    </figure>
+  </section>
 </div>
 """),
 ]
