@@ -134,6 +134,19 @@ def extract_followup_events(
         while current_element:
 
             if (
+                current_element.name == "p"
+                and "ecl-social-media-share__description"
+                in current_element.get("class", [])
+            ):
+                breaks
+
+            if (
+                current_element.name == "figure"
+                and "ecl-banner__picture-container" in current_element.get("class", [])
+            ):
+                break
+
+            if (
                 current_element.name == "h2"
                 and "ecl-u-type-heading-2" in current_element.get("class", [])
                 and current_element.get("id") in stop_section_ids
