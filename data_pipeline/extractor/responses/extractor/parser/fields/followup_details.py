@@ -121,7 +121,7 @@ def extract_followup_events(
                 f"No valid follow-up actions found for {registration_number}"
             )
 
-        return normalize_spaces(text, content_elements)
+        return normalize_spaces(content_elements)
 
     except Exception as e:
         raise ValueError(
@@ -219,6 +219,8 @@ def _should_skip_text(text: str) -> bool:
     if text.endswith(":"):
         return True
 
+    return False
 
-def normalize_spaces(content_elements):
+
+def normalize_spaces(content_elements: List[str]) -> List[str]:
     return [re.sub(r"\s+", " ", text) for text in content_elements]

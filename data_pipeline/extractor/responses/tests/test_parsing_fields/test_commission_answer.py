@@ -25,12 +25,15 @@ def _tag(html: str) -> Tag:
 class TestExtractCommissionAnswer:
 
     @pytest.mark.parametrize("reg_num,soup", ECI_FIXTURES)
-    def test_returns_non_empty_string(self, reg_num, soup):
+    def test_returns_non_empty_list(self, reg_num, soup):
 
         result = extract_commission_answer(soup, reg_num)
 
-        assert isinstance(result, str)
-        assert len(result.strip()) > 50
+        assert isinstance(result, list)
+        assert len(result) > 0
+        assert all(isinstance(item, str) for item in result)
+        for section in result:
+            assert len(section) > 15
 
     def test_missing_header_raises(self):
 
@@ -73,7 +76,7 @@ class TestExtractCommissionAnswer:
 
         result = extract_commission_answer(soup, "2012/000099")
 
-        assert "SENTINEL_FOLLOWUP_TEXT" not in result
+        assert any("SENTINEL_FOLLOWUP_TEXT" not in item for item in result)
 
     def test_answer_ends_at_first_subsequent_h2(self):
         soup = _soup(
@@ -84,8 +87,6 @@ class TestExtractCommissionAnswer:
             <p>SENTINEL_FOLLOWUP_TEXT</p>
         """
         )
-
         result = extract_commission_answer(soup, "2012/000099")
-
-        assert "SENTINEL_ANSWER_TEXT" in result
-        assert "SENTINEL_FOLLOWUP_TEXT" not in result
+        assert any("SENTINEL_ANSWER_TEXT" in item for item in result)
+        assert not any("SENTINEL_FOLLOWUP_TEXT" in item for item in result)

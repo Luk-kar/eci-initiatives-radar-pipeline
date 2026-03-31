@@ -71,11 +71,17 @@ class TestParseHTML:
 
         html_file = _write_html(tmp_path)
 
-        with _mock_extractors(ca="The Commission responds."):
+        with _mock_extractors(ca=["The Commission responds."]):
 
             result = parse_HTML(html_file, "2020/000001")
 
-        assert result["commission_answer_text"] == "The Commission responds."
+        commission_answer_text = result["commission_answer_text"]
+
+        assert isinstance(commission_answer_text, list)
+        assert all(isinstance(item, str) for item in commission_answer_text)
+        assert len(commission_answer_text) == 1
+
+        assert commission_answer_text == ["The Commission responds."]
 
     def test_list_fields_preserved(self, tmp_path):
 

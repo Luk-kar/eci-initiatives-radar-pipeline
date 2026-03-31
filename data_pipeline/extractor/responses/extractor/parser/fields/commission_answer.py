@@ -5,7 +5,7 @@ response to the ECI, preserving inline hyperlinks as plain text with URLs.
 """
 
 import logging
-from typing import Optional
+from typing import Optional, List
 import re
 
 from bs4 import BeautifulSoup, Tag
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 def extract_commission_answer(
     soup: BeautifulSoup, registration_number: str
-) -> Optional[str]:
+) -> Optional[List[str]]:
     """Extract main conclusions text from Communication, excluding factsheet downloads.
 
     If the Answer section contains insufficient content (only decision date and document links),
@@ -46,16 +46,11 @@ def extract_commission_answer(
             f"{registration_number}"
         )
 
-    text_only_answer = "\n".join(content_parts).strip()
-
-    if _is_answer_insufficient(text_only_answer) and followup_header:
+    if _is_answer_insufficient(content_parts) and followup_header:
 
         content_parts = _supplement_with_followup(content_parts, followup_header)
-        text_answer_with_followup = "\n".join(content_parts).strip()
 
-        return text_answer_with_followup
-
-    return text_only_answer
+    return content_parts
 
 
 # ---------------------------------------------------------------------------
@@ -186,7 +181,7 @@ def _is_document_links_list(ul_element) -> bool:
     return True  # All items are document links
 
 
-def _is_answer_insufficient(text: str) -> bool:
+def _is_answer_insufficient(content_parts: List[str]) -> bool:
     """Check if extracted answer text is insufficient.
 
     Answer is considered insufficient if it's very short and only contains:
@@ -199,8 +194,10 @@ def _is_answer_insufficient(text: str) -> bool:
     Returns:
         True if answer is insufficient, False otherwise
     """
+    text_one_string = "\n".join(content_parts).strip()
+
     # Remove whitespace and newlines for analysis
-    normalized = re.sub(r"\s+", " ", text).strip()
+    normalized = re.sub(r"\s+", " ", text_one_string).strip()
 
     # Check length - if very short (less than 250 chars), might be insufficient
     if len(normalized) > 250:

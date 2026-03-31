@@ -28,7 +28,7 @@ class TestECIResponseRecord:
 
         record = ECIResponseRecord(
             **MINIMAL,
-            commission_answer_text="The Commission answers…",
+            commission_answer_text=["The Commission answers…", "and that's all folks!"],
             followup_additional_website="https://example.com",
             followup_events=["Event A", "Event B"],
             legislation_passed=["Regulation (EU) 2021/1"],
