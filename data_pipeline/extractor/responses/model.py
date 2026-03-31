@@ -24,9 +24,8 @@ class ECIResponseRecord(BaseModel):
 
     # List fields — serialized as JSON strings for flat CSV compatibility
     followup_events: Optional[List[str]] = None  # plain-text descriptions with links
-    legislation_passed: Optional[List[str]] = None  # plain-text law descriptions
 
-    @field_serializer("followup_events", "legislation_passed")
+    @field_serializer("followup_events")
     def serialize_list_as_json(self, value: Optional[List[str]]) -> Optional[str]:
 
         if value is None:

@@ -10,7 +10,7 @@ import re
 
 from bs4 import BeautifulSoup, Tag
 
-from .utils import _find_answer_header, _extract_element_with_links
+from .utils import find_answer_header, extract_element_with_links
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +102,7 @@ def extract_followup_events(
     """
 
     try:
-        response_h2 = _find_answer_header(soup)
+        response_h2 = find_answer_header(soup)
         if not response_h2:
             raise ValueError(
                 f"No 'Answer of the European Commission' section found for {registration_number}"
@@ -181,7 +181,7 @@ def _collect_followup_content(start_header: Tag) -> List[str]:
 
         if current_element.name in ("p", "li"):
 
-            text = _extract_element_with_links(current_element)
+            text = extract_element_with_links(current_element)
 
             if text and not _should_skip_text(text):
                 content_elements.append(text)

@@ -13,7 +13,6 @@ PARSED_DICT = {
     "commission_answer_text": None,
     "followup_additional_website": None,
     "followup_events": None,
-    "legislation_passed": None,
 }
 
 

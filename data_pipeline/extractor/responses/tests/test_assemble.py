@@ -18,7 +18,6 @@ PARSED = {
         "commission_answer_text": ["The Commission will act."],
         "followup_additional_website": None,
         "followup_events": None,
-        "legislation_passed": None,
     }
 }
 
@@ -67,7 +66,6 @@ class TestBuildRecords:
                 "commission_answer_text": None,
                 "followup_additional_website": None,
                 "followup_events": None,
-                "legislation_passed": None,
             },
         }
 
@@ -86,7 +84,6 @@ class TestBuildRecords:
                 "commission_answer_text": None,
                 "followup_additional_website": None,
                 "followup_events": None,
-                "legislation_passed": None,
             }
         }
 

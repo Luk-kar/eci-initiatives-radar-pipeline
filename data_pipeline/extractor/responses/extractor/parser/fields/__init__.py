@@ -8,11 +8,9 @@ from .followup_details import (
     extract_followup_additional_website,
     extract_followup_events,
 )
-from .legislation import extract_legislation_passed
 
 __all__ = [
     "extract_commission_answer",
     "extract_followup_additional_website",
     "extract_followup_events",
-    "extract_legislation_passed",
 ]

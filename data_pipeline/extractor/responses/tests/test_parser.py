@@ -43,12 +43,6 @@ def _mock_extractors(ca=None, fw=None, fe=None, lp=None):
         )
         stack.enter_context(
             patch(
-                "data_pipeline.extractor.responses.extractor.parser.extract_legislation_passed",
-                return_value=lp,
-            )
-        )
-        stack.enter_context(
-            patch(
                 "data_pipeline.extractor.responses.extractor.parser.FILE_ENCODING",
                 "utf-8",
             )
@@ -97,7 +91,6 @@ class TestParseHTML:
 
         assert result["followup_additional_website"] == "https://followup.example.com"
         assert result["followup_events"] == ["Event 1", "Event 2"]
-        assert result["legislation_passed"] == ["Regulation (EU) 1/2020"]
 
     def test_missing_file_raises(self, tmp_path):
 

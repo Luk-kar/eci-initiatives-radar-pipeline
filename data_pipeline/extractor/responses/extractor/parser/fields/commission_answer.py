@@ -10,7 +10,7 @@ import re
 
 from bs4 import BeautifulSoup, Tag
 
-from .utils import _find_answer_header, _extract_element_with_links
+from .utils import find_answer_header, extract_element_with_links
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ def extract_commission_answer(
     Raises:
         ValueError: If the Commission answer section cannot be found or extracted
     """
-    answer_header = _find_answer_header(soup)
+    answer_header = find_answer_header(soup)
 
     if not answer_header:
         raise ValueError(
@@ -112,7 +112,7 @@ def _collect_answer_content(answer_header: Tag) -> tuple[list[str], Optional[Tag
 
         if not _should_skip(current) and current.name:
 
-            element_text = _extract_element_with_links(current)
+            element_text = extract_element_with_links(current)
 
             if element_text:
                 content_parts.append(element_text)
@@ -265,7 +265,7 @@ def _extract_first_followup_paragraph(followup_header) -> str:
         # Extract first meaningful paragraph
         if current.name == "p":
 
-            element_text = _extract_element_with_links(current)
+            element_text = extract_element_with_links(current)
             if element_text and len(element_text.strip()) > 20:  # Meaningful content
                 return element_text
 

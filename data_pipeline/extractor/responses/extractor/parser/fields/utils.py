@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup, Tag
 # ---------------------------------------------------------------------------
 
 
-def _find_answer_header(soup: BeautifulSoup) -> Optional[Tag]:
+def find_answer_header(soup: BeautifulSoup) -> Optional[Tag]:
     """Locate the Answer heading by id first, then by text fallback."""
 
     header = soup.find("h2", id="Answer-of-the-European-Commission")
@@ -21,7 +21,7 @@ def _find_answer_header(soup: BeautifulSoup) -> Optional[Tag]:
     return header
 
 
-def _extract_element_with_links(element) -> str:
+def extract_element_with_links(element) -> str:
     """Extract text while preserving links in markdown format."""
 
     if not element.name:

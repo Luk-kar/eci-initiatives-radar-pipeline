@@ -67,7 +67,7 @@ class TestWriteCsv:
 
         out = tmp_path / "result.csv"
         write_csv(
-            [_make_record(followup_events=["A", "B"], legislation_passed=["Law 1"])],
+            [_make_record(followup_events=["A", "B"])],
             out,
         )
 
@@ -75,7 +75,6 @@ class TestWriteCsv:
             row = next(csv.DictReader(f))
 
         assert row["followup_events"] == json.dumps(["A", "B"], ensure_ascii=False)
-        assert row["legislation_passed"] == json.dumps(["Law 1"], ensure_ascii=False)
 
     def test_none_fields_written_as_empty_string(self, tmp_path):
 

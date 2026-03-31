@@ -12,4 +12,3 @@ class ECIResponseParseHTMLRecord(BaseModel):
 
     # List fields — serialized as JSON strings for flat CSV compatibility
     followup_events: Optional[List[str]] = None  # plain-text descriptions with links
-    legislation_passed: Optional[List[str]] = None  # plain-text law descriptions

@@ -14,7 +14,6 @@ from .fields import (
     extract_commission_answer,
     extract_followup_additional_website,
     extract_followup_events,
-    extract_legislation_passed,
 )
 
 
@@ -50,7 +49,6 @@ def parse_HTML(html_file: Path, registration_number: str) -> dict:
             soup, registration_number
         ),
         followup_events=extract_followup_events(soup, registration_number),
-        legislation_passed=extract_legislation_passed(soup, registration_number),
     )
 
     logger.info("Successfully parsed %s", html_file.name)
