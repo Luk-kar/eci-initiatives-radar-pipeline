@@ -8,7 +8,7 @@ import logging
 from typing import List, Optional
 import re
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 from .utils import _find_answer_header, _extract_element_with_links
 
@@ -102,80 +102,93 @@ def extract_followup_events(
     """
 
     try:
-        # Step 1: Locate the target section
         response_h2 = _find_answer_header(soup)
-
         if not response_h2:
             raise ValueError(
-                f"No 'Response of the Commission' section found for {registration_number}"
+                f"No 'Answer of the European Commission' section found for {registration_number}"
             )
 
-        # Step 2: Find the next h2 that starts the content
-        start_h2 = response_h2.find_next(
-            lambda tag: tag.name in ("h2", "h4")
-            and any(
-                phrase in tag.get_text()
-                for phrase in ("Follow-up", "Updates on the Commission's proposals")
-            )
-        )
-
-        if not start_h2:
+        start_header = _find_followup_header(response_h2)
+        if not start_header:
             logger.warning(
-                "⚠️ No content 'Follow-up' section found after 'Response of the Commission' for "
-                f"{registration_number}"
+                f"⚠️ No 'Follow-up' section found after the Answer section for {registration_number}"
             )
             return None
 
-        # Step 3: Extract content elements between start_h2 and stop sections
-        stop_section_ids = {"related-links", "press-release", "video"}
-        content_elements = []
-        current_element = start_h2.find_next()
-
-        while current_element:
-
-            if (
-                current_element.name == "p"
-                and "ecl-social-media-share__description"
-                in current_element.get("class", [])
-            ):
-                breaks
-
-            if (
-                current_element.name == "figure"
-                and "ecl-banner__picture-container" in current_element.get("class", [])
-            ):
-                break
-
-            if (
-                current_element.name == "h2"
-                and "ecl-u-type-heading-2" in current_element.get("class", [])
-                and current_element.get("id") in stop_section_ids
-            ):
-                break
-
-            if current_element.name in ["p", "li"]:
-
-                text = _extract_element_with_links(current_element)
-
-                if text and not _should_skip_text(text):
-                    content_elements.append(text)
-
-            current_element = current_element.find_next()
-
-        # Step 4: Normalise and return
+        content_elements = _collect_followup_content(start_header)
         if not content_elements:
             raise ValueError(
-                f"No valid follow-up actions found in 'Response of the Commission' section "
-                f"for {registration_number}"
+                f"No valid follow-up actions found for {registration_number}"
             )
 
-        normalized_content = [re.sub(r"\s+", " ", text) for text in content_elements]
-        return normalized_content
+        return normalize_spaces(text, content_elements)
 
     except Exception as e:
         raise ValueError(
             f"Error extracting follow-up events for {registration_number}:\n{str(e)}"
         ) from e
+
+
+def _find_followup_header(answer_header: Tag) -> Optional[Tag]:
+    """Find the Follow-up heading after the Answer header."""
+
+    return answer_header.find_next(
+        lambda tag: tag.name in ("h2", "h4")
+        and any(
+            phrase in tag.get_text()
+            for phrase in ("Follow-up", "Updates on the Commission's proposals")
+        )
+    )
+
+
+def _is_followup_boundary(element: Tag) -> bool:
+    """Return True when the traversal should stop."""
+
+    stop_section_ids = {"related-links", "press-release", "video"}
+
+    if element.name == "p" and "ecl-social-media-share__description" in element.get(
+        "class", []
+    ):
+        return True
+
+    if element.name == "figure" and "ecl-banner__picture-container" in element.get(
+        "class", []
+    ):
+        return True
+
+    if element.get("data-inpage-navigation-source-area"):
+        return True
+
+    if (
+        element.name == "h2"
+        and "ecl-u-type-heading-2" in element.get("class", [])
+        and element.get("id") in stop_section_ids
+    ):
+        return True
+
+    return False
+
+
+def _collect_followup_content(start_header: Tag) -> List[str]:
+    """Walk siblings from the Follow-up header and accumulate text content."""
+
+    content_elements = []
+    current_element = start_header.find_next()
+
+    while current_element:
+        if _is_followup_boundary(current_element):
+            break
+
+        if current_element.name in ("p", "li"):
+
+            text = _extract_element_with_links(current_element)
+
+            if text and not _should_skip_text(text):
+                content_elements.append(text)
+
+        current_element = current_element.find_next()
+
+    return content_elements
 
 
 def _should_skip_text(text: str) -> bool:
@@ -205,3 +218,7 @@ def _should_skip_text(text: str) -> bool:
     # Also skip if it's just a subsection header (ends with colon)
     if text.endswith(":"):
         return True
+
+
+def normalize_spaces(content_elements):
+    return [re.sub(r"\s+", " ", text) for text in content_elements]

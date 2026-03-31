@@ -31,6 +31,7 @@ def _extract_element_with_links(element) -> str:
         return ""
 
     if element.name == "a":
+
         link_text = element.get_text(strip=True)
         href = element.get("href", "")
         return f"[{link_text}]({href})"
@@ -38,17 +39,26 @@ def _extract_element_with_links(element) -> str:
     # For all other elements: walk descendants, but skip text nodes
     # that are already captured as part of an <a> tag.
     if element.find("a"):
+
         text_parts = []
+
         for child in element.descendants:
+
             if hasattr(child, "name") and child.name == "a":
+
                 link_text = child.get_text(strip=True)
                 href = child.get("href", "")
+
                 if link_text:
                     text_parts.append(f"[{link_text}]({href})")
+
             elif isinstance(child, str) and child.parent.name != "a":
+
                 text = child.strip()
+
                 if text:
                     text_parts.append(text)
+
         return " ".join(text_parts)
 
     return element.get_text(strip=True)
