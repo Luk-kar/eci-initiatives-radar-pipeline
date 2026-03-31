@@ -46,9 +46,10 @@ from bs4 import BeautifulSoup
 #       All <h2> headings now carry both id and <strong>.
 # ──────────────────────────────────────────────────────────────────────────
 
-# fmt: off
 _ECI_HTML = [
-    ("2012/000003", """
+    (
+        "2012/000003",
+        """
 <h2>Answer of the European Commission</h2>
 <p>The Commission committed, in particular, to taking the following actions:</p>
 <ul>
@@ -81,8 +82,11 @@ _ECI_HTML = [
     </figure>
   </section>
 </div>
-"""),
-    ("2012/000005", """
+""",
+    ),
+    (
+        "2012/000005",
+        """
 <h2>Answer of the European Commission</h2>
 <p>Decision date: 28/05/2014<br>Official documents related to the decision:</p>
 <h2>Follow-up</h2>
@@ -94,8 +98,11 @@ and decided EU policy in this regard. See <a href="http://europa.eu/rapid/press-
     <img alt="Footer banner" src="/hero-banner-bg.png">
   </picture>
 </figure>
-"""),
-    ("2012/000007", """
+""",
+    ),
+    (
+        "2012/000007",
+        """
 <h2>Answer of the European Commission</h2>
 <p>Decision date: 03/06/2015</p>
 <p><br>Official documents related to the decision:</p>
@@ -121,8 +128,11 @@ concerning the initiative 'Stop Vivisection'. The Ombudsman concluded that there
     <img alt="Footer banner" src="/hero-banner-bg.png">
   </picture>
 </figure>
-"""),
-    ("2017/000002", """
+""",
+    ),
+    (
+        "2017/000002",
+        """
 <h2>Answer of the European Commission</h2>
 <p>Official documents:</p>
 <p>Main conclusions of the Communication:</p>
@@ -143,46 +153,11 @@ on 27 March 2021.</p>
     <img alt="Footer banner" src="/hero-banner-bg.png">
   </picture>
 </figure>
-"""),
-    ("2017/000004", """
-<h2 id="Answer-of-the-European-Commision">
-  Answer of the European Commission and follow-up
-</h2>
-<h4>Official document:</h4>
-<ul>
-  <li><a href="https://ec.europa.eu/transparency/documents-register/detail?ref=C(2021)171&amp;lang=en">Communication</a></li>
-</ul>
-<p>Main conclusions of the Communication:</p>
-<p>Inclusion and respect for the rich cultural diversity of Europe is one of the priorities of the
-European Commission. While no further legal acts are proposed, the full implementation of legislation
-and policies already in place provides a powerful set of measures to support the initiative's goals.</p>
-<h4>Follow-up</h4>
-<ul>
-  <li>The Commission implements funding programmes in the areas of culture and education (notably
-  Erasmus+) which are fully accessible for small regional or minority language communities.</li>
-  <li>Regarding the promotion of linguistic diversity, the Commission is further developing its
-  cooperation with the Council of Europe's
-  <a class="ecl-link ecl-link--icon" href="https://www.ecml.at/ECML-Programme/ECML-ECCooperation/Colloquium2023/tabid/5664/language/en-GB/Default.aspx">
-    <span class="ecl-link__label">colloquium on Strengthening support to regional and minority languages</span>
-    <svg aria-hidden="true" class="ecl-icon ecl-icon--xs ecl-link__icon ecl-icon--external"><path d="M30 6V3h15v15h-3V8.13L29.13 21 27 18.87 39.87 6z"/></svg>
-  </a>
-  co-organised with the ECML in November 2023.</li>
-</ul>
-<p><strong>Other information</strong></p>
-<p>In a <a href="https://curia.europa.eu/jcms/upload/docs/application/pdf/2022-11/cp220179en.pdf">judgement</a>
-of 9 November 2022, the General Court dismissed the request to annul the Commission Communication
-C(2021) 171.</p>
-<div data-inpage-navigation-source-area="h2">
-  <section class="ecl-banner ecl-banner--m">
-    <figure class="ecl-banner__picture-container">
-      <picture class="ecl-picture ecl-banner__picture">
-        <img alt="Footer banner" src="/hero-banner-bg.png">
-      </picture>
-    </figure>
-  </section>
-</div>
-"""),    
-("2017/000002", """
+""",
+    ),
+    (
+        "2017/000002",
+        """
 <div class="ecl">
 <h2>Answer of the European Commission</h2>
 <p>Official documents:</p>
@@ -219,8 +194,11 @@ on 27 March 2021.</p>
     </figure>
   </section>
 </div>
-"""),
-    ("2017/000004", """
+""",
+    ),
+    (
+        "2017/000004",
+        """
 <div class="ecl">
 <h2 id="Submission-and-examination">Submission and examination
   <p><a href="https://citizens-initiative.europa.eu/initiatives/details/2017/000004_en">Minority
@@ -267,8 +245,11 @@ judgment</a> of 5 June 2025.</p>
     </figure>
   </section>
 </div>
-"""),
-    ("2018/000004", """
+""",
+    ),
+    (
+        "2018/000004",
+        """
 <div class="ecl">
 <h2><strong>Submission and examination</strong>
   <p><a href="https://citizens-initiative.europa.eu/initiatives/details/2018/000004_en">'End the
@@ -302,8 +283,11 @@ page</a>.</p>
     </figure>
   </section>
 </div>
-"""),
-("2019/000007", """
+""",
+    ),
+    (
+        "2019/000007",
+        """
 <div class="ecl">
 <h2 id="Answer-of-the-European-Commission"><strong>Answer of the European Commission</strong></h2>
 <p>Main conclusions of the <a href="https://citizens-initiative.europa.eu/sites/default/files/2025-09/C20256015EN.pdf"><u>Communication</u></a>:</p>
@@ -323,8 +307,11 @@ actions to guarantee equal treatment in the implementation of Cohesion policy.</
     </figure>
   </section>
 </div>
-"""),
-("2019/000016", """
+""",
+    ),
+    (
+        "2019/000016",
+        """
 <div class="ecl">
  <p></p>
  <h2><strong>Submission and examination</strong></h2>
@@ -381,8 +368,11 @@ actions to guarantee equal treatment in the implementation of Cohesion policy.</
     </figure>
   </section>
 </div>
-"""),
-("2020/000001", """
+""",
+    ),
+    (
+        "2020/000001",
+        """
 <div>
  <div class="ecl">
   <p></p>
@@ -451,8 +441,11 @@ actions to guarantee equal treatment in the implementation of Cohesion policy.</
     </figure>
   </section>
 </div>
-"""),
-("2021/000006", """
+""",
+    ),
+    (
+        "2021/000006",
+        """
 <div class="ecl">
  <h2 id="Submission-and-examination"><strong>Submission and examination</strong></h2>
  <p>The '<a href="https://citizens-initiative.europa.eu/initiatives/details/2021/000006_en">Save
@@ -513,8 +506,11 @@ actions to guarantee equal treatment in the implementation of Cohesion policy.</
     </figure>
   </section>
 </div>
-"""),
-("2022/000002", """
+""",
+    ),
+    (
+        "2022/000002",
+        """
 <div class="ecl">
  <h2 id="Submission-and-examination"><strong>Submission and examination</strong></h2>
  <p>The '<a href="https://citizens-initiative.europa.eu/initiatives/details/2022/000002_en">Fur
@@ -573,8 +569,11 @@ actions to guarantee equal treatment in the implementation of Cohesion policy.</
     </figure>
   </section>
 </div>
-"""),
-("2024/000004", """
+""",
+    ),
+    (
+        "2024/000004",
+        """
 <div class="ecl">
  <h2 id="Submission-and-examination"><strong>Submission and examination</strong></h2>
  <p>The <a href="https://citizens-initiative.europa.eu/initiatives/details/2024/000004_en">'My
@@ -637,10 +636,22 @@ actions to guarantee equal treatment in the implementation of Cohesion policy.</
     </figure>
   </section>
 </div>
-"""),
+""",
+    ),
 ]
-# fmt: on
 
 ECI_FIXTURES = [
     (reg_num, BeautifulSoup(html, "html.parser")) for reg_num, html in _ECI_HTML
 ]
+
+
+@pytest.fixture
+def eci_fixture_soup():
+    index = {reg_num: soup for reg_num, soup in ECI_FIXTURES}
+
+    def _get(registration_number: str) -> BeautifulSoup:
+        if registration_number not in index:
+            raise KeyError(f"No fixture for {registration_number!r}")
+        return index[registration_number]
+
+    return _get
