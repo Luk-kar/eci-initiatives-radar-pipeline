@@ -1,0 +1,19 @@
+"""
+Browser management for the Commission responses scraper.
+"""
+
+# Third-party
+from selenium import webdriver
+
+# Local
+from ..scraper_shared.browser import initialize_browser as _shared_initialize_browser
+from .log_messages import LOG_MESSAGES
+from ._logger import logger
+
+
+def initialize_browser() -> webdriver.Chrome:
+    """Initialize Chrome WebDriver with headless options.
+
+    Delegates to shared browser initializer while preserving logging.
+    """
+    return _shared_initialize_browser(logger, LOG_MESSAGES)
