@@ -10,6 +10,8 @@ import re
 
 from bs4 import BeautifulSoup
 
+from .utils import _find_answer_header, _extract_element_with_links
+
 logger = logging.getLogger(__name__)
 
 
@@ -98,8 +100,95 @@ def extract_followup_events(
     Returns:
         List of event description strings, or None if the section is absent.
     """
-    # TODO: implement — locate and iterate the follow-up events list in the DOM
-    logger.debug(
-        f"[{registration_number}] extract_followup_events: not yet implemented"
-    )
-    return None
+
+    try:
+        # Step 1: Locate the target section
+        response_h2 = _find_answer_header(soup)
+
+        if not response_h2:
+            raise ValueError(
+                f"No 'Response of the Commission' section found for {registration_number}"
+            )
+
+        # Step 2: Find the next h2 that starts the content
+        start_h2 = response_h2.find_next(
+            lambda tag: tag.name in ("h2", "h4")
+            and any(
+                phrase in tag.get_text()
+                for phrase in ("Follow-up", "Updates on the Commission's proposals")
+            )
+        )
+
+        if not start_h2:
+            logger.warning(
+                "⚠️ No content 'Follow-up' section found after 'Response of the Commission' for "
+                f"{registration_number}"
+            )
+            return None
+
+        # Step 3: Extract content elements between start_h2 and stop sections
+        stop_section_ids = {"related-links", "press-release", "video"}
+        content_elements = []
+        current_element = start_h2.find_next()
+
+        while current_element:
+
+            if (
+                current_element.name == "h2"
+                and "ecl-u-type-heading-2" in current_element.get("class", [])
+                and current_element.get("id") in stop_section_ids
+            ):
+                break
+
+            if current_element.name in ["p", "li"]:
+
+                text = _extract_element_with_links(current_element)
+
+                if text and not _should_skip_text(text):
+                    content_elements.append(text)
+
+            current_element = current_element.find_next()
+
+        # Step 4: Normalise and return
+        if not content_elements:
+            raise ValueError(
+                f"No valid follow-up actions found in 'Response of the Commission' section "
+                f"for {registration_number}"
+            )
+
+        normalized_content = [re.sub(r"\s+", " ", text) for text in content_elements]
+        return normalized_content
+
+    except Exception as e:
+        raise ValueError(
+            f"Error extracting follow-up events for {registration_number}:\n{str(e)}"
+        ) from e
+
+
+def _should_skip_text(text: str) -> bool:
+    """
+    Determine if text should be skipped (generic intro or subsection header).
+
+    Args:
+        text: Text content to check
+
+    Returns:
+        True if text should be skipped, False otherwise
+    """
+
+    skip_patterns = [
+        "provides regularly updated information",
+        "provides information on the follow-up",
+        "this section provides",
+    ]
+
+    text_lower = text.lower()
+
+    for pattern in skip_patterns:
+
+        if pattern in text_lower:
+            return True
+
+    # Also skip if it's just a subsection header (ends with colon)
+    if text.endswith(":"):
+        return True
