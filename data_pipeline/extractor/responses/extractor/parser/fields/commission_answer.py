@@ -8,15 +8,19 @@ import logging
 from typing import Optional
 import re
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
 
 
 def extract_commission_answer(
     soup: BeautifulSoup, registration_number: str
 ) -> Optional[str]:
-    """Extract main conclusions text from Communication, excluding factsheet downloads
+    """Extract main conclusions text from Communication, excluding factsheet downloads.
 
     If the Answer section contains insufficient content (only decision date and document links),
     extract one additional paragraph from the Follow-up section.
@@ -24,17 +28,7 @@ def extract_commission_answer(
     Raises:
         ValueError: If the Commission answer section cannot be found or extracted
     """
-
-    # Find the "Answer of the European Commission" header
-    answer_header = soup.find("h2", id="Answer-of-the-European-Commission")
-
-    if not answer_header:
-
-        # Alternative: find h2 containing the text
-        answer_header = soup.find(
-            lambda tag: tag.name == "h2"
-            and "Answer of the European Commission" in tag.get_text()
-        )
+    answer_header = _find_answer_header(soup)
 
     if not answer_header:
         raise ValueError(
@@ -42,53 +36,7 @@ def extract_commission_answer(
             f"{registration_number}"
         )
 
-    # Collect all content between this header and the Follow-up header
-    content_parts = []
-    current = answer_header.find_next_sibling()
-    followup_header = None
-
-    while current:
-
-        # Stop if we hit Follow-up or another major section
-        if current.name == "h2":
-
-            h2_id = current.get("id", "")
-            h2_text = current.get_text(strip=True)
-            if "Follow-up" in h2_text or h2_id == "Follow-up":
-                followup_header = current
-                break
-
-            # Also stop at other major sections
-            if h2_id and h2_id != "Answer-of-the-European-Commission":
-                break
-
-        if current.name == "h4":
-            h4_text = current.get_text(strip=True)
-            if "Follow-up" in h4_text:
-                break
-
-        # Skip factsheet file download components (ecl-file divs)
-        if current.name == "div" and "ecl-file" in current.get("class", []):
-            current = current.find_next_sibling()
-            continue
-
-        # skip navigation/banner wrapper divs
-        if current.name == "div" and current.get("data-inpage-navigation-source-area"):
-            current = current.find_next_sibling()
-            continue
-
-        # Skip <ul> elements that only contain document links (Communication, Annex, etc.)
-        if current.name == "ul" and _is_document_links_list(current):
-            current = current.find_next_sibling()
-            continue
-
-        # Extract and format content from this element
-        if current.name:
-            element_text = _extract_element_with_links(current)
-            if element_text:
-                content_parts.append(element_text)
-
-        current = current.find_next_sibling()
+    content_parts, followup_header = _collect_answer_content(answer_header)
 
     if not content_parts:
         raise ValueError(
@@ -96,20 +44,121 @@ def extract_commission_answer(
             f"{registration_number}"
         )
 
-    # Check if content is insufficient (likely only decision date and document links)
-    combined_text = "\n".join(content_parts).strip()
+    text_only_answer = "\n".join(content_parts).strip()
 
-    # Heuristic: if the content is very short and contains only common patterns,
-    # it's likely insufficient
-    if _is_answer_insufficient(combined_text):
-        # Try to extract one paragraph from Follow-up section
-        if followup_header:
-            followup_paragraph = _extract_first_followup_paragraph(followup_header)
-            if followup_paragraph:
-                content_parts.append(followup_paragraph)
-                combined_text = "\n".join(content_parts).strip()
+    if _is_answer_insufficient(text_only_answer) and followup_header:
 
-    return combined_text
+        content_parts = _supplement_with_followup(content_parts, followup_header)
+        text_answer_with_followup = "\n".join(content_parts).strip()
+
+        return text_answer_with_followup
+
+    return text_only_answer
+
+
+# ---------------------------------------------------------------------------
+# Header location
+# ---------------------------------------------------------------------------
+
+
+def _find_answer_header(soup: BeautifulSoup) -> Optional[Tag]:
+    """Locate the Answer heading by id first, then by text fallback."""
+
+    header = soup.find("h2", id="Answer-of-the-European-Commission")
+
+    if not header:
+        header = soup.find(
+            lambda tag: tag.name == "h2"
+            and "Answer of the European Commission" in tag.get_text()
+        )
+    return header
+
+
+# ---------------------------------------------------------------------------
+# Section traversal
+# ---------------------------------------------------------------------------
+
+
+def _is_section_boundary(tag: Tag) -> tuple[bool, bool]:
+    """Return (is_boundary, is_followup) for a given sibling tag."""
+
+    if tag.name == "h2":
+
+        h2_id = tag.get("id", "")
+        h2_text = tag.get_text(strip=True)
+
+        is_followup = "Follow-up" in h2_text or h2_id == "Follow-up"
+        is_other = h2_id and h2_id != "Answer-of-the-European-Commission"
+
+        return (is_followup or is_other), is_followup
+
+    if tag.name == "h4" and "Follow-up" in tag.get_text(strip=True):
+        return True, True
+
+    return False, False
+
+
+def _should_skip(tag: Tag) -> bool:
+    """Return True for non-content elements: factsheet downloads, banners, document link lists."""
+
+    if tag.name == "div" and "ecl-file" in tag.get("class", []):
+        return True
+
+    if tag.name == "div" and tag.get("data-inpage-navigation-source-area"):
+        return True
+
+    if tag.name == "ul" and _is_document_links_list(tag):
+        return True
+
+    return False
+
+
+def _collect_answer_content(answer_header: Tag) -> tuple[list[str], Optional[Tag]]:
+    """Walk siblings from the Answer header, accumulate text, and return the Follow-up header if found."""
+
+    content_parts = []
+    followup_header = None
+    current = answer_header.find_next_sibling()
+
+    while current:
+
+        is_boundary, is_followup = _is_section_boundary(current)
+
+        if is_boundary:
+
+            if is_followup:
+                followup_header = current
+
+            break
+
+        if not _should_skip(current) and current.name:
+
+            element_text = _extract_element_with_links(current)
+
+            if element_text:
+                content_parts.append(element_text)
+
+        current = current.find_next_sibling()
+
+    return content_parts, followup_header
+
+
+def _supplement_with_followup(
+    content_parts: list[str], followup_header: Tag
+) -> list[str]:
+    """Append the first Follow-up paragraph to the Answer content parts."""
+
+    followup_paragraph = _extract_first_followup_paragraph(followup_header)
+
+    if followup_paragraph:
+        content_parts.append(followup_paragraph)
+
+    return content_parts
+
+
+# ---------------------------------------------------------------------------
+# Content classification
+# ---------------------------------------------------------------------------
 
 
 def _is_document_links_list(ul_element) -> bool:
@@ -203,6 +252,11 @@ def _is_answer_insufficient(text: str) -> bool:
         return True
 
     return False
+
+
+# ---------------------------------------------------------------------------
+# Text extraction
+# ---------------------------------------------------------------------------
 
 
 def _extract_element_with_links(element) -> str:
