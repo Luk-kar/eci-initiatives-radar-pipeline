@@ -3,33 +3,20 @@ WebDriver wait utilities for Commission response pages.
 """
 
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 
-from ....scraper_shared.wait_utils import wait_for_any_selector
-from ...css_selectors import ResponsePageSelectors
+from ....scraper_shared.response_and_followup.waiter import (
+    wait_for_page_content as _wait_for_page_content,
+)
 from ...consts import WEBDRIVER_TIMEOUT_CONTENT
-from ..._logger import logger
 from ...log_messages import LOG_MESSAGES
+from ..._logger import logger
 
 
 def wait_for_page_content(driver: webdriver.Chrome) -> bool:
-    """Wait for response page content to load.
-
-    Tries selectors in order of preference, returning True as soon
-    as any element is located.
-
-    Returns:
-        bool: True if any content element was found, False otherwise.
-    """
-    return wait_for_any_selector(
-        driver=driver,
-        selectors=[
-            ResponsePageSelectors.MAIN_CONTENT,
-            ResponsePageSelectors.PAGE_HEADER_TITLE,
-            ResponsePageSelectors.INITIATIVE_PROGRESS,
-        ],
+    """Wait for Commission response page content to load."""
+    return _wait_for_page_content(
+        driver,
         timeout=WEBDRIVER_TIMEOUT_CONTENT,
-        by=By.CSS_SELECTOR,
         logger=logger,
         log_messages=LOG_MESSAGES,
     )
