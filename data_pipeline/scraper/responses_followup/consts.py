@@ -30,14 +30,15 @@ from ..scraper_shared.consts import (
     DEBUGGING_DIR_NAME,
     DEFAULT_MAX_RETRIES,
     INITIATIVE_PAGE_FILENAME_PATTERN,
+    INITIATIVES_DIR_NAME,
 )
 
 # Module-specific Directory Names
-RESPONSES_DIR_NAME = "responses"
+RESPONSES_DIR_NAME = "responses_followup"
 INITIATIVE_PAGES_DIR_NAME = "initiatives"
 
 # CSV Configuration
-CSV_FILENAME = "responses_list.csv"
+CSV_FILENAME = "responses_followup_list.csv"
 CSV_FIELDNAMES = [
     "url_find_initiative",
     "registration_number",

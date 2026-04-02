@@ -1,9 +1,5 @@
 """
-Pytest configuration and shared fixtures for the responses test suite.
-
-Uses pytest_configure / pytest_unconfigure hooks — not fixtures — so that
-PIPELINE_DIR is patched before any test module imports consts.py and
-freezes the path at collection time.
+Pytest configuration and shared fixtures for the responses_followup test suite.
 """
 
 import shutil
@@ -13,12 +9,12 @@ from unittest.mock import MagicMock, patch
 import pytest
 from selenium import webdriver
 
-_RESPONSES_CONSTS = "data_pipeline.scraper.responses.consts"
+_RESPONSES_FOLLOWUP_CONSTS = "data_pipeline.scraper.responses_followup.consts"
 
-_TMP_DIR = tempfile.mkdtemp(prefix="eci_responses_test_")
+_TMP_DIR = tempfile.mkdtemp(prefix="eci_responses_followup_test_")
 
 _PATCHES = [
-    patch(f"{_RESPONSES_CONSTS}.PIPELINE_DIR", _TMP_DIR),
+    patch(f"{_RESPONSES_FOLLOWUP_CONSTS}.PIPELINE_DIR", _TMP_DIR),
 ]
 
 

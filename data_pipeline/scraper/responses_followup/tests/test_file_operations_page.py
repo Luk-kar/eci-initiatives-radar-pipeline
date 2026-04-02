@@ -1,8 +1,5 @@
 """
-Tests for Commission response page HTML save operations.
-
-Validates the normal save path, debug directory routing, filename
-format, and the validate → prettify → write pipeline.
+Tests for Commission response follow-up page HTML save operations.
 """
 
 import os
@@ -10,10 +7,12 @@ from unittest.mock import patch
 
 import pytest
 
-from data_pipeline.scraper.responses.file_operations.page import save_response_page
+from data_pipeline.scraper.responses_followup.file_operations.page import (
+    save_response_page,
+)
 from data_pipeline.pipeline_shared.consts import FILE_ENCODING
 
-MODULE = "data_pipeline.scraper.responses.file_operations.page"
+MODULE = "data_pipeline.scraper.responses_followup.file_operations.page"
 
 YEAR = "2023"
 REG_NUMBER = "000007"
@@ -47,16 +46,14 @@ class TestSaveResponsePage:
     def test_file_is_written_to_year_subdirectory(self, tmp_path):
 
         save_response_page(str(tmp_path), YEAR, REG_NUMBER, HTML)
-        expected = tmp_path / YEAR / f"{YEAR}_{REG_NUMBER}.html"
-
-        assert expected.exists()
+        assert (tmp_path / YEAR / f"{YEAR}_{REG_NUMBER}.html").exists()
 
     def test_written_file_contains_page_source(self, tmp_path):
 
         save_response_page(str(tmp_path), YEAR, REG_NUMBER, HTML)
-        path = tmp_path / YEAR / f"{YEAR}_{REG_NUMBER}.html"
-
-        content = path.read_text(encoding=FILE_ENCODING)
+        content = (tmp_path / YEAR / f"{YEAR}_{REG_NUMBER}.html").read_text(
+            encoding=FILE_ENCODING
+        )
         assert "Commission response content" in content
 
     def test_year_directory_is_created(self, tmp_path):
@@ -83,33 +80,37 @@ class TestSaveResponsePageDebug:
 
     def test_debug_file_written_to_debugging_subtree(self, tmp_path):
 
-        responses_dir = tmp_path / "responses"
-        responses_dir.mkdir()
+        responses_followup_dir = tmp_path / "responses_followup"
+        responses_followup_dir.mkdir()
 
-        save_response_page(str(responses_dir), YEAR, REG_NUMBER, HTML, debug=True)
+        save_response_page(
+            str(responses_followup_dir), YEAR, REG_NUMBER, HTML, debug=True
+        )
 
         debug_path = (
-            tmp_path / "debugging" / "responses" / YEAR / f"{YEAR}_{REG_NUMBER}.html"
+            tmp_path
+            / "debugging"
+            / "responses_followup"
+            / YEAR
+            / f"{YEAR}_{REG_NUMBER}.html"
         )
         assert debug_path.exists()
 
     def test_debug_does_not_write_to_normal_dir(self, tmp_path):
 
-        responses_dir = tmp_path / "responses"
-        responses_dir.mkdir()
+        responses_followup = tmp_path / "responses_followup"
+        responses_followup.mkdir()
 
-        save_response_page(str(responses_dir), YEAR, REG_NUMBER, HTML, debug=True)
-
-        normal_path = responses_dir / YEAR / f"{REG_NUMBER}.html"
-        assert not normal_path.exists()
+        save_response_page(str(responses_followup), YEAR, REG_NUMBER, HTML, debug=True)
+        assert not (responses_followup / YEAR / f"{REG_NUMBER}.html").exists()
 
     def test_debug_returns_same_relative_filename(self, tmp_path):
 
-        responses_dir = tmp_path / "responses"
-        responses_dir.mkdir()
+        responses_followup = tmp_path / "responses_followup"
+        responses_followup.mkdir()
 
         result = save_response_page(
-            str(responses_dir), YEAR, REG_NUMBER, HTML, debug=True
+            str(responses_followup), YEAR, REG_NUMBER, HTML, debug=True
         )
 
         assert result == f"{YEAR}_{REG_NUMBER}.html"

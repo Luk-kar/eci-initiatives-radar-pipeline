@@ -1,9 +1,6 @@
 """
 Tests for the HTML parser that extracts Commission response links
 from saved initiative pages.
-
-Validates link extraction, title parsing, edge cases (missing links,
-malformed HTML, unreadable files), and directory-level aggregation.
 """
 
 import os
@@ -12,7 +9,7 @@ from unittest.mock import patch
 
 import pytest
 
-from data_pipeline.scraper.responses.html_parser import ResponseLinkExtractor
+from data_pipeline.scraper.responses_followup.html_parser import ResponseLinkExtractor
 
 # ── Shared HTML fixtures ───────────────────────────────────────────────────────
 

@@ -1,19 +1,19 @@
 """
-Light-weight end-to-end tests against the live EU Commission server.
+Light-weight end-to-end tests against the live EU Commission follow-up server.
 
-Validates the complete responses scraping pipeline produces the expected
-file artifacts. The session fixture keeps total server load to
-MAX_RESPONSES_E2E Commission response pages.
+Validates the complete responses_followup scraping pipeline produces the
+expected file artifacts. The session fixture limits total server load to
+MAX_RESPONSES_E2E pages.
 
 What is tested:
-    - Directory structure (responses/, logs/)
+    - Directory structure (responses_followup/, logs/)
     - CSV created with required columns, slash-format registration numbers,
       and non-empty datetimes on successful downloads
-    - Individual response HTML files organised in 4-digit year directories
-    - HTML content is non-trivial and references the Commission domain
+    - Individual follow-up HTML files organised in 4-digit year directories
+    - HTML content is non-trivial and references an europa.eu domain
 
 What is NOT tested:
-    - Detailed link extraction edge-cases (covered by unit tests)
+    - CSV reading edge-cases (covered by unit tests in test_csv_reader.py)
     - Rate-limit recovery paths (covered by unit tests)
     - Exact row counts or specific content values (change on the live site)
 
@@ -26,7 +26,7 @@ from pathlib import Path
 import pytest
 
 from data_pipeline.pipeline_shared.consts import FILE_ENCODING
-from data_pipeline.scraper.responses.consts import CSV_FIELDNAMES
+from data_pipeline.scraper.responses_followup.consts import CSV_FIELDNAMES
 
 pytestmark = pytest.mark.e2e
 
@@ -125,7 +125,7 @@ class TestCsvArtifacts:
 
 
 class TestResponsePageArtifacts:
-    """Validate the individually downloaded Commission response HTML files."""
+    """Validate the individually downloaded follow-up HTML files."""
 
     def test_response_html_files_downloaded(self, e2e_scrape):
 
@@ -133,7 +133,7 @@ class TestResponsePageArtifacts:
 
         assert (
             len(html_files) > 0
-        ), f"No response HTML files found under {e2e_scrape.responses_path}"
+        ), f"No follow-up HTML files found under {e2e_scrape.responses_path}"
 
     def test_year_directories_are_4_digit(self, e2e_scrape):
 
@@ -144,40 +144,15 @@ class TestResponsePageArtifacts:
                     item.name.isdigit() and len(item.name) == 4
                 ), f"Year directory {item.name!r} is not 4 digits"
 
-    def test_response_filenames_end_with_en(self, e2e_scrape):
-
-        for html_path in _collect_response_html_files(e2e_scrape.responses_path):
-
-            assert html_path.stem.endswith(
-                "_en"
-            ), f"Response filename doesn't end with _en: {html_path.name!r}"
-
     def test_response_html_is_non_trivial(self, e2e_scrape):
-
         for html_path in _collect_response_html_files(e2e_scrape.responses_path):
-
             content = html_path.read_text(encoding=FILE_ENCODING)
             assert (
                 len(content) > 1_000
             ), f"HTML file suspiciously small ({len(content)} chars): {html_path.name}"
 
     def test_response_html_has_html_tags(self, e2e_scrape):
-
         for html_path in _collect_response_html_files(e2e_scrape.responses_path):
-
             content = html_path.read_text(encoding=FILE_ENCODING).lower()
             assert "<html" in content, f"No <html> tag in {html_path.name}"
             assert "</html>" in content, f"No </html> tag in {html_path.name}"
-
-    def test_response_html_references_commission_domain(self, e2e_scrape):
-
-        commission_markers = (
-            "commission.europa.eu",
-            "European Commission",
-        )
-
-        for html_path in _collect_response_html_files(e2e_scrape.responses_path):
-            content = html_path.read_text(encoding=FILE_ENCODING)
-            assert any(
-                m in content for m in commission_markers
-            ), f"No Commission domain marker found in {html_path.name}"

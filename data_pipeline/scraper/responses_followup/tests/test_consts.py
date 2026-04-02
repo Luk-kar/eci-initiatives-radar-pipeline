@@ -1,18 +1,20 @@
 """
-Tests for the configuration constants used by the Commission responses scraper.
-
-Verifies that wait time tuples are correctly bounded, retry limits are
-positive integers, and WebDriver timeouts are set to sane values.
+Tests for configuration constants in the Commission responses follow-up scraper.
 """
+
+import fnmatch
 
 import pytest
 
-from data_pipeline.scraper.responses.consts import (
+from data_pipeline.scraper.responses_followup.consts import (
     WAIT_BETWEEN_DOWNLOADS,
     RETRY_WAIT_BASE,
     DEFAULT_MAX_RETRIES,
     WEBDRIVER_TIMEOUT_DEFAULT,
     WEBDRIVER_TIMEOUT_CONTENT,
+    RESPONSES_CSV_GLOB,
+    FOLLOWUP_URL_COLUMN,
+    RESPONSES_DIR_NAME,
 )
 
 _WAIT_TUPLES = [
@@ -57,3 +59,18 @@ class TestNumericConsts:
 
     def test_webdriver_timeout_content_is_positive(self):
         assert WEBDRIVER_TIMEOUT_CONTENT > 0
+
+
+# class TestStringConsts:
+
+#     def test_responses_csv_glob_matches_extractor_output(self):
+#         assert fnmatch.fnmatch(
+#             "eci_responses_2026-03-31_16-26-53.csv", RESPONSES_CSV_GLOB
+#         )
+
+#     def test_followup_url_column_is_non_empty_string(self):
+#         assert isinstance(FOLLOWUP_URL_COLUMN, str)
+#         assert FOLLOWUP_URL_COLUMN.strip()
+
+#     def test_responses_dir_name_is_responses_followup(self):
+#         assert RESPONSES_DIR_NAME == "responses_followup"

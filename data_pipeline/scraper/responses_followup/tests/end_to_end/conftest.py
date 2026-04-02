@@ -1,12 +1,13 @@
 """
-Session-scoped fixtures for the Commission responses end-to-end test suite.
+Session-scoped fixtures for the Commission responses follow-up end-to-end test suite.
 
-Strategy: copy the real initiatives pages dir into a temp run dir, then
-patch find_newest_scraped_data_dir to return that temp run dir.
-The scraper reads HTML from there AND writes all output (responses/, logs/,
-CSV) into the same temp dir — no real data directory is touched.
+Strategy: find the real eci_responses_*.csv, copy a limited subset of rows
+(only those with a non-empty followup_additional_website) into a temp run dir,
+then patch _resolve_run_dir_and_csv so the scraper reads from there.
+No real data directory is touched during the run.
 """
 
+import csv
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
@@ -14,17 +15,16 @@ from unittest.mock import patch
 
 import pytest
 
-from data_pipeline.scraper.responses import html_parser as responses_html_parser
-from data_pipeline.scraper.responses import consts as responses_consts
+from data_pipeline.scraper.responses_followup import consts as followup_consts
 
 MAX_RESPONSES_E2E = 2
 
-MAIN_MODULE = "data_pipeline.scraper.responses.__main__"
-LOCATE_FN = f"{MAIN_MODULE}.find_newest_scraped_data_dir"
+MAIN_MODULE = "data_pipeline.scraper.responses_followup.__main__"
+RESOLVE_FN = f"{MAIN_MODULE}._resolve_run_dir_and_csv"
 
 
 @dataclass
-class ResponseScrapeArtifacts:
+class ResponseFollowupScrapeArtifacts:
     timestamp: str
     run_dir: Path
     responses_path: Path
@@ -32,47 +32,67 @@ class ResponseScrapeArtifacts:
     csv_path: Path
 
 
+def _find_real_csv() -> Path | None:
+    """Return the newest eci_responses_*.csv from any run dir, or None."""
+    from data_pipeline.pipeline_shared.consts import DATA_DIR
+
+    candidates = sorted(
+        DATA_DIR.glob(f"*/{followup_consts.RESPONSES_CSV_GLOB}"),
+        reverse=True,
+    )
+    return candidates[0] if candidates else None
+
+
+def _write_limited_csv(src_csv: Path, dest_csv: Path, max_rows: int) -> None:
+    """Copy up to max_rows rows with non-empty followup_additional_website."""
+    from data_pipeline.pipeline_shared.consts import FILE_ENCODING
+
+    with open(src_csv, encoding=FILE_ENCODING, newline="") as f:
+        reader = csv.DictReader(f)
+        fieldnames = reader.fieldnames or []
+        valid = [
+            row
+            for row in reader
+            if row.get(followup_consts.FOLLOWUP_URL_COLUMN, "").strip()
+        ][:max_rows]
+
+    with open(dest_csv, "w", encoding=FILE_ENCODING, newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(valid)
+
+
 @pytest.fixture(scope="session")
-def e2e_scrape(tmp_path_factory) -> ResponseScrapeArtifacts:
-    from data_pipeline.scraper.responses.__main__ import scrape_commission_responses
-    from data_pipeline.pipeline_shared.consts import DATA_DIR, INITIATIVES_DIR_NAME
-    from data_pipeline.pipeline_shared.locate_run_dir import (
-        find_newest_scraped_data_dir,
+def e2e_scrape(tmp_path_factory) -> ResponseFollowupScrapeArtifacts:
+    from data_pipeline.scraper.responses_followup.__main__ import (
+        scrape_commission_responses,
     )
 
-    # Resolve the real initiatives run dir BEFORE any patching
-    real_run_dir = Path(find_newest_scraped_data_dir(DATA_DIR, INITIATIVES_DIR_NAME))
+    real_csv = _find_real_csv()
+    if real_csv is None:
+        raise FileNotFoundError(
+            f"No '{followup_consts.RESPONSES_CSV_GLOB}' found — "
+            "run the extractor first."
+        )
 
-    # Build a temp run dir and copy the real initiatives pages into it
-    tmp_run_dir = tmp_path_factory.mktemp("eci_responses_e2e")
-    shutil.copytree(
-        real_run_dir / INITIATIVES_DIR_NAME,
-        tmp_run_dir / INITIATIVES_DIR_NAME,
-    )
+    tmp_run_dir = tmp_path_factory.mktemp("eci_responses_followup_e2e")
+    tmp_csv = tmp_run_dir / real_csv.name
+    _write_limited_csv(real_csv, tmp_csv, MAX_RESPONSES_E2E)
 
-    original_extract = (
-        responses_html_parser.ResponseLinkExtractor.extract_links_from_directory
-    )
+    if tmp_csv.stat().st_size == 0:
+        raise RunDirectoryValidationError(
+            "No rows with followup_additional_website found in CSV."
+        )
 
-    def limited_extract(self, initiatives_dir: str) -> list:
-        return original_extract(self, initiatives_dir)[:MAX_RESPONSES_E2E]
-
-    with (
-        patch(LOCATE_FN, return_value=str(tmp_run_dir)),
-        patch.object(
-            responses_html_parser.ResponseLinkExtractor,
-            "extract_links_from_directory",
-            limited_extract,
-        ),
-    ):
+    with patch(RESOLVE_FN, return_value=(str(tmp_run_dir), str(tmp_csv))):
         timestamp = scrape_commission_responses()
 
-    responses_path = tmp_run_dir / responses_consts.RESPONSES_DIR_NAME
+    responses_path = tmp_run_dir / followup_consts.RESPONSES_DIR_NAME
 
-    yield ResponseScrapeArtifacts(
+    yield ResponseFollowupScrapeArtifacts(
         timestamp=timestamp,
         run_dir=tmp_run_dir,
         responses_path=responses_path,
-        logs_path=tmp_run_dir / responses_consts.LOG_DIR_NAME,
-        csv_path=responses_path / responses_consts.CSV_FILENAME,
+        logs_path=tmp_run_dir / followup_consts.LOG_DIR_NAME,
+        csv_path=responses_path / followup_consts.CSV_FILENAME,
     )

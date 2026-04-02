@@ -1,17 +1,13 @@
 """
-Tests for Chrome WebDriver initialisation in the Commission responses scraper.
-
-Validates that initialize_browser delegates correctly to the shared
-browser initialiser, passing the module logger and LOG_MESSAGES.
+Tests for Chrome WebDriver initialisation in the Commission responses
+follow-up scraper.
 """
 
-from unittest.mock import call, patch
+from unittest.mock import patch
 
-import pytest
+from data_pipeline.scraper.responses_followup.browser import initialize_browser
 
-from data_pipeline.scraper.responses.browser import initialize_browser
-
-MODULE = "data_pipeline.scraper.responses.browser"
+MODULE = "data_pipeline.scraper.responses_followup.browser"
 
 
 class TestInitializeBrowser:
