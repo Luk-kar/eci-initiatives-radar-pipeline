@@ -20,7 +20,8 @@ from data_pipeline.scraper.responses_followup import consts as followup_consts
 MAX_RESPONSES_E2E = 2
 
 MAIN_MODULE = "data_pipeline.scraper.responses_followup.__main__"
-RESOLVE_FN = f"{MAIN_MODULE}._resolve_run_dir_and_csv"
+RESOLVE_DATA_DIR_FN = f"{MAIN_MODULE}._resolve_run_data_dir"
+RESOLVE_CSV_FN = f"{MAIN_MODULE}._resolve_response_csv"
 
 
 @dataclass
@@ -84,7 +85,10 @@ def e2e_scrape(tmp_path_factory) -> ResponseFollowupScrapeArtifacts:
             "No rows with followup_additional_website found in CSV."
         )
 
-    with patch(RESOLVE_FN, return_value=(str(tmp_run_dir), str(tmp_csv))):
+    with (
+        patch(RESOLVE_DATA_DIR_FN, return_value=tmp_run_dir),
+        patch(RESOLVE_CSV_FN, return_value=tmp_csv),
+    ):
         timestamp = scrape_commission_responses()
 
     responses_path = tmp_run_dir / followup_consts.RESPONSES_DIR_NAME

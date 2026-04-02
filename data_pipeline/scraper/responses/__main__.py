@@ -187,7 +187,7 @@ def _write_initial_csv(csv_path: str, response_links: List[dict]) -> None:
         [
             {
                 "url_find_initiative": link["url"],
-                "registration_number": link["reg_number"],
+                "registration_number": f"{link['year']}_{link['reg_number']}",
                 "title": link.get("title", ""),
                 "datetime": "",
             }

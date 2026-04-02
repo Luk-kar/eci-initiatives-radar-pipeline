@@ -58,7 +58,7 @@ def initiative_file(tmp_path):
     def _write(year: str, reg_number: str, html: str) -> Path:
         year_dir = tmp_path / year
         year_dir.mkdir(parents=True, exist_ok=True)
-        path = year_dir / f"{reg_number}_en.html"
+        path = year_dir / f"{year}_{reg_number}.html"
         path.write_text(html, encoding="utf-8")
         return path
 

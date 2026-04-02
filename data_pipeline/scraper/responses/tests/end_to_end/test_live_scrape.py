@@ -145,12 +145,15 @@ class TestResponsePageArtifacts:
                 ), f"Year directory {item.name!r} is not 4 digits"
 
     def test_response_filenames_end_with_en(self, e2e_scrape):
+        """Response pages are saved as {year}_{reg_number}.html."""
 
         for html_path in _collect_response_html_files(e2e_scrape.responses_path):
 
-            assert html_path.stem.endswith(
-                "_en"
-            ), f"Response filename doesn't end with _en: {html_path.name!r}"
+            parts = html_path.stem.split("_", 1)
+
+            assert (
+                len(parts) == 2 and parts[0].isdigit() and len(parts[0]) == 4
+            ), f"Response filename doesn't match {{year}}_{{number}} pattern: {html_path.name!r}"
 
     def test_response_html_is_non_trivial(self, e2e_scrape):
 
