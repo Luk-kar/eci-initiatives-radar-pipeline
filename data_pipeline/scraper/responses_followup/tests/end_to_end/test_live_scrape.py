@@ -120,7 +120,7 @@ class TestCsvArtifacts:
 
         for row in rows:
             assert row[
-                "url_find_initiative"
+                "url_response_followup"
             ].strip(), "Found a row with an empty url_find_initiative"
 
 

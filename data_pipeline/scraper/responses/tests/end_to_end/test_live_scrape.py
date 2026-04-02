@@ -119,9 +119,7 @@ class TestCsvArtifacts:
         rows = _read_csv_rows(e2e_scrape.csv_path)
 
         for row in rows:
-            assert row[
-                "url_find_initiative"
-            ].strip(), "Found a row with an empty url_find_initiative"
+            assert row["url_response"].strip(), "Found a row with an empty url_response"
 
 
 class TestResponsePageArtifacts:

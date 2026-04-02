@@ -93,7 +93,7 @@ def _download_single(
 
 def _build_record(link_data: dict, success: bool) -> dict:
     return {
-        "url_find_initiative": link_data["url"],
+        "url_response": link_data["url"],
         "registration_number": f"{link_data['year']}_{link_data['reg_number']}",
         "title": link_data.get("title", ""),
         "datetime": (

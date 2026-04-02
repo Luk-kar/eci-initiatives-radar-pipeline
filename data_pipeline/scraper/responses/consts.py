@@ -39,7 +39,7 @@ INITIATIVE_PAGES_DIR_NAME = "initiatives"
 # CSV Configuration
 CSV_FILENAME = "responses_list.csv"
 CSV_FIELDNAMES = [
-    "url_find_initiative",
+    "url_response",
     "registration_number",
     "title",
     "datetime",
