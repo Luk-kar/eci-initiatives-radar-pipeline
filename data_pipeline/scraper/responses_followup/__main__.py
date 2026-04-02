@@ -21,7 +21,7 @@ from .consts import (
     INITIATIVES_DIR_NAME,
 )
 from .log_messages import LOG_MESSAGES
-from .fetchers.responses import download_all_responses
+from .fetchers.followup import download_all_responses
 from .browser import initialize_browser
 from .file_operations.csv import write_responses_csv
 from .statistics import display_completion_summary
