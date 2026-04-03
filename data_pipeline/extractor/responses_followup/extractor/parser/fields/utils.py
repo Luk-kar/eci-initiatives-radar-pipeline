@@ -1,7 +1,12 @@
 import logging
-from typing import Optional
+import re
+from typing import List, Optional
+
 
 from bs4 import BeautifulSoup, Tag
+
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Header location
@@ -19,6 +24,11 @@ def find_answer_header(soup: BeautifulSoup) -> Optional[Tag]:
             and "Answer of the European Commission" in tag.get_text()
         )
     return header
+
+
+# ---------------------------------------------------------------------------
+# Element text extraction
+# ---------------------------------------------------------------------------
 
 
 def extract_element_with_links(element) -> str:
