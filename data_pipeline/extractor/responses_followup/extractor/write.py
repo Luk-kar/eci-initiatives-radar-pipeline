@@ -1,5 +1,5 @@
 """
-CSV writer — serializes ECIResponseRecords to the output CSV file.
+CSV writer — serializes ECIFollowupRecord to the output CSV file.
 """
 
 import csv
@@ -7,14 +7,14 @@ import logging
 from pathlib import Path
 from typing import List
 
-from ..model import ECIResponseRecord
+from ..model import ECIFollowupRecord
 from data_pipeline.pipeline_shared.consts import FILE_ENCODING
 
 
 logger = logging.getLogger(__name__)
 
 
-def write_csv(records: List[ECIResponseRecord], output_csv: Path) -> None:
+def write_csv(records: List[ECIFollowupRecord], output_csv: Path) -> None:
     """
     Serialize records and write to CSV.
 
@@ -27,7 +27,7 @@ def write_csv(records: List[ECIResponseRecord], output_csv: Path) -> None:
     output_csv.parent.mkdir(parents=True, exist_ok=True)
 
     with open(output_csv, "w", encoding=FILE_ENCODING, newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=list(ECIResponseRecord.model_fields))
+        writer = csv.DictWriter(f, fieldnames=list(ECIFollowupRecord.model_fields))
         writer.writeheader()
 
         for record in records:

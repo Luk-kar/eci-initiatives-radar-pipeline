@@ -9,17 +9,16 @@ from bs4 import BeautifulSoup
 
 from data_pipeline.pipeline_shared.consts import FILE_ENCODING
 
-from .model import ECIResponseParseHTMLRecord
+from .model import ECIFollowupParseHTMLRecord
 from .fields import (
     extract_commission_answer,
-    extract_followup_additional_website,
     extract_followup_events,
 )
 
 
 logger = logging.getLogger(__name__)
 
-CSV_COLUMNS: list[str] = list(ECIResponseParseHTMLRecord.model_fields)
+CSV_COLUMNS: list[str] = list(ECIFollowupParseHTMLRecord.model_fields)
 
 
 def parse_HTML(html_file: Path, registration_number: str) -> dict:
@@ -43,11 +42,8 @@ def parse_HTML(html_file: Path, registration_number: str) -> dict:
     with open(html_file, "r", encoding=FILE_ENCODING) as f:
         soup = BeautifulSoup(f.read(), "html.parser")
 
-    record = ECIResponseParseHTMLRecord(
+    record = ECIFollowupParseHTMLRecord(
         commission_answer_text=extract_commission_answer(soup, registration_number),
-        followup_additional_website=extract_followup_additional_website(
-            soup, registration_number
-        ),
         followup_events=extract_followup_events(soup, registration_number),
     )
 

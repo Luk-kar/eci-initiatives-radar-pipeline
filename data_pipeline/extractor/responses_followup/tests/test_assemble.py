@@ -3,7 +3,7 @@
 import pytest
 
 from data_pipeline.extractor.responses.extractor.assemble import build_records
-from data_pipeline.extractor.responses.model import ECIResponseRecord
+from data_pipeline.extractor.responses.model import ECIFollowupRecord
 
 METADATA = {
     "2020/000001": {
@@ -27,7 +27,7 @@ class TestBuildRecords:
     def test_returns_list_of_eci_response_records(self):
 
         assert all(
-            isinstance(r, ECIResponseRecord) for r in build_records(METADATA, PARSED)
+            isinstance(r, ECIFollowupRecord) for r in build_records(METADATA, PARSED)
         )
 
     def test_metadata_fields_copied(self):
@@ -47,7 +47,7 @@ class TestBuildRecords:
 
     def test_multiple_records(self):
         """
-        build_records should return one ECIResponseRecord per entry in parsed_data.
+        build_records should return one ECIFollowupRecord per entry in parsed_data.
         Verifies that the function iterates over all parsed entries, not just the first.
         """
 

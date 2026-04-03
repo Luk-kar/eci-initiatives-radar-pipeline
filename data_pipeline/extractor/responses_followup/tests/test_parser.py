@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 
 from data_pipeline.extractor.responses.extractor.parser.model import (
-    ECIResponseParseHTMLRecord,
+    ECIFollowupParseHTMLRecord,
 )
 from data_pipeline.extractor.responses.extractor.parser import parse_HTML
 
@@ -59,7 +59,7 @@ class TestParseHTML:
 
             result = parse_HTML(html_file, "2020/000001")
 
-        assert set(result.keys()) == set(ECIResponseParseHTMLRecord.model_fields.keys())
+        assert set(result.keys()) == set(ECIFollowupParseHTMLRecord.model_fields.keys())
 
     def test_commission_answer_text_in_result(self, tmp_path):
 

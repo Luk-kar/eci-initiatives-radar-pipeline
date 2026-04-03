@@ -5,7 +5,7 @@ present) and the flat list of follow-up events as plain text with links.
 """
 
 import logging
-from typing import List, Optional
+from typing import List, Optional, Dict, Union
 import re
 
 from bs4 import BeautifulSoup, Tag
@@ -41,6 +41,9 @@ def extract_followup_events(
     Raises:
         ValueError: If critical error occurs during extraction
     """
+
+    return [""]
+
     try:
         # Step 1: Locate the target section
         response_h2 = soup.find("h2", id="response-of-the-commission")

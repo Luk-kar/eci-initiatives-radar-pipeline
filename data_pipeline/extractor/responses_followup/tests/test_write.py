@@ -5,13 +5,13 @@ import json
 
 import pytest
 
-from data_pipeline.extractor.responses.model import ECIResponseRecord
+from data_pipeline.extractor.responses.model import ECIFollowupRecord
 from data_pipeline.extractor.responses.extractor.write import write_csv
 
 
 def _make_record(**kwargs):
 
-    return ECIResponseRecord(
+    return ECIFollowupRecord(
         **{
             "registration_number": "2020/000001",
             "initiative_url": "https://ec.europa.eu/initiative/1",
@@ -50,7 +50,7 @@ class TestWriteCsv:
 
         with open(out, encoding="utf-8") as f:
             assert set(csv.DictReader(f).fieldnames) == set(
-                ECIResponseRecord.model_fields.keys()
+                ECIFollowupRecord.model_fields.keys()
             )
 
     def test_row_count_matches_records(self, tmp_path):

@@ -27,6 +27,9 @@ def extract_commission_answer(
     Raises:
         ValueError: If the Commission answer section cannot be found or extracted
     """
+
+    return [""]
+
     answer_header = find_answer_header(soup)
 
     if not answer_header:

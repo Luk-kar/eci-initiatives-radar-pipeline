@@ -1,6 +1,6 @@
 """
-ECI Initiative Details Extractor
-Reads saved HTML response files and extracts structured data to CSV.
+ECI Responses Follow-up Extractor
+Reads saved HTML follow-up website files and extracts structured data to CSV.
 """
 
 from datetime import datetime

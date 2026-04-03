@@ -1,5 +1,5 @@
 """
-ECI Responses Extractor — public API.
+ECI Responses Follow-up Extractor — public API.
 
 Entry points:
     configure(timestamp) → output CSV filename
@@ -9,7 +9,7 @@ Entry points:
 import logging
 from pathlib import Path
 
-from data_pipeline.pipeline_shared.consts import ECI_RESPONSES_CSV_PATTERN
+from data_pipeline.pipeline_shared.consts import ECI_RESPONSES_FOLLOWUP_CSV_PATTERN
 
 from .session import setup
 from .collect import collect_html_files
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 def configure(timestamp: str) -> str:
     """Return the output CSV filename for this run. Must be called before run()."""
-    return ECI_RESPONSES_CSV_PATTERN.format(timestamp=timestamp)
+    return ECI_RESPONSES_FOLLOWUP_CSV_PATTERN.format(timestamp=timestamp)
 
 
 def run(output_csv_name: str, timestamp: str) -> None:
@@ -34,13 +34,13 @@ def run(output_csv_name: str, timestamp: str) -> None:
     if timestamp is None or output_csv_name is None:
         raise RuntimeError("Extractor is not configured. Call configure() first.")
 
-    html_dir, output_csv, initiatives_csv, step_logger = setup(
+    html_dir, output_csv, followup_list_csv, step_logger = setup(
         timestamp, output_csv_name
     )
     logger = step_logger
 
     html_files = collect_html_files(html_dir)
-    metadata = load_metadata(initiatives_csv, html_files)
+    metadata = load_metadata(followup_list_csv, html_files)
     parsed_data = parse_html_files(html_files)
     records = build_records(metadata, parsed_data)
 

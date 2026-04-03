@@ -14,16 +14,18 @@ class ECIResponseRecord(BaseModel):
 
     # --- Core metadata (copied from responses_list.csv) ---
     registration_number: str
-    initiative_url: str
+    initiative_url: str  # For debug purposes
     response_url: str
     title: str
 
     # --- Extracted from response HTML ---
+    # List instead of a single string to keep text partitioned by HTML code
     commission_answer_text: Optional[List[str]] = None
     followup_additional_website: Optional[str] = None
 
     # List fields — serialized as JSON strings for flat CSV compatibility
-    followup_events: Optional[List[str]] = None  # plain-text descriptions with links
+    # List instead of a single string to keep text partitioned by HTML code
+    followup_events: Optional[List[str]] = None
 
     @field_serializer("followup_events")
     def serialize_list_as_json(self, value: Optional[List[str]]) -> Optional[str]:

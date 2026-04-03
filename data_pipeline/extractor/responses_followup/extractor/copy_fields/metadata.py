@@ -7,13 +7,15 @@ responses_list.csv.
 
 from typing import Dict
 
-from .model import ECIInitiativeInheritedRecord
+from .model import ECIResponseInheritedRecord
 
 
-def extract_metadata(csv_record: dict) -> ECIInitiativeInheritedRecord:
-    return ECIInitiativeInheritedRecord(
+def extract_metadata(csv_record: dict) -> ECIResponseInheritedRecord:
+
+    return ECIResponseInheritedRecord(
         registration_number=csv_record["registration_number"],
-        initiative_url=csv_record["url"],
-        response_url=csv_record["response_commission_url"],
+        initiative_url=csv_record["initiative_url"],
+        response_url=csv_record["response_url"],
+        followup_url=csv_record["followup_additional_website"],
         title=csv_record["title"],
     )

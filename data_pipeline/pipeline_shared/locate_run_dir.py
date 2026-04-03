@@ -13,6 +13,7 @@ from pathlib import Path
 
 from data_pipeline.pipeline_shared.consts import LOG_DIR_NAME, FILE_ENCODING
 from .errors import RunDirectoryValidationError
+from .consts import HTML_DOMAIN_ECI_PORTAL
 
 logger = logging.getLogger(__name__)
 
@@ -21,12 +22,13 @@ logger = logging.getLogger(__name__)
 _MIN_HTML_BYTES = 256
 
 # Tokens that must appear in a valid ECI initiative HTML page
-_REQUIRED_HTML_TOKENS = ("<html", "citizens-initiative.europa.eu")
+_REQUIRED_HTML_TOKEN = "<html"
 
 
 def find_newest_scraped_data_dir(
     data_dir: Path,
     dir_name: str,
+    domain: str = HTML_DOMAIN_ECI_PORTAL,
 ) -> Path:
     """
     Return the most recent timestamped run directory under *data_dir*
@@ -58,7 +60,7 @@ def find_newest_scraped_data_dir(
     logger.info("Newest run directory: %s", newest)
 
     try:
-        validate_run_dir(newest, dir_name)
+        validate_run_dir(newest, dir_name, domain)
     except RunDirectoryValidationError as exc:
         logger.error("Run directory validation failed: %s", exc)
         raise
@@ -66,10 +68,7 @@ def find_newest_scraped_data_dir(
     return newest
 
 
-def validate_run_dir(
-    run_dir: Path,
-    dir_name: str,
-) -> None:
+def validate_run_dir(run_dir: Path, dir_name: str, domain: str) -> None:
     """
     Validate that *run_dir* has the expected structure and valid HTML content.
 
@@ -99,7 +98,7 @@ def validate_run_dir(
     for year_dir in year_dirs:
         html_files = _validate_html_files_present(year_dir)
         for html_file in html_files:
-            _validate_html_content(html_file)
+            _validate_html_content(html_file, domain)
 
     logger.info("Run directory validated successfully: %s", run_dir)
 
@@ -166,7 +165,7 @@ def _validate_html_files_present(year_dir: Path) -> list[Path]:
     return html_files
 
 
-def _validate_html_content(html_file: Path) -> None:
+def _validate_html_content(html_file: Path, domain: str) -> None:
     """
     Check that *html_file* is non-trivially populated and contains
     the expected ECI HTML tokens.
@@ -192,7 +191,7 @@ def _validate_html_content(html_file: Path) -> None:
 
     content_lower = content.lower()
 
-    for token in _REQUIRED_HTML_TOKENS:
+    for token in (_REQUIRED_HTML_TOKEN, domain):
         if token.lower() not in content_lower:
             raise RunDirectoryValidationError(
                 f"HTML file missing expected token {token!r}: {html_file}"

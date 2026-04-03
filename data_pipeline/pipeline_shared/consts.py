@@ -27,13 +27,11 @@ DATA_DIR = PIPELINE_DIR / DATA_DIR_NAME
 # ── Scraper output subdirectory modules ────────────────────────────────────────
 INITIATIVES_DIR_NAME = "initiatives"
 RESPONSES_DIR_NAME = "responses"
-RESPONSES_FOLLOWUP_DIR_NAME = "responses_followup_website"
+RESPONSES_FOLLOWUP_DIR_NAME = "responses_followup"
 
 # ── Scraper output subdirectory names ──────────────────────────────────────────
 # Used by scraper to write, and by extractor/merger/renamer to read.
 LISTINGS_DIR_NAME = "listings"
-RESPONSES_DIR_NAME = "responses"
-RESPONSES_FOLLOWUP_DIR_NAME = "responses_followup"
 
 # ── HTML page filename pattern ─────────────────────────────────────────────────
 # Produced by scraper, consumed by extractor.
@@ -87,3 +85,11 @@ LOG_DASHBOARD_PATTERN = "dashboard_{timestamp}.log"
 # Formats
 TIMESTAMP_FORMAT = "%Y-%m-%d_%H-%M-%S"
 FILE_ENCODING = "utf-8"
+
+# ── HTML content validation tokens ────────────────────────────────────────────
+# Used by locate_run_dir to verify that sampled HTML files originate from the
+# expected domain before extraction begins.
+HTML_DOMAIN_ECI_PORTAL = "citizens-initiative.europa.eu"  # initiatives + responses
+HTML_DOMAIN_EC_FOLLOWUP = "ec.europa.eu"  # responses_followup
+
+ECI_RESPONSES_CSV_GLOB: str = "eci_responses_*.csv"
