@@ -16,6 +16,6 @@ def extract_metadata(csv_record: dict) -> ECIResponseInheritedRecord:
         registration_number=csv_record["registration_number"],
         initiative_url=csv_record["initiative_url"],
         response_url=csv_record["response_url"],
-        followup_url=csv_record["followup_additional_website"],
+        followup_url=csv_record["followup_url"],
         title=csv_record["title"],
     )

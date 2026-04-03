@@ -89,7 +89,7 @@ class TestParseHTML:
 
             result = parse_HTML(html_file, "2020/000001")
 
-        assert result["followup_additional_website"] == "https://followup.example.com"
+        assert result["followup_url"] == "https://followup.example.com"
         assert result["followup_events"] == ["Event 1", "Event 2"]
 
     def test_missing_file_raises(self, tmp_path):

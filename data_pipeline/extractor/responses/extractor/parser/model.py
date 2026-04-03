@@ -8,7 +8,7 @@ class ECIResponseParseHTMLRecord(BaseModel):
 
     # --- Extracted from response HTML ---
     commission_answer_text: Optional[List[str]] = None
-    followup_additional_website: Optional[str] = None
+    followup_url: Optional[str] = None
 
     # List fields — serialized as JSON strings for flat CSV compatibility
     followup_events: Optional[List[str]] = None  # plain-text descriptions with links

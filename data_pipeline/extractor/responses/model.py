@@ -21,7 +21,7 @@ class ECIResponseRecord(BaseModel):
     # --- Extracted from response HTML ---
     # List instead of a single string to keep text partitioned by HTML code
     commission_answer_text: Optional[List[str]] = None
-    followup_additional_website: Optional[str] = None
+    followup_url: Optional[str] = None
 
     # List fields — serialized as JSON strings for flat CSV compatibility
     # List instead of a single string to keep text partitioned by HTML code
