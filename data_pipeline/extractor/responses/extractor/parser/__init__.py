@@ -39,7 +39,7 @@ def parse_HTML(html_file: Path, registration_number: str) -> dict:
         ValueError: If parsing fails for any reason; the original
                     exception is chained via ``__cause__``.
     """
-    # try:
+
     with open(html_file, "r", encoding=FILE_ENCODING) as f:
         soup = BeautifulSoup(f.read(), "html.parser")
 
@@ -51,6 +51,3 @@ def parse_HTML(html_file: Path, registration_number: str) -> dict:
 
     logger.info("Successfully parsed %s", html_file.name)
     return record.model_dump()
-
-    # except Exception as exc:
-    #     raise ValueError(f"Error parsing {html_file}") from exc
