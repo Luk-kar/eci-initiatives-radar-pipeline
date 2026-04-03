@@ -11,7 +11,7 @@ This document describes the fields extracted from the European Citizens' Initiat
 | `objective` | `str` | Yes | Organizers must provide a summary of the subject matter and objectives. The portal always renders this core text on the initiative's page. |
 | `annex` | `Optional[str]` | No | Organizers *may* choose to attach an annex providing more detailed background or a draft legal act, but it is not legally required. If they don't submit one, the HTML section is simply absent. |
 | `current_status` | `str` | Yes | The portal always displays the current lifecycle phase (e.g., "Collecting", "Closed", "Answered") to inform citizens of its legal standing. |
-| `url` | `str` | Yes | The EU portal generates a dedicated public webpage for every successfully registered initiative. |
+| `initiative_url` | `str` | Yes | The EU portal generates a dedicated public webpage for every successfully registered initiative. |
 | `timeline_registered` | `str` | Yes | This is the official date the Commission registered the initiative. It is the starting point of the legal process and is always published in the portal's timeline. |
 | `timeline_collection_start_date` | `Optional[str]` | No | Organizers have up to 6 months after registration to choose their collection start date. A newly registered initiative may not have selected or published this date yet. |
 | `timeline_collection_closed` | `Optional[str]` | No | The collection period lasts 12 months. If the initiative is still actively collecting signatures, the official closing date may not be reached or confirmed in the HTML timeline yet. |
@@ -24,7 +24,7 @@ This document describes the fields extracted from the European Citizens' Initiat
 | `signatures_collected` | `Optional[str]` | No | The portal displays this based on the Central Online Collection System. Newly registered initiatives will have no data. Older initiatives might lack this if they used private collection systems or if final verified numbers haven't been published yet. |
 | `signatures_collected_by_country` | `Optional[str]` | No | The HTML map/table showing the breakdown by member state is only populated when active collection data is available or after final verification is published. |
 | `signatures_threshold_met` | `Optional[str]` | No | An initiative must reach a minimum threshold of signatures in at least 7 member states. The portal only confirms this status after national authorities complete the official verification phase. |
-| `response_commission_url` | `Optional[str]` | No | This link is only added to the HTML if the initiative succeeds and the Commission publishes its official legal communication in response. |
+| `response_url` | `Optional[str]` | No | This link is only added to the HTML if the initiative succeeds and the Commission publishes its official legal communication in response. |
 
 ## Expected Structure Notes
 

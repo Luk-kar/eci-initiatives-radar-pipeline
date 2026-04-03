@@ -76,7 +76,7 @@ class ECIHTMLParser:
                 objective=extract_objective(soup),
                 annex=extract_annex(soup),
                 current_status=extract_current_status(soup),
-                url=url,
+                initiative_url=url,
                 timeline_registered=timeline_data.get("timeline_registered"),
                 timeline_collection_start_date=timeline_data.get(
                     "timeline_collection_start_date"
@@ -101,7 +101,7 @@ class ECIHTMLParser:
                     soup, html_file, title, url
                 ),
                 signatures_threshold_met=extract_signatures_threshold_met(soup),
-                response_commission_url=extract_response_commission_url(soup),
+                response_url=extract_response_commission_url(soup),
             )
 
             self.logger.info("Successfully parsed %s", html_file.name)

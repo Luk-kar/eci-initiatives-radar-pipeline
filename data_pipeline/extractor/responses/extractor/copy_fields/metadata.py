@@ -13,7 +13,7 @@ from .model import ECIInitiativeInheritedRecord
 def extract_metadata(csv_record: dict) -> ECIInitiativeInheritedRecord:
     return ECIInitiativeInheritedRecord(
         registration_number=csv_record["registration_number"],
-        initiative_url=csv_record["url"],
-        response_url=csv_record["response_commission_url"],
+        initiative_url=csv_record["initiative_url"],
+        response_url=csv_record["response_url"],
         title=csv_record["title"],
     )

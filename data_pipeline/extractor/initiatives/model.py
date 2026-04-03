@@ -85,7 +85,7 @@ class ECIInitiativeDetailsRecord(BaseModel):
     objective: str
     annex: Optional[str]
     current_status: str
-    url: str
+    initiative_url: str
 
     timeline_registered: str
     timeline_collection_start_date: Optional[str]
@@ -105,4 +105,4 @@ class ECIInitiativeDetailsRecord(BaseModel):
     ] = None
     signatures_threshold_met: Optional[str]
 
-    response_commission_url: Optional[str]
+    response_url: Optional[str]

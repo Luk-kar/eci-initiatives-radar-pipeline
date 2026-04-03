@@ -11,7 +11,7 @@ def construct_url(reg_number: str) -> str:
     """
     if not reg_number:
         raise FieldValueError(
-            field="url",
+            field="initiative_url",
             value=reg_number,
             message=(
                 "Cannot construct URL: registration number is empty or None. "
@@ -22,7 +22,7 @@ def construct_url(reg_number: str) -> str:
     parts = reg_number.split(RegistrationNumberFormat.SEPARATOR)
     if len(parts) != 2:
         raise FieldValueError(
-            field="url",
+            field="initiative_url",
             value=reg_number,
             message=(
                 f"Cannot construct URL: registration number {reg_number!r} "
