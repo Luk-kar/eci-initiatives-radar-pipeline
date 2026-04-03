@@ -44,7 +44,7 @@ class TestECIHTMLParserParse:
     @pytest.fixture()
     def sample_html(self, tmp_path) -> Path:
 
-        src = FIXTURES_DIR / "2020_000001_en.html"
+        src = FIXTURES_DIR / "2020_000001.html"
         dest = tmp_path / "2023" / "2023_000008.html"
         dest.parent.mkdir(parents=True)
         dest.write_text(src.read_text(encoding=FILE_ENCODING), encoding=FILE_ENCODING)
@@ -115,7 +115,7 @@ class TestECIHTMLParserParse:
 
     def test_parse_raises_value_error_on_malformed_html(self, parser, tmp_path):
 
-        bad_html = tmp_path / "2023" / "2023_000001_en.html"
+        bad_html = tmp_path / "2023" / "2023_000001.html"
         bad_html.parent.mkdir(parents=True)
         bad_html.write_text("<not valid", encoding=FILE_ENCODING)
 
@@ -128,7 +128,7 @@ class TestECIHTMLParserParse:
 
     def test_parse_chains_original_exception(self, parser, tmp_path):
 
-        bad_html = tmp_path / "2023" / "2023_000001_en.html"
+        bad_html = tmp_path / "2023" / "2023_000001.html"
         bad_html.parent.mkdir(parents=True)
         bad_html.write_text("<html></html>", encoding=FILE_ENCODING)
 

@@ -5,9 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from data_pipeline.extractor.responses.extractor.parser.model import (
-    ECIFollowupParseHTMLRecord,
-)
+from data_pipeline.extractor.responses_followup.model import ECIFollowupRecord
 from data_pipeline.extractor.responses.extractor.parser import parse_HTML
 
 HTML = "<html><body><p>Commission response.</p></body></html>"

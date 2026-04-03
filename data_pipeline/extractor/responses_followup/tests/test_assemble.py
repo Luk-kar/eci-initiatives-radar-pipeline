@@ -3,7 +3,7 @@
 import pytest
 
 from data_pipeline.extractor.responses.extractor.assemble import build_records
-from data_pipeline.extractor.responses.model import ECIFollowupRecord
+from data_pipeline.extractor.responses_followup.model import ECIFollowupRecord
 
 METADATA = {
     "2020/000001": {

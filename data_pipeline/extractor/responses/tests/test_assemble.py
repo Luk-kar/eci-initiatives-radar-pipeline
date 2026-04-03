@@ -8,8 +8,8 @@ from data_pipeline.extractor.responses.model import ECIResponseRecord
 METADATA = {
     "2020/000001": {
         "registration_number": "2020/000001",
-        "url": "https://ec.europa.eu/initiative/1",
-        "response_commission_url": "https://ec.europa.eu/response/1",
+        "initiative_url": "https://ec.europa.eu/initiative/1",
+        "response_url": "https://ec.europa.eu/response/1",
         "title": "Save The Bees",
     }
 }
@@ -55,8 +55,8 @@ class TestBuildRecords:
             **METADATA,
             "2021/000002": {
                 "registration_number": "2021/000002",
-                "url": "u2",
-                "response_commission_url": "r2",
+                "initiative_url": "u2",
+                "response_url": "r2",
                 "title": "Clean Air",
             },
         }

@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from data_pipeline.extractor.responses.model import ECIFollowupRecord
+from data_pipeline.extractor.responses_followup.model import ECIFollowupRecord
 
 
 MINIMAL = {

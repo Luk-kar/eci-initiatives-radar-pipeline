@@ -11,8 +11,8 @@ from data_pipeline.extractor.responses.extractor.copy_fields.model import (
 
 CSV_ROW = {
     "registration_number": "2020/000001",
-    "url": "https://ec.europa.eu/initiative/1",
-    "response_commission_url": "https://ec.europa.eu/response/1",
+    "initiative_url": "https://ec.europa.eu/initiative/1",
+    "response_url": "https://ec.europa.eu/response/1",
     "title": "Save The Bees",
 }
 
@@ -43,8 +43,8 @@ class TestExtractMetadata:
 
         row = {
             "registration_number": "2021/000042",
-            "url": "https://ec.europa.eu/initiative/42",
-            "response_commission_url": "https://ec.europa.eu/response/42",
+            "initiative_url": "https://ec.europa.eu/initiative/42",
+            "response_url": "https://ec.europa.eu/response/42",
             "title": "Clean Air Now",
         }
         result = extract_metadata(row)
