@@ -1,10 +1,12 @@
-"""Tests for data_pipeline.extractor.responses.extractor.configure."""
+"""Tests for data_pipeline.extractor.responses_followup.extractor.configure."""
 
 from unittest.mock import patch
 
-from data_pipeline.extractor.responses.extractor import configure
+# FIX: import from responses_followup (not responses)
+from data_pipeline.extractor.responses_followup.extractor import configure
 
-PATTERN = "eci_responses_{timestamp}.csv"
+# FIX: pattern updated to match ECI_RESPONSES_FOLLOWUP_CSV_PATTERN naming convention
+PATTERN = "eci_responses_followup_{timestamp}.csv"
 
 
 class TestConfigure:
@@ -12,30 +14,32 @@ class TestConfigure:
     def test_returns_string(self):
 
         with patch(
-            "data_pipeline.extractor.responses.extractor.ECI_RESPONSES_CSV_PATTERN",
+            "data_pipeline.extractor.responses_followup.extractor.ECI_RESPONSES_FOLLOWUP_CSV_PATTERN",
             PATTERN,
         ):
 
             assert isinstance(configure("2026-03-30_14-00-00"), str)
 
     def test_timestamp_embedded_in_filename(self):
+
         timestamp = "2026-03-30_14-00-00"
 
         with patch(
-            "data_pipeline.extractor.responses.extractor.ECI_RESPONSES_CSV_PATTERN",
+            "data_pipeline.extractor.responses_followup.extractor.ECI_RESPONSES_FOLLOWUP_CSV_PATTERN",
             PATTERN,
         ):
             result = configure(timestamp)
 
         assert timestamp in result
-        assert result.startswith("eci_responses_")
+
+        assert result.startswith("eci_responses_followup_")
         assert result.endswith(".csv")
-        assert result == f"eci_responses_{timestamp}.csv"
+        assert result == f"eci_responses_followup_{timestamp}.csv"
 
     def test_different_timestamps_produce_different_filenames(self):
 
         with patch(
-            "data_pipeline.extractor.responses.extractor.ECI_RESPONSES_CSV_PATTERN",
+            "data_pipeline.extractor.responses_followup.extractor.ECI_RESPONSES_FOLLOWUP_CSV_PATTERN",
             PATTERN,
         ):
 

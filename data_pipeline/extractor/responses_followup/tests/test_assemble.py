@@ -2,21 +2,22 @@
 
 import pytest
 
-from data_pipeline.extractor.responses.extractor.assemble import build_records
+from data_pipeline.extractor.responses_followup.extractor.assemble import build_records
 from data_pipeline.extractor.responses_followup.model import ECIFollowupRecord
 
 METADATA = {
     "2020/000001": {
         "registration_number": "2020/000001",
-        "url": "https://ec.europa.eu/initiative/1",
-        "response_commission_url": "https://ec.europa.eu/response/1",
+        "initiative_url": "https://ec.europa.eu/initiative/1",
+        "response_url": "https://ec.europa.eu/response/1",
+        "followup_url": "https://ec.europa.eu/followup/1",
         "title": "Save The Bees",
     }
 }
+
 PARSED = {
     "2020/000001": {
         "commission_answer_text": ["The Commission will act."],
-        "followup_additional_website": None,
         "followup_events": None,
     }
 }
@@ -38,6 +39,7 @@ class TestBuildRecords:
         assert r.title == "Save The Bees"
         assert r.initiative_url == "https://ec.europa.eu/initiative/1"
         assert r.response_url == "https://ec.europa.eu/response/1"
+        assert r.followup_url == "https://ec.europa.eu/followup/1"
 
     def test_parsed_fields_merged(self):
 
@@ -55,16 +57,16 @@ class TestBuildRecords:
             **METADATA,
             "2021/000002": {
                 "registration_number": "2021/000002",
-                "url": "u2",
-                "response_commission_url": "r2",
+                "initiative_url": "u2",
+                "response_url": "r2",
+                "followup_url": "f2",
                 "title": "Clean Air",
             },
         }
         parsed = {
             **PARSED,
             "2021/000002": {
-                "commission_answer_text": None,
-                "followup_additional_website": None,
+                "commission_answer_text": ["Answer text for Clean Air."],
                 "followup_events": None,
             },
         }
@@ -81,8 +83,7 @@ class TestBuildRecords:
 
         parsed = {
             "2020/MISSING": {
-                "commission_answer_text": None,
-                "followup_additional_website": None,
+                "commission_answer_text": ["Some answer text here."],
                 "followup_events": None,
             }
         }

@@ -1,12 +1,17 @@
-"""Tests for responses.extractor.parser (parse_HTML)."""
+"""Tests for responses_followup.extractor.parser (parse_HTML)."""
 
 from contextlib import contextmanager, ExitStack
 from unittest.mock import patch
 
 import pytest
 
-from data_pipeline.extractor.responses_followup.model import ECIFollowupRecord
-from data_pipeline.extractor.responses.extractor.parser import parse_HTML
+
+from data_pipeline.extractor.responses_followup.extractor.parser.model import (
+    ECIFollowupParseHTMLRecord,
+)
+
+
+from data_pipeline.extractor.responses_followup.extractor.parser import parse_HTML
 
 HTML = "<html><body><p>Commission response.</p></body></html>"
 
@@ -19,29 +24,31 @@ def _write_html(tmp_path, content=HTML):
 
 
 @contextmanager
-def _mock_extractors(ca=None, fw=None, fe=None, lp=None):
+def _mock_extractors(ca=None, fe=None):
+    """
+    Mock the two active extractor functions in the parser module.
+
+    FIX: removed mocks for 'extract_followup_additional_website' and
+         'extract_linked_policies' — neither function exists in the current
+         parser.fields module.  Only 'extract_commission_answer' and
+         'extract_followup_events' are imported and called.
+    """
     with ExitStack() as stack:
         stack.enter_context(
             patch(
-                "data_pipeline.extractor.responses.extractor.parser.extract_commission_answer",
+                "data_pipeline.extractor.responses_followup.extractor.parser.extract_commission_answer",
                 return_value=ca,
             )
         )
         stack.enter_context(
             patch(
-                "data_pipeline.extractor.responses.extractor.parser.extract_followup_additional_website",
-                return_value=fw,
-            )
-        )
-        stack.enter_context(
-            patch(
-                "data_pipeline.extractor.responses.extractor.parser.extract_followup_events",
+                "data_pipeline.extractor.responses_followup.extractor.parser.extract_followup_events",
                 return_value=fe,
             )
         )
         stack.enter_context(
             patch(
-                "data_pipeline.extractor.responses.extractor.parser.FILE_ENCODING",
+                "data_pipeline.extractor.responses_followup.extractor.parser.FILE_ENCODING",
                 "utf-8",
             )
         )
@@ -49,6 +56,7 @@ def _mock_extractors(ca=None, fw=None, fe=None, lp=None):
 
 
 class TestParseHTML:
+
     def test_returns_dict_with_model_fields(self, tmp_path):
 
         html_file = _write_html(tmp_path)
@@ -72,7 +80,6 @@ class TestParseHTML:
         assert isinstance(commission_answer_text, list)
         assert all(isinstance(item, str) for item in commission_answer_text)
         assert len(commission_answer_text) == 1
-
         assert commission_answer_text == ["The Commission responds."]
 
     def test_list_fields_preserved(self, tmp_path):
@@ -80,14 +87,13 @@ class TestParseHTML:
         html_file = _write_html(tmp_path)
 
         with _mock_extractors(
-            fw="https://followup.example.com",
+            ca=["Commission answer text here."],
             fe=["Event 1", "Event 2"],
-            lp=["Regulation (EU) 1/2020"],
         ):
 
             result = parse_HTML(html_file, "2020/000001")
 
-        assert result["followup_additional_website"] == "https://followup.example.com"
+        assert result["commission_answer_text"] == ["Commission answer text here."]
         assert result["followup_events"] == ["Event 1", "Event 2"]
 
     def test_missing_file_raises(self, tmp_path):

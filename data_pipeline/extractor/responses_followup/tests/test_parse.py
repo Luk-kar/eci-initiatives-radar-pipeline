@@ -1,17 +1,19 @@
-"""Tests for responses.extractor.parse."""
+"""Tests for responses_followup.extractor.parse."""
 
 from unittest.mock import patch
 
 import pytest
 
 from data_pipeline.extractor.extractor_shared.errors import HTMLParseError
-from data_pipeline.extractor.responses.extractor.parse import (
+
+
+from data_pipeline.extractor.responses_followup.extractor.parse import (
     parse_html_files,
 )
 
+
 PARSED_DICT = {
     "commission_answer_text": None,
-    "followup_additional_website": None,
     "followup_events": None,
 }
 
@@ -23,7 +25,7 @@ class TestParseHtmlFiles:
         html_files = {"2020/000001": tmp_path / "2020_000001_en.html"}
 
         with patch(
-            "data_pipeline.extractor.responses.extractor.parse.parse_HTML",
+            "data_pipeline.extractor.responses_followup.extractor.parse.parse_HTML",
             return_value=PARSED_DICT,
         ):
 
@@ -38,7 +40,7 @@ class TestParseHtmlFiles:
             "2021/000002": tmp_path / "2021_000002_en.html",
         }
         with patch(
-            "data_pipeline.extractor.responses.extractor.parse.parse_HTML",
+            "data_pipeline.extractor.responses_followup.extractor.parse.parse_HTML",
             return_value=PARSED_DICT,
         ):
 
@@ -51,7 +53,7 @@ class TestParseHtmlFiles:
         html_files = {"2020/000001": tmp_path / "2020_000001_en.html"}
 
         with patch(
-            "data_pipeline.extractor.responses.extractor.parse.parse_HTML",
+            "data_pipeline.extractor.responses_followup.extractor.parse.parse_HTML",
             side_effect=ValueError("bad HTML"),
         ):
 
@@ -66,7 +68,7 @@ class TestParseHtmlFiles:
         html_files = {"2020/000001": tmp_path / "2020_000001_en.html"}
 
         with patch(
-            "data_pipeline.extractor.responses.extractor.parse.parse_HTML",
+            "data_pipeline.extractor.responses_followup.extractor.parse.parse_HTML",
             side_effect=original,
         ):
 
@@ -77,7 +79,9 @@ class TestParseHtmlFiles:
 
     def test_empty_html_files_returns_empty_dict(self):
 
-        with patch("data_pipeline.extractor.responses.extractor.parse.parse_HTML"):
+        with patch(
+            "data_pipeline.extractor.responses_followup.extractor.parse.parse_HTML"
+        ):
             result = parse_html_files({})
 
         assert not result

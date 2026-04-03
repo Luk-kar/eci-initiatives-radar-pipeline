@@ -30,6 +30,8 @@ def parse_html_files(html_files: Dict[str, Path]) -> Dict[str, dict]:
         try:
             parsed_data[reg_number] = parse_HTML(html_path, reg_number)
         except Exception as exc:
-            raise HTMLParseError(f"Failed to parse HTML for {reg_number}") from exc
+            raise HTMLParseError(
+                f"Failed to parse HTML for {reg_number}.\nThe error:\n{exc}"
+            ) from exc
 
     return parsed_data

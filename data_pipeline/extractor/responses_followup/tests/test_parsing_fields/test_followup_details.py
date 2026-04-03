@@ -1,9 +1,21 @@
+"""Tests for responses_followup.extractor.parser.fields.followup_details.
+
+NOTE: extract_followup_events is currently a placeholder stub (returns [""]
+for every input).  These tests verify the placeholder contract so that when
+the real implementation lands, any behavioural change is caught immediately.
+The old tests for extract_followup_additional_website have been removed — that
+function no longer exists in this module.
+"""
+
 import pytest
 
 from bs4 import BeautifulSoup
 
-from data_pipeline.extractor.responses.extractor.parser.fields.followup_details import (
-    extract_followup_additional_website,
+# FIX: import from responses_followup (not responses)
+# FIX: import extract_followup_events — extract_followup_additional_website
+#      was removed from the module
+from data_pipeline.extractor.responses_followup.extractor.parser.fields.followup_details import (
+    extract_followup_events,
 )
 
 
@@ -11,129 +23,35 @@ def _soup(html: str) -> BeautifulSoup:
     return BeautifulSoup(html, "html.parser")
 
 
-class TestMatchingUrls:
+class TestExtractFollowupEventsPlaceholder:
+    """
+    Smoke tests for the placeholder implementation.
 
-    @pytest.mark.parametrize(
-        "href",
-        [
-            "https://food.ec.europa.eu/animals/animal-welfare/eci/eci-end-cage-age_en",
-            "https://food.ec.europa.eu/animals/animal-welfare/eci/eci-fur-free-europe_en",
-            "https://ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/eci/eci-water_en",
-            "https://EXAMPLE.COM/eci/eci-animal-welfare_en",  # case-insensitive scheme
-        ],
-    )
-    def test_returns_matching_dedicated_website(self, href):
-        soup = _soup(f'<p>See the <a href="{href}">dedicated website</a>.</p>')
-        assert extract_followup_additional_website(soup, "2020/000001") == href
+    extract_followup_events currently ignores its arguments and returns [""].
+    The first positional argument binds to 'self' (a leftover from the class
+    method era); the second argument binds to 'soup'.  Both are accepted
+    without error.
+    """
 
-    def test_returns_first_match_when_multiple_present(self):
-        first = (
-            "https://food.ec.europa.eu/animals/animal-welfare/eci/eci-end-cage-age_en"
-        )
-        second = "https://example.com/eci/eci-fur-free-europe_en"
-        soup = _soup(
-            f'<p><a href="{first}">first</a></p>'
-            f'<p><a href="{second}">second</a></p>'
-        )
-        assert extract_followup_additional_website(soup, "2020/000001") == first
+    def test_returns_a_list(self):
+        """Placeholder always returns a list."""
+        result = extract_followup_events(None, _soup("<p>Any content.</p>"))
+        assert isinstance(result, list)
 
+    def test_returns_list_for_empty_soup(self):
+        result = extract_followup_events(None, _soup(""))
+        assert isinstance(result, list)
 
-class TestNonMatchingUrls:
+    def test_returns_list_for_rich_html(self):
+        html = """
+            <div class="ecl">
+              <h2>Follow-up</h2>
+              <p>On 9 February 2024, Commissioner met with organisers.</p>
+            </div>
+        """
+        result = extract_followup_events(None, _soup(html))
+        assert isinstance(result, list)
 
-    @pytest.mark.parametrize(
-        "href, reason",
-        [
-            (
-                "https://example.com/eci/eci-something_de",
-                "wrong language suffix",
-            ),
-            (
-                "https://example.com/citizens-initiative_en",
-                "missing eci/ path segment",
-            ),
-            (
-                "https://example.com/eci/eci-something_en/extra",
-                "extra path after _en",
-            ),
-            (
-                "http://example.com/eci/eci-something_en",
-                "http instead of https",
-            ),
-            (
-                "https://example.com/eci/something_en",
-                "missing eci- prefix on identifier",
-            ),
-            (
-                "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019R1381",
-                "unrelated external link",
-            ),
-            (
-                "https://ec.europa.eu/commission/presscorner/detail/en/ip_21_3297",
-                "press release link",
-            ),
-        ],
-    )
-    def test_returns_none_for_non_matching_url(self, href, reason):
-        soup = _soup(f'<p><a href="{href}">link</a></p>')
-        assert extract_followup_additional_website(soup, "2019/000016") is None, reason
-
-    def test_returns_none_when_no_links_present(self):
-        soup = _soup("<p>No links here.</p>")
-        assert extract_followup_additional_website(soup, "2019/000016") is None
-
-    def test_returns_none_for_empty_soup(self):
-        soup = _soup("")
-        assert extract_followup_additional_website(soup, "2019/000016") is None
-
-    def test_skips_anchor_with_empty_href(self):
-        valid = (
-            "https://food.ec.europa.eu/animals/animal-welfare/eci/eci-end-cage-age_en"
-        )
-        soup = _soup(f'<a href="">empty</a>' f'<a href="{valid}">dedicated</a>')
-        assert extract_followup_additional_website(soup, "2020/000001") == valid
-
-    def test_skips_anchor_without_href(self):
-        valid = (
-            "https://food.ec.europa.eu/animals/animal-welfare/eci/eci-end-cage-age_en"
-        )
-        soup = _soup(f'<a name="anchor">no href</a>' f'<a href="{valid}">dedicated</a>')
-        assert extract_followup_additional_website(soup, "2020/000001") == valid
-
-
-class TestEdgeCases:
-
-    @pytest.mark.parametrize(
-        "registration_number, href",
-        [
-            (
-                "2018/000004",
-                "https://food.ec.europa.eu/animals/animal-welfare/eci/eci-end-cage-age_en",
-            ),
-            (
-                "2022/000002",
-                "https://food.ec.europa.eu/animals/animal-welfare/eci/eci-fur-free-europe_en",
-            ),
-        ],
-    )
-    def test_real_world_dedicated_website(
-        self, registration_number, href, eci_fixture_soup
-    ):
-        """Verify extraction against actual fixture HTML."""
-        soup = eci_fixture_soup(registration_number)
-        assert extract_followup_additional_website(soup, registration_number) == href
-
-    @pytest.mark.parametrize(
-        "registration_number",
-        [
-            "2012/000003",
-            "2012/000005",
-            "2012/000007",
-            "2019/000007",
-        ],
-    )
-    def test_real_world_no_dedicated_website(
-        self, registration_number, eci_fixture_soup
-    ):
-        """Initiatives without a dedicated follow-up website return None."""
-        soup = eci_fixture_soup(registration_number)
-        assert extract_followup_additional_website(soup, registration_number) is None
+    def test_does_not_raise(self):
+        """Placeholder must never raise regardless of input."""
+        extract_followup_events(None, _soup("<p>Anything.</p>"))

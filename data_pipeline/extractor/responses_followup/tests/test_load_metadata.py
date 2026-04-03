@@ -1,16 +1,28 @@
-"""Tests for responses.extractor.load_metadata."""
+"""Tests for responses_followup.extractor.load_metadata."""
 
 import csv
 from unittest.mock import patch
 
 import pytest
 
-from data_pipeline.extractor.responses.extractor.load_metadata import (
+# FIX: all imports updated from 'responses.extractor' to 'responses_followup.extractor'
+from data_pipeline.extractor.responses_followup.extractor.load_metadata import (
     _load_responses_metadata,
 )
 
 FILE_ENCODING = "utf-8"
-FIELDNAMES = ["registration_number", "url", "response_commission_url", "title"]
+
+# FIX: FIELDNAMES updated to match current CSV schema:
+#   'url' → 'initiative_url'
+#   'response_commission_url' → 'response_url'
+#   added 'followup_url'
+FIELDNAMES = [
+    "registration_number",
+    "initiative_url",
+    "response_url",
+    "followup_url",
+    "title",
+]
 
 
 def _write_csv(path, rows):
@@ -22,6 +34,17 @@ def _write_csv(path, rows):
         writer.writerows(rows)
 
 
+# Helper to build a minimal valid CSV row with current field names
+def _row(reg, initiative_url="u", response_url="r", followup_url="f", title="T"):
+    return {
+        "registration_number": reg,
+        "initiative_url": initiative_url,
+        "response_url": response_url,
+        "followup_url": followup_url,
+        "title": title,
+    }
+
+
 class TestLoadResponsesMetadata:
 
     def test_filters_by_reg_numbers(self, tmp_path):
@@ -30,23 +53,25 @@ class TestLoadResponsesMetadata:
         _write_csv(
             csv_path,
             [
-                {
-                    "registration_number": "2020/000001",
-                    "url": "u1",
-                    "response_commission_url": "r1",
-                    "title": "T1",
-                },
-                {
-                    "registration_number": "2020/000002",
-                    "url": "u2",
-                    "response_commission_url": "r2",
-                    "title": "T2",
-                },
+                _row(
+                    "2020/000001",
+                    initiative_url="u1",
+                    response_url="r1",
+                    followup_url="f1",
+                    title="T1",
+                ),
+                _row(
+                    "2020/000002",
+                    initiative_url="u2",
+                    response_url="r2",
+                    followup_url="f2",
+                    title="T2",
+                ),
             ],
         )
 
         with patch(
-            "data_pipeline.extractor.responses.extractor.load_metadata.FILE_ENCODING",
+            "data_pipeline.extractor.responses_followup.extractor.load_metadata.FILE_ENCODING",
             FILE_ENCODING,
         ):
             result = _load_responses_metadata(csv_path, reg_numbers={"2020/000001"})
@@ -60,26 +85,30 @@ class TestLoadResponsesMetadata:
         _write_csv(
             csv_path,
             [
-                {
-                    "registration_number": "2020/000001",
-                    "url": "u1",
-                    "response_commission_url": "r1",
-                    "title": "T1",
-                },
+                _row(
+                    "2020/000001",
+                    initiative_url="u1",
+                    response_url="r1",
+                    followup_url="f1",
+                    title="T1",
+                )
             ],
         )
 
         with patch(
-            "data_pipeline.extractor.responses.extractor.load_metadata.FILE_ENCODING",
+            "data_pipeline.extractor.responses_followup.extractor.load_metadata.FILE_ENCODING",
             FILE_ENCODING,
         ):
 
             result = _load_responses_metadata(csv_path, reg_numbers={"2020/000001"})
 
-        assert result["2020/000001"]["registration_number"] == "2020/000001"
-        assert result["2020/000001"]["url"] == "u1"
-        assert result["2020/000001"]["response_commission_url"] == "r1"
-        assert result["2020/000001"]["title"] == "T1"
+        row = result["2020/000001"]
+        assert row["registration_number"] == "2020/000001"
+
+        assert row["initiative_url"] == "u1"
+        assert row["response_url"] == "r1"
+        assert row["followup_url"] == "f1"
+        assert row["title"] == "T1"
 
     def test_empty_reg_numbers_returns_empty(self, tmp_path):
 
@@ -87,16 +116,18 @@ class TestLoadResponsesMetadata:
         _write_csv(
             csv_path,
             [
-                {
-                    "registration_number": "2020/000001",
-                    "url": "u1",
-                    "response_commission_url": "r1",
-                    "title": "T1",
-                },
+                _row(
+                    "2020/000001",
+                    initiative_url="u1",
+                    response_url="r1",
+                    followup_url="f1",
+                    title="T1",
+                )
             ],
         )
+
         with patch(
-            "data_pipeline.extractor.responses.extractor.load_metadata.FILE_ENCODING",
+            "data_pipeline.extractor.responses_followup.extractor.load_metadata.FILE_ENCODING",
             FILE_ENCODING,
         ):
 
@@ -113,12 +144,13 @@ class TestLoadMetadata:
         _write_csv(
             csv_path,
             [
-                {
-                    "registration_number": "2020/000001",
-                    "url": "u1",
-                    "response_commission_url": "r1",
-                    "title": "T1",
-                },
+                _row(
+                    "2020/000001",
+                    initiative_url="u1",
+                    response_url="r1",
+                    followup_url="f1",
+                    title="T1",
+                )
             ],
         )
 
@@ -128,10 +160,11 @@ class TestLoadMetadata:
         }
 
         with patch(
-            "data_pipeline.extractor.responses.extractor.load_metadata.FILE_ENCODING",
+            "data_pipeline.extractor.responses_followup.extractor.load_metadata.FILE_ENCODING",
             FILE_ENCODING,
         ):
-            from data_pipeline.extractor.responses.extractor.load_metadata import (
+
+            from data_pipeline.extractor.responses_followup.extractor.load_metadata import (
                 load_metadata,
             )
 
@@ -144,22 +177,23 @@ class TestLoadMetadata:
         _write_csv(
             csv_path,
             [
-                {
-                    "registration_number": "2020/000001",
-                    "url": "u1",
-                    "response_commission_url": "r1",
-                    "title": "T1",
-                },
+                _row(
+                    "2020/000001",
+                    initiative_url="u1",
+                    response_url="r1",
+                    followup_url="f1",
+                    title="T1",
+                )
             ],
         )
 
         html_files = {"2020/000001": tmp_path / "2020_000001_en.html"}
 
         with patch(
-            "data_pipeline.extractor.responses.extractor.load_metadata.FILE_ENCODING",
+            "data_pipeline.extractor.responses_followup.extractor.load_metadata.FILE_ENCODING",
             FILE_ENCODING,
         ):
-            from data_pipeline.extractor.responses.extractor.load_metadata import (
+            from data_pipeline.extractor.responses_followup.extractor.load_metadata import (
                 load_metadata,
             )
 

@@ -1,274 +1,186 @@
-# data_pipeline/extractor/responses/parser/fields/commission_answer.py
 """
-Commission answer extractor — extracts the full text of the Commission's
+Commission answer extractor — extracts the full text of the Commission\'s
 response to the ECI, preserving inline hyperlinks as plain text with URLs.
 """
 
 import logging
 from typing import Optional, List
-import re
 
 from bs4 import BeautifulSoup, Tag
 
-from .utils import find_answer_header, extract_element_with_links
+from .utils import extract_element_with_links
 
 logger = logging.getLogger(__name__)
 
+_RESPONSE_HEADER_ID = "response-of-the-commission"
+_RESPONSE_HEADER_TEXT = "Response of the Commission"
+_HEADING_TAGS = frozenset({"h1", "h2", "h3", "h4", "h5", "h6"})
 
-# TODO it is a placeholder now
+
 def extract_commission_answer(
-    soup: BeautifulSoup, registration_number: str
+    soup: BeautifulSoup,
+    registration_number: str,
 ) -> Optional[List[str]]:
-    """Extract main conclusions text from Communication, excluding factsheet downloads.
+    """Extract the full text of the \'Response of the Commission\' section,
+    preserving inline hyperlinks.
 
-    If the Answer section contains insufficient content (only decision date and document links),
-    extract one additional paragraph from the Follow-up section.
+    The section is identified by an h2 with id=\'response-of-the-commission\'
+    (or matching text).  Collection stops as soon as the next heading tag
+    (h1–h6) is encountered.
 
     Raises:
-        ValueError: If the Commission answer section cannot be found or extracted
+        ValueError: If the section cannot be found or contains no content.
     """
 
-    return [""]
+    response_h2 = _find_response_header(soup)
 
-    answer_header = find_answer_header(soup)
+    if not response_h2:
 
-    if not answer_header:
         raise ValueError(
-            "Could not find 'Answer of the European Commission' section for "
+            "Could not find 'Response of the Commission' section for "
             f"{registration_number}"
         )
 
-    content_parts, followup_header = _collect_answer_content(answer_header)
+    content_parts = _collect_response_content(response_h2)
 
     if not content_parts:
+
         raise ValueError(
-            "No content found in 'Answer of the European Commission' section for "
+            "No content found in 'Response of the Commission' section for "
             f"{registration_number}"
         )
 
-    if _is_answer_insufficient(content_parts) and followup_header:
-
-        content_parts = _supplement_with_followup(content_parts, followup_header)
-
     return content_parts
 
 
 # ---------------------------------------------------------------------------
-# Section traversal
+# Header location
 # ---------------------------------------------------------------------------
 
 
-def _is_section_boundary(tag: Tag) -> tuple[bool, bool]:
-    """Return (is_boundary, is_followup) for a given sibling tag."""
+def _find_response_header(soup: BeautifulSoup) -> Optional[Tag]:
+    """Locate the h2 tag for \'Response of the Commission\'.
 
-    if tag.name == "h2":
+    Prefers the stable id-based lookup; falls back to an exact text match.
+    """
 
-        h2_id = tag.get("id", "")
-        h2_text = tag.get_text(strip=True)
+    h2 = soup.find("h2", id=_RESPONSE_HEADER_ID)
 
-        is_followup = "Follow-up" in h2_text or h2_id == "Follow-up"
-        is_other = h2_id and h2_id != "Answer-of-the-European-Commission"
+    if h2:
+        return h2
 
-        return (is_followup or is_other), is_followup
+    for candidate in soup.find_all("h2"):
 
-    if tag.name == "h4" and "Follow-up" in tag.get_text(strip=True):
-        return True, True
+        if candidate.get_text(strip=True) == _RESPONSE_HEADER_TEXT:
+            return candidate
 
-    return False, False
-
-
-def _should_skip(tag: Tag) -> bool:
-    """Return True for non-content elements: factsheet downloads, banners, document link lists."""
-
-    if tag.name == "div" and "ecl-file" in tag.get("class", []):
-        return True
-
-    if tag.name == "div" and tag.get("data-inpage-navigation-source-area"):
-        return True
-
-    if tag.name == "ul" and _is_document_links_list(tag):
-        return True
-
-    return False
+    return None
 
 
-def _collect_answer_content(answer_header: Tag) -> tuple[list[str], Optional[Tag]]:
-    """Walk siblings from the Answer header, accumulate text, and return the Follow-up header if found."""
-
-    content_parts = []
-    followup_header = None
-    current = answer_header.find_next_sibling()
-
-    while current:
-
-        is_boundary, is_followup = _is_section_boundary(current)
-
-        if is_boundary:
-
-            if is_followup:
-                followup_header = current
-
-            break
-
-        if not _should_skip(current) and current.name:
-
-            element_text = extract_element_with_links(current)
-
-            if element_text:
-                content_parts.append(element_text)
-
-        current = current.find_next_sibling()
-
-    return content_parts, followup_header
+# ---------------------------------------------------------------------------
+# Content extraction
+# ---------------------------------------------------------------------------
 
 
-def _supplement_with_followup(
-    content_parts: list[str], followup_header: Tag
-) -> list[str]:
-    """Append the first Follow-up paragraph to the Answer content parts."""
+def _collect_response_content(response_h2: Tag) -> List[str]:
+    """Collect content after the Response h2, stopping at the next heading tag.
 
-    followup_paragraph = _extract_first_followup_paragraph(followup_header)
+    Supports two DOM layouts:
 
-    if followup_paragraph:
-        content_parts.append(followup_paragraph)
+    Container-based (ECL)::
+
+        div.ecl-u-mb-2xl
+          a#paragraph_NNN
+          div                     ← wrapper_div
+            div.ecl               ← header block  (holds response_h2)
+            div.ecl               ← content block (paragraphs, lists, …)
+
+    Flat (fallback)::
+
+        <h2 id="response-of-the-commission">…</h2>
+        <p>…</p>
+        <ul>…</ul>
+        <h2 id="next-section">…</h2>
+
+    In both cases the scan halts the moment an h1–h6 is encountered.
+    """
+
+    header_ecl_div = response_h2.parent  # immediate parent of the h2
+    wrapper_div = header_ecl_div.parent if header_ecl_div else None
+
+    content_parts: List[str] = []
+
+    if wrapper_div:
+        content_parts = _walk_wrapper_children(header_ecl_div, wrapper_div)
+
+    # Fallback: flat layout — h2 and content are direct siblings
+    if not content_parts:
+
+        logger.debug(
+            "Container-based traversal yielded nothing; "
+            "falling back to flat sibling walk"
+        )
+        content_parts = _walk_next_siblings(response_h2)
 
     return content_parts
 
 
-# ---------------------------------------------------------------------------
-# Content classification
-# ---------------------------------------------------------------------------
+def _walk_wrapper_children(
+    header_ecl_div: Tag,
+    wrapper_div: Tag,
+) -> List[str]:
+    """Walk children of wrapper_div after the header block.
 
-
-def _is_document_links_list(ul_element) -> bool:
-    """Check if a <ul> element contains only document links (Communication, Annex, etc.)
-
-    Args:
-        ul_element: BeautifulSoup <ul> element
-
-    Returns:
-        True if the list only contains document links, False otherwise
+    Stops as soon as a child block itself contains any heading tag (h1–h6),
+    which signals the start of the next section.
     """
-    if not ul_element or ul_element.name != "ul":
-        return False
 
-    list_items = ul_element.find_all("li", recursive=False)
+    content_parts: List[str] = []
+    after_header = False
 
-    if not list_items:
-        return False
+    for child in wrapper_div.children:
 
-    # Check if all list items contain only document link text
-    document_link_patterns = [
-        r"^\s*Communication\s*$",
-        r"^\s*Annex(es)?\s*$",
-        r"^\s*Staff Working Document\s*$",
-        r"^\s*SWD\s*$",
-    ]
-
-    for li in list_items:
-        li_text = li.get_text(strip=True)
-
-        # Check if text matches any document link pattern
-        is_doc_link = False
-        for pattern in document_link_patterns:
-            if re.match(pattern, li_text, re.IGNORECASE):
-                is_doc_link = True
-                break
-
-        if not is_doc_link:
-            return False  # Contains non-document content
-
-    return True  # All items are document links
-
-
-def _is_answer_insufficient(content_parts: List[str]) -> bool:
-    """Check if extracted answer text is insufficient.
-
-    Answer is considered insufficient if it's very short and only contains:
-    - Decision date
-    - Document links or references
-
-    Args:
-        text: The extracted answer text
-
-    Returns:
-        True if answer is insufficient, False otherwise
-    """
-    text_one_string = "\n".join(content_parts).strip()
-
-    # Remove whitespace and newlines for analysis
-    normalized = re.sub(r"\s+", " ", text_one_string).strip()
-
-    # Check length - if very short (less than 250 chars), might be insufficient
-    if len(normalized) > 250:
-        return False
-
-    # Check if it contains typical insufficient content patterns
-    has_decision_date = bool(re.search(r"Decision\s+date:", normalized, re.IGNORECASE))
-    has_doc_reference = bool(
-        re.search(r"Official\s+documents\s+related\s+to", normalized, re.IGNORECASE)
-    )
-
-    # Count meaningful sentences (excluding common metadata phrases)
-    # Remove decision date line
-    text_cleaned = re.sub(
-        r"Decision\s+date:[^\n]*", "", normalized, flags=re.IGNORECASE
-    )
-    # Remove official documents line
-    text_cleaned = re.sub(
-        r"Official\s+documents\s+related\s+to[^\n]*",
-        "",
-        text_cleaned,
-        flags=re.IGNORECASE,
-    )
-    # Clean up extra whitespace
-    text_cleaned = re.sub(r"\s+", " ", text_cleaned).strip()
-
-    # If after removing metadata, there's very little content left, it's insufficient
-    if has_decision_date and has_doc_reference and len(text_cleaned) < 30:
-        return True
-
-    # Also check if it's ONLY a decision date
-    if has_decision_date and len(text_cleaned) < 30:
-        return True
-
-    return False
-
-
-# ---------------------------------------------------------------------------
-# Text extraction
-# ---------------------------------------------------------------------------
-
-
-def _extract_first_followup_paragraph(followup_header) -> str:
-    """Extract the first meaningful paragraph from Follow-up section.
-
-    Args:
-        followup_header: BeautifulSoup element representing the Follow-up h2 header
-
-    Returns:
-        Text of the first paragraph, or empty string if none found
-    """
-    current = followup_header.find_next_sibling()
-
-    while current:
-        # Stop at next h2 section
-        if current.name == "h2":
-            break
-
-        # Skip factsheet file download components
-        if current.name == "div" and "ecl-file" in current.get("class", []):
-
-            current = current.find_next_sibling()
+        if not isinstance(child, Tag):
             continue
 
-        # Extract first meaningful paragraph
-        if current.name == "p":
+        if child is header_ecl_div:
+            after_header = True
+            continue
 
-            element_text = extract_element_with_links(current)
-            if element_text and len(element_text.strip()) > 20:  # Meaningful content
-                return element_text
+        if not after_header:
+            continue
 
-        current = current.find_next_sibling()
+        # Any heading inside this block marks a new section — stop here.
+        if child.find(_HEADING_TAGS):
+            break
 
-    return ""
+        for element in child.children:
+
+            if not isinstance(element, Tag):
+                continue
+
+            text = extract_element_with_links(element)
+
+            if text:
+                content_parts.append(text)
+
+    return content_parts
+
+
+def _walk_next_siblings(response_h2: Tag) -> List[str]:
+    """Fallback: collect direct next-siblings of response_h2 until a heading."""
+
+    content_parts: List[str] = []
+
+    for sibling in response_h2.find_next_siblings():
+
+        # Stop on a bare heading sibling OR a block that wraps a heading.
+        if sibling.name in _HEADING_TAGS or sibling.find(_HEADING_TAGS):
+            break
+
+        text = extract_element_with_links(sibling)
+
+        if text:
+            content_parts.append(text)
+
+    return content_parts

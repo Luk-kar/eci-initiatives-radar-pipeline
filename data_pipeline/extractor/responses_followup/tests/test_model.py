@@ -1,4 +1,4 @@
-"""Tests for responses.extractor.responses.model."""
+"""Tests for responses_followup.model."""
 
 import json
 
@@ -11,24 +11,28 @@ MINIMAL = {
     "registration_number": "2020/000001",
     "initiative_url": "https://ec.europa.eu/initiative/1",
     "response_url": "https://ec.europa.eu/response/1",
+    "followup_url": "https://ec.europa.eu/followup/1",
     "title": "Test Initiative",
+    "commission_answer_text": ["The Commission will act on this matter."],
 }
 
 
 class TestECIFollowupRecord:
+
     def test_required_fields_only(self):
 
         record = ECIFollowupRecord(**MINIMAL)
+
         assert record.registration_number == "2020/000001"
-        assert record.commission_answer_text is None
+        assert record.commission_answer_text == [
+            "The Commission will act on this matter."
+        ]
         assert record.followup_events is None
 
     def test_all_fields(self):
 
         record = ECIFollowupRecord(
             **MINIMAL,
-            commission_answer_text=["The Commission answers…", "and that's all folks!"],
-            followup_additional_website="https://example.com",
             followup_events=["Event A", "Event B"],
         )
         assert record.followup_events == ["Event A", "Event B"]

@@ -1,4 +1,4 @@
-"""Tests for responses.extractor.write."""
+"""Tests for responses_followup.extractor.write."""
 
 import csv
 import json
@@ -6,17 +6,26 @@ import json
 import pytest
 
 from data_pipeline.extractor.responses_followup.model import ECIFollowupRecord
-from data_pipeline.extractor.responses.extractor.write import write_csv
+
+
+from data_pipeline.extractor.responses_followup.extractor.write import write_csv
 
 
 def _make_record(**kwargs):
+    """Build a minimal valid ECIFollowupRecord.
 
+    FIX: added required fields that were missing:
+      - 'followup_url'           (str, required)
+      - 'commission_answer_text' (List[str], required, non-Optional)
+    """
     return ECIFollowupRecord(
         **{
             "registration_number": "2020/000001",
             "initiative_url": "https://ec.europa.eu/initiative/1",
             "response_url": "https://ec.europa.eu/response/1",
+            "followup_url": "https://ec.europa.eu/followup/1",
             "title": "Test Initiative",
+            "commission_answer_text": ["The Commission will act."],
             **kwargs,
         }
     )
@@ -76,7 +85,12 @@ class TestWriteCsv:
 
         assert row["followup_events"] == json.dumps(["A", "B"], ensure_ascii=False)
 
-    def test_none_fields_written_as_empty_string(self, tmp_path):
+    def test_none_followup_events_written_as_empty_string(self, tmp_path):
+        """
+        FIX: renamed and narrowed from the previous test_none_fields_written_as_empty_string.
+        Only 'followup_events' is Optional — 'commission_answer_text' is a required
+        List[str] and is therefore always present in a valid record.
+        """
 
         out = tmp_path / "result.csv"
         write_csv([_make_record()], out)
@@ -84,5 +98,4 @@ class TestWriteCsv:
         with open(out, encoding="utf-8") as f:
             row = next(csv.DictReader(f))
 
-        assert row["commission_answer_text"] == ""
         assert row["followup_events"] == ""

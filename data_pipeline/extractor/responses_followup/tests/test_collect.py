@@ -1,11 +1,11 @@
-"""Tests for responses.extractor.collect."""
+"""Tests for responses_followup.extractor.collect."""
 
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
-from data_pipeline.extractor.responses.extractor.collect import (
+from data_pipeline.extractor.responses_followup.extractor.collect import (
     collect_html_files,
     _scan_html_files,
 )
@@ -35,7 +35,7 @@ class TestCollectHtmlFiles:
         _create_html_file(tmp_path, "2021", "2021_000002.html")
 
         with patch(
-            "data_pipeline.extractor.responses.extractor.collect.FilePatterns.FILENAME_REGEX",
+            "data_pipeline.extractor.responses_followup.extractor.collect.FilePatterns.FILENAME_REGEX",
             FILENAME_REGEX,
         ):
 
@@ -48,7 +48,7 @@ class TestCollectHtmlFiles:
     def test_raises_when_no_html_files(self, tmp_path):
 
         with patch(
-            "data_pipeline.extractor.responses.extractor.collect.FilePatterns.FILENAME_REGEX",
+            "data_pipeline.extractor.responses_followup.extractor.collect.FilePatterns.FILENAME_REGEX",
             FILENAME_REGEX,
         ):
 
@@ -58,8 +58,9 @@ class TestCollectHtmlFiles:
     def test_raises_when_directory_has_only_empty_subdirs(self, tmp_path):
 
         (tmp_path / "2020").mkdir()
+
         with patch(
-            "data_pipeline.extractor.responses.extractor.collect.FilePatterns.FILENAME_REGEX",
+            "data_pipeline.extractor.responses_followup.extractor.collect.FilePatterns.FILENAME_REGEX",
             FILENAME_REGEX,
         ):
 
@@ -68,13 +69,14 @@ class TestCollectHtmlFiles:
 
 
 class TestScanHtmlFiles:
+
     def test_skips_unrecognised_filenames(self, tmp_path):
 
         _create_html_file(tmp_path, "2020", "invalid_name.html")
         _create_html_file(tmp_path, "2020", "2020_000001.html")
 
         with patch(
-            "data_pipeline.extractor.responses.extractor.collect.FilePatterns.FILENAME_REGEX",
+            "data_pipeline.extractor.responses_followup.extractor.collect.FilePatterns.FILENAME_REGEX",
             FILENAME_REGEX,
         ):
 
@@ -86,7 +88,7 @@ class TestScanHtmlFiles:
     def test_returns_empty_dict_for_no_files(self, tmp_path):
 
         with patch(
-            "data_pipeline.extractor.responses.extractor.collect.FilePatterns.FILENAME_REGEX",
+            "data_pipeline.extractor.responses_followup.extractor.collect.FilePatterns.FILENAME_REGEX",
             FILENAME_REGEX,
         ):
 
@@ -100,7 +102,7 @@ class TestScanHtmlFiles:
             _create_html_file(tmp_path, year, f"{year}_000001.html")
 
         with patch(
-            "data_pipeline.extractor.responses.extractor.collect.FilePatterns.FILENAME_REGEX",
+            "data_pipeline.extractor.responses_followup.extractor.collect.FilePatterns.FILENAME_REGEX",
             FILENAME_REGEX,
         ):
 
