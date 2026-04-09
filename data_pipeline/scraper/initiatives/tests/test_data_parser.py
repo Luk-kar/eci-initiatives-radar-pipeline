@@ -9,6 +9,8 @@ cards, and formats the extracted data into the expected structures.
 # Local
 from data_pipeline.scraper.initiatives.html_parser import parse_initiatives_list_data
 
+import pytest
+
 BASE_URL = "https://citizens-initiative.europa.eu"
 
 _HREFS = [
@@ -115,9 +117,14 @@ class TestRegistrationNumberFormat:
 
         assert result[0]["registration_number"] == "2024/000006"
 
-    def test_unrecognized_format_left_unchanged(self):
+    def test_unrecognized_format_raises_error(self):
 
         html = make_listing_html_with_meta([_HREFS[0]], ["UNKNOWN-FORMAT"])
-        result = parse_initiatives_list_data(html, BASE_URL)
 
-        assert result[0]["registration_number"] == "UNKNOWN-FORMAT"
+        # Assert that the ValueError is raised with the correct message
+        with pytest.raises(ValueError) as exc_info:
+            parse_initiatives_list_data(html, BASE_URL)
+
+        assert "Invalid ECI registration number format: 'UNKNOWN-FORMAT'" in str(
+            exc_info.value
+        )

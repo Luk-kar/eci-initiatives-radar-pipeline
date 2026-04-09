@@ -12,6 +12,7 @@ import datetime
 import os
 from collections import Counter
 from typing import Dict
+import logging
 
 # Local modules
 from data_pipeline.pipeline_shared.consts import FILE_ENCODING
@@ -23,7 +24,7 @@ from .consts import (
     LISTINGS_DIR_NAME,
     PAGES_DIR_NAME,
 )
-from data_pipeline.pipeline_shared import logger
+from ._logger import logger
 from .log_messages import LOG_MESSAGES
 
 
