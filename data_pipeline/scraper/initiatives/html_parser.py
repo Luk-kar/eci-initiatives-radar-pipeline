@@ -8,6 +8,7 @@ downstream processing and storage.
 """
 
 # Python Standard Library
+import re
 from typing import Dict
 
 # Third-party
@@ -52,8 +53,11 @@ def parse_initiatives_list_data(
 
             if text.startswith("Current status:"):
                 current_status = text.replace("Current status:", "").strip()
+
             elif text.startswith("Registration number:"):
-                registration_number = text.replace("Registration number:", "").strip()
+                raw = text.replace("Registration number:", "").strip()
+                registration_number = re.sub(r"^ECI\((\d{4})\)(\d+)$", r"\1/\2", raw)
+
             elif "signature collection" in text.lower():
                 signature_collection = text.strip()
 

@@ -90,3 +90,34 @@ class TestParseInitiativesListData:
         result_b = parse_initiatives_list_data(html, "https://host-b.example.com")
         assert len(result_a) > 0 and len(result_b) > 0
         assert result_a[0]["url"] != result_b[0]["url"]
+
+
+def make_listing_html_with_meta(hrefs: list[str], reg_numbers: list[str]) -> str:
+    cards = "".join(
+        f"""<div class="ecl-content-block ecl-content-item__content-block">
+          <div class="ecl-content-block__title">
+            <a class="ecl-link" href="{href}">Initiative {i}</a>
+          </div>
+          <span class="ecl-content-block__secondary-meta-label">
+            Registration number: {reg}
+          </span>
+        </div>"""
+        for i, (href, reg) in enumerate(zip(hrefs, reg_numbers), 1)
+    )
+    return f"<html><body>{cards}</body></html>"
+
+
+class TestRegistrationNumberFormat:
+    def test_eci_format_converted_to_slash_format(self):
+
+        html = make_listing_html_with_meta([_HREFS[0]], ["ECI(2024)000006"])
+        result = parse_initiatives_list_data(html, BASE_URL)
+
+        assert result[0]["registration_number"] == "2024/000006"
+
+    def test_unrecognized_format_left_unchanged(self):
+
+        html = make_listing_html_with_meta([_HREFS[0]], ["UNKNOWN-FORMAT"])
+        result = parse_initiatives_list_data(html, BASE_URL)
+
+        assert result[0]["registration_number"] == "UNKNOWN-FORMAT"
