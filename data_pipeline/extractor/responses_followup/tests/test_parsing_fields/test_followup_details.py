@@ -11,9 +11,6 @@ import pytest
 
 from bs4 import BeautifulSoup
 
-# FIX: import from responses_followup (not responses)
-# FIX: import extract_followup_events — extract_followup_additional_website
-#      was removed from the module
 from data_pipeline.extractor.responses_followup.extractor.parser.fields.followup_details import (
     extract_followup_events,
 )
@@ -23,35 +20,29 @@ def _soup(html: str) -> BeautifulSoup:
     return BeautifulSoup(html, "html.parser")
 
 
-class TestExtractFollowupEventsPlaceholder:
-    """
-    Smoke tests for the placeholder implementation.
+class TestExtractFollowupEvents:
 
-    extract_followup_events currently ignores its arguments and returns [""].
-    The first positional argument binds to 'self' (a leftover from the class
-    method era); the second argument binds to 'soup'.  Both are accepted
-    without error.
-    """
+    def test_raises_on_none_soup(self):
+        with pytest.raises(TypeError, match="BeautifulSoup"):
+            extract_followup_events(None, "2016_000001")
 
-    def test_returns_a_list(self):
-        """Placeholder always returns a list."""
-        result = extract_followup_events(None, _soup("<p>Any content.</p>"))
-        assert isinstance(result, list)
+    def test_raises_when_no_response_section(self):
+        soup = _soup("<p>Any content.</p>")
+        with pytest.raises(ValueError, match="2016_000001"):
+            extract_followup_events(soup, "2016_000001")
 
-    def test_returns_list_for_empty_soup(self):
-        result = extract_followup_events(None, _soup(""))
-        assert isinstance(result, list)
+    def test_raises_for_empty_soup(self):
+        soup = _soup("")
+        with pytest.raises(ValueError, match="2016_000001"):
+            extract_followup_events(soup, "2016_000001")
 
-    def test_returns_list_for_rich_html(self):
+    def test_raises_when_followup_heading_only_no_response(self):
         html = """
             <div class="ecl">
               <h2>Follow-up</h2>
               <p>On 9 February 2024, Commissioner met with organisers.</p>
             </div>
         """
-        result = extract_followup_events(None, _soup(html))
-        assert isinstance(result, list)
-
-    def test_does_not_raise(self):
-        """Placeholder must never raise regardless of input."""
-        extract_followup_events(None, _soup("<p>Anything.</p>"))
+        soup = _soup(html)
+        with pytest.raises(ValueError, match="2016_000001"):
+            extract_followup_events(soup, "2016_000001")
