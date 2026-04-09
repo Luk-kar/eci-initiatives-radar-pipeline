@@ -15,13 +15,13 @@ from .log_messages import LOG_MESSAGES
 
 
 class ResponseLinkExtractor:
-    """Extract Commission response links from initiative page HTML files."""
+    """Extract Commission response links from responses page HTML files."""
 
     def extract_links_from_directory(self, base_dir: str) -> List[Dict[str, str]]:
-        """Extract all Commission response links from an initiative pages directory.
+        """Extract all Commission follow-up links from an responses pages directory.
 
         Args:
-            base_dir: Directory containing <year>/<reg_number>_en.html files.
+            base_dir: Directory containing <year>/<reg_number>.html files.
 
         Returns:
             List of dicts with 'url', 'year', 'reg_number', 'title'.
@@ -33,7 +33,7 @@ class ResponseLinkExtractor:
             if not year_dir.is_dir():
                 continue
 
-            for html_file in year_dir.glob("*_en.html"):
+            for html_file in year_dir.glob("*.html"):
                 link_data = self.extract_links_from_file(str(html_file))
                 if link_data:
                     response_links.append(link_data)

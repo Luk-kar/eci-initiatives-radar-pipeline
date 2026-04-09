@@ -56,4 +56,4 @@ RETRY_WAIT_BASE = (2.0, 2.5)  # Base time for retry exponential backoff
 RESPONSES_CSV_GLOB = "eci_responses_*.csv"
 
 # Column in eci_responses_*.csv that holds the follow-up website URL.
-FOLLOWUP_URL_COLUMN = "followup_additional_website"
+FOLLOWUP_URL_COLUMN = "followup_url"

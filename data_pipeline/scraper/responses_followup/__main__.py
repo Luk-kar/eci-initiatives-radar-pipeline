@@ -157,13 +157,26 @@ def _read_followup_links_from_csv(csv_path: str) -> list[dict]:
 
     try:
         with open(csv_path, encoding=FILE_ENCODING, newline="") as f:
+
             reader = csv.DictReader(f)
+
+            # ── Column presence guard ────────────────────────────────────
+            if (
+                reader.fieldnames is None
+                or FOLLOWUP_URL_COLUMN not in reader.fieldnames
+            ):
+                raise ValueError(
+                    f"Required column {FOLLOWUP_URL_COLUMN!r} not found in {csv_path}. "
+                    f"Available columns: {list(reader.fieldnames or [])}"
+                )
+            # ─────────────────────────────────────────────────────────────
+
             for row in reader:
                 url = row.get(FOLLOWUP_URL_COLUMN, "").strip()
                 if not url:
                     continue
 
-                reg = row.get("registration_number", "").strip()
+                reg = row["registration_number"].strip()
                 # Normalise both underscore and slash separators.
                 parts = reg.replace("_", "/").split("/")
                 if len(parts) != 2 or not parts[0].isdigit():
@@ -178,7 +191,7 @@ def _read_followup_links_from_csv(csv_path: str) -> list[dict]:
                         "url": url,
                         "year": year,
                         "reg_number": reg_number,
-                        "title": row.get("title", "").strip(),
+                        "title": row["title"].strip(),
                         "datetime": "",
                     }
                 )
