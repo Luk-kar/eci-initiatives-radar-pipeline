@@ -83,7 +83,7 @@ def save_initiative_page(
 
     parts = url.rstrip("/").split("/")
     year = parts[-2]
-    number = parts[-1]
+    number = parts[-1].split("_")[0]  # strip language suffix, e.g. '_en'
 
     if debug:
 

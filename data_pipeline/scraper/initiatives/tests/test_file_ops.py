@@ -28,7 +28,7 @@ from data_pipeline.pipeline_shared.consts import FILE_ENCODING
 MODULE = "data_pipeline.scraper.initiatives.file_operations"
 
 URL = "https://host/2023/000001_en"
-EXPECTED_FILENAME = "2023_000001_en.html"
+EXPECTED_FILENAME = "2023_000001.html"
 YEAR = "2023"
 HTML = "<html><body>initiative content</body></html>"
 
