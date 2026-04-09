@@ -99,20 +99,23 @@ def _find_followup_start_h2(response_h2: Tag, registration_number: str) -> Tag:
             section.
     """
 
+    # Pass 1 — ECL class (modern layout)
     start_h2 = response_h2.find_next("h2", class_="ecl-u-type-heading-2")
+
+    # Pass 2 — bare h2 (flat legacy layout)
+    if not start_h2:
+        start_h2 = response_h2.find_next("h2")
 
     if not start_h2:
         raise ValueError(
             f"No content section found after 'Response of the Commission' "
             f"for {registration_number}"
         )
-
     if start_h2.get("id") in _STOP_SECTION_IDS:
         raise ValueError(
             f"No follow-up content section found after 'Response of the "
             f"Commission' for {registration_number}"
         )
-
     return start_h2
 
 
@@ -136,8 +139,15 @@ def _collect_content_elements(start_h2: Tag) -> List[str]:
     current = start_h2.find_next()
 
     while current:
-        if current.name == "h2" and "ecl-u-type-heading-2" in current.get("class", []):
-            if current.get("id") in _STOP_SECTION_IDS:
+        if current.name == "h2":
+
+            is_section_boundary = "ecl-u-type-heading-2" in current.get(
+                "class", []
+            ) or not current.get(
+                "class"
+            )  # flat legacy layout — bare h2
+
+            if is_section_boundary and current.get("id") in _STOP_SECTION_IDS:
                 break
             # Non-stop h2 (e.g. "Supporting measures") — continue collecting
 
