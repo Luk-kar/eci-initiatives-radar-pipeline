@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import ast
 import csv
+from dataclasses import fields as dataclass_fields
 import logging
 import sys
 from datetime import datetime
@@ -49,18 +50,13 @@ from data_pipeline.pipeline_shared.consts import (
 from data_pipeline.pipeline_shared.errors import RunDirectoryValidationError
 from data_pipeline.pipeline_shared.logger import get_logger
 
-from .extractor import LegislationResult, analyse_row
+from .extractor import LegislationResult, analyse_row, LegislationResult
 
 # ── Module-level logger (populated after get_logger() is called in main()) ────
 logger = logging.getLogger(__name__)
 
 # ── Output CSV ────────────────────────────────────────────────────────────────
-_OUTPUT_FIELDNAMES: list[str] = [
-    "registration_number",
-    "Law_Passed",
-    "Is_Law_Passed",
-    "Rejected_Legislation",
-]
+_OUTPUT_FIELDNAMES: list[str] = [f.name for f in dataclass_fields(LegislationResult)]
 
 # ── Source-column documentation (not enforced here; used for clarity) ─────────
 _RESPONSES_COLS = ("registration_number", "commission_answer_text")
