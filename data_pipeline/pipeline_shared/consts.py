@@ -65,7 +65,9 @@ ECI_RESPONSES_FOLLOWUP_CSV_PATTERN = "eci_responses_followup_{timestamp}.csv"
 
 # ── Merger CSV output filename pattern ─────────────────────────────────────────
 # Produced by merger, consumed by renamer.
-ECI_MERGER_CSV_PATTERN = "eci_merger_responses_and_followup_{timestamp}.csv"
+ECI_RESPONSES_FOLLOWUP_LEGISLATION_PATTERN = (
+    "eci_responses_followup_legislation_{timestamp}.csv"
+)
 
 # ── Renaming CSV files' fields or columns when needed ──────────────────────────
 ECI_DASHBOARD_CSV_PATTERN = "eci_dashboard_{timestamp}.csv"
@@ -79,7 +81,7 @@ LOG_EXTRACTOR_RESPONSES_PATTERN = "extractor_responses_{timestamp}.log"
 LOG_EXTRACTOR_RESPONSES_FOLLOWUP_PATTERN = (
     "extractor_responses_followup_{timestamp}.log"
 )
-LOG_MERGER_PATTERN = "merger_responses_and_followup_{timestamp}.log"
+LOG_LEGISLATION_PATTERN = "responses_followup_legislation_{timestamp}.log"
 LOG_DASHBOARD_PATTERN = "dashboard_{timestamp}.log"
 
 # Formats
