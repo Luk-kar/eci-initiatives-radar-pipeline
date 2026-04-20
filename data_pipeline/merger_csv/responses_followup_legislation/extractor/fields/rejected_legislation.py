@@ -98,7 +98,7 @@ _COMPILED_LEGISLATION: list[re.Pattern] = _compile_patterns(_LEGISLATION_TERMS)
 # Prevents a match from bridging two unrelated sentences.
 _WORD_GAP = r"(?:\s+\S+){0,10}\s+"
 
-PATTERNS: list[re.Pattern] = [
+REJECTED_PATTERNS: list[re.Pattern] = [
     re.compile(
         # neg.pattern  → \b<negation_phrase>\b  (from _compile_patterns)
         # _WORD_GAP    → up to 10 intervening tokens + mandatory trailing whitespace
@@ -124,37 +124,114 @@ PATTERNS: list[re.Pattern] = [
 #     r"no further legal acts",
 # ]
 
-# PATTERNS: list[re.Pattern] = [
+# REJECTED_PATTERNS: list[re.Pattern] = [
 #     re.compile(rf"\b{re.escape(keyword)}\b", re.IGNORECASE)
 #     for keyword in REJECTION_REASONING_KEYWORDS
 # ]
+
+# ── The Commissions tabling law commitment  ───────────────────────────────────
+
+# ── Proposal terms ────────────────────────────────────────────────────────────
+# Matches a legislative root followed (within _WORD_GAP) by a proposal-surface noun.
+# e.g. "legislative proposal", "legal act", "legal directive", "legislative measure"
+
+_PROPOSAL_ROOT = r"proposals?|directives?|regulations?|acts?|changes?|measures?"
+
+PROPOSAL_PATTERN: re.Pattern = re.compile(
+    rf"\b(?:{_LEGAL}|{_LEGISLATIVE_FORMS}){_WORD_GAP}(?:{_PROPOSAL_ROOT})\b",
+    re.IGNORECASE,
+)
+
+# ── Non-rejection guard ───────────────────────────────────────────────────────
+
+# NON_REJECTION reuses _COMPILED_NEGATIONS: an item is a commitment when it
+# contains PROPOSAL_PATTERN AND none of the negation patterns fire on it.
+NON_REJECTION: list[re.Pattern] = _COMPILED_NEGATIONS
+
+
+# ── Commitment check ──────────────────────────────────────────────────────────
+
+
+def check_tabling_law_committed(text_items: list[str], skip_item: str) -> bool:
+    """
+    Check whether ANY OTHER item in *text_items* mentions a legislative/proposal
+    term WITHOUT a negation — i.e. a commitment rather than a rejection.
+
+    ``skip_item`` is the normalised item that already triggered the rejection
+    hit; it is excluded so the same sentence cannot cancel itself.
+
+    Args:
+        text_items: Pre-merged list of text fragments for one initiative.
+        skip_item:  The normalised item that fired the rejection pattern.
+
+    Returns:
+        ``True`` if another item commits to legislation, ``False`` otherwise.
+    """
+    for item in text_items:
+
+        normalised = _normalise(item).strip()
+
+        if not normalised or normalised == skip_item:
+            continue
+
+        if not PROPOSAL_PATTERN.search(normalised):
+            continue
+
+        # Commitment only if no negation term fires on the same item
+        is_negated = any(p.search(normalised) for p in NON_REJECTION)
+
+        if not is_negated:
+            logger.debug("LAW_COMMITTED hit in: %.80s", normalised)
+            return True
+
+    return False
+
 
 # ── Extractor ─────────────────────────────────────────────────────────────────
 
 
 def extract(text_items: list[str]) -> bool:
     """
-    Scan *text_items* for REJECTED_LEGISLATION pattern matches.
+    Scan *text_items* for REJECTED_LEGISLATION and LAW_COMMITTED signals.
 
-    Evaluation stops at the first match (short-circuit): a single hit is
-    sufficient to set the flag.
+    Pass 1 — rejection: iterate items, set flag on first hit, then stop.
+    Pass 2 — commitment: only runs when rejection was found; iterates all
+              OTHER items for a legislative commitment (PROPOSAL_PATTERN
+              present, no NON_REJECTION negation).
 
     Args:
         text_items: Pre-merged list of text fragments for one initiative.
 
     Returns:
-        ``True`` when at least one pattern fires, ``False`` otherwise.
+        ``True``  — rejection found, no commitment in any other item.
+        ``False`` — no rejection found, OR rejection overridden by commitment.
     """
+    rejected_item: str | None = None
+
+    # ── Pass 1: find the first rejection ─────────────────────────────────────
     for item in text_items:
 
         normalised = _normalise(item).strip()
 
-        if not item.strip():
+        if not normalised:
             continue
 
-        for pattern in PATTERNS:
-            if pattern.search(item):
-                logger.debug("REJECTED_LEGISLATION hit in: %.80s", item)
-                return True
+        if any(p.search(normalised) for p in REJECTED_PATTERNS):
 
-    return False
+            logger.debug("REJECTED_LEGISLATION hit in: %.80s", normalised)
+            rejected_item = normalised
+            break
+
+    if rejected_item is None:
+        return False
+
+    # ── Pass 2: check for commitment in any OTHER item ────────────────────────
+    committed = check_tabling_law_committed(text_items, skip_item=rejected_item)
+
+    if committed:
+        logger.debug(
+            "REJECTED_LEGISLATION overridden: commitment found in another item"
+        )
+        return False
+
+    return True

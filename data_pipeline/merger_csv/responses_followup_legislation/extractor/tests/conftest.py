@@ -35,7 +35,8 @@ def commission_answers_rejection_legislation() -> list[tuple[bool, str, list[str
             ],
             [
                 "will not make a legislative proposal to that effect"
-            ],  # It is canceled by proposition of other legislation
+            ],  # It is canceled by proposition of other later point legislation
+            # e. g. "the Commission committed to come forward with a legislative proposal"
         ),
         (
             True,

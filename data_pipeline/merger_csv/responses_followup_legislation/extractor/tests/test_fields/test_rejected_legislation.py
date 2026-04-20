@@ -2,6 +2,7 @@ import pytest
 
 from data_pipeline.merger_csv.responses_followup_legislation.extractor.fields.rejected_legislation import (
     extract,
+    check_tabling_law_committed,
 )
 
 
@@ -245,3 +246,110 @@ class TestExtractRejectedLegislationExplicit:
         assert registration_number == "2024/000004"
         assert rejection_phrases == ["not necessary to propose a new legal instrument"]
         assert extract(text_items) is True
+
+
+class TestCheckTablingLawCommitted:
+    """
+    Covers every commitment surface form observed in commission_answers_rejection_legislation.
+    Each test isolates a single item as skip_item (simulating the rejecting sentence)
+    and asserts the OTHER items are recognised as a commitment.
+    """
+
+    # ── 2017/000002 ───────────────────────────────────────────────────────────
+
+    def test_committed_to_come_forward_with_legislative_proposal(self) -> None:
+        """'committed to come forward with a legislative proposal' — 2017/000002"""
+        skip = "will not make a legislative proposal to that effect."
+        items = [
+            skip,
+            (
+                "the Commission committed to come forward with a legislative proposal"
+                " by May 2018, amongst others, to strengthen the transparency of the"
+                " EU risk assessment in the food chain."
+            ),
+        ]
+        assert check_tabling_law_committed(items, skip_item=skip) is True
+
+    # ── 2018/000004 ───────────────────────────────────────────────────────────
+
+    def test_intention_to_table_legislative_proposal(self) -> None:
+        """'communicated its intention to table a legislative proposal' — 2018/000004"""
+        skip = "some unrelated rejection sentence."
+        items = [
+            skip,
+            (
+                "In its response to the ECI, the Commission communicated its intention"
+                " to table a legislative proposal, by the end of 2023, to phase out"
+                " the use of cages for all animals."
+            ),
+        ]
+        assert check_tabling_law_committed(items, skip_item=skip) is True
+
+    def test_sets_out_plans_for_legislative_proposal(self) -> None:
+        """'Commission sets out plans for a legislative proposal' — 2018/000004"""
+        skip = "some unrelated rejection sentence."
+        items = [
+            skip,
+            (
+                "In its communication the Commission sets out plans for a legislative"
+                " proposal to prohibit cages for the species and categories of animals"
+                " covered by the ECI."
+            ),
+        ]
+        assert check_tabling_law_committed(items, skip_item=skip) is True
+
+    # ── 2021/000006 ───────────────────────────────────────────────────────────
+
+    def test_will_consider_future_potential_legislative_changes(self) -> None:
+        """'will consider … future potential legislative changes' — 2021/000006"""
+        skip = "some unrelated rejection sentence."
+        items = [
+            skip,
+            (
+                "The Commission will consider the outcome of the court cases in view"
+                " of any future potential legislative changes."
+            ),
+        ]
+        assert check_tabling_law_committed(items, skip_item=skip) is True
+
+    # ── Negative cases ────────────────────────────────────────────────────────
+
+    def test_returns_false_when_only_skip_item_present(self) -> None:
+        """No other items — nothing to commit from."""
+
+        skip = "the Commission committed to come forward with a legislative proposal."
+        assert check_tabling_law_committed([skip], skip_item=skip) is False
+
+    def test_returns_false_when_all_other_items_are_negated(self) -> None:
+        """Other item contains a proposal term but is negated — not a commitment."""
+
+        skip = "some unrelated rejection sentence."
+        items = [
+            skip,
+            "The Commission will not submit a legislative proposal at this time.",
+        ]
+        assert check_tabling_law_committed(items, skip_item=skip) is False
+
+    def test_returns_false_when_no_proposal_term_in_other_items(self) -> None:
+        """Other items have no legislative/proposal term at all."""
+
+        skip = "some unrelated rejection sentence."
+        items = [
+            skip,
+            "The Commission will continue to monitor the situation.",
+            "Official documents related to the decision:",
+        ]
+        assert check_tabling_law_committed(items, skip_item=skip) is False
+
+    def test_skip_item_is_not_matched_as_commitment(self) -> None:
+        """
+        The rejecting sentence itself contains a proposal term (negated).
+        skip_item must be excluded even if PROPOSAL_PATTERN would match it
+        before the negation guard runs.
+        """
+
+        skip = (
+            "the Commission decided not to submit a legislative proposal,"
+            " given that Member States had only recently agreed EU policy."
+        )
+        assert check_tabling_law_committed([skip], skip_item=skip) is False
