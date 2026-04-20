@@ -49,7 +49,9 @@ def commission_answers_rejection_legislation() -> list[tuple[bool, str, list[str
                 "Moreover, the Communication sets out four further Commission’s actions to be taken towards the goal of phasing out animal testing. These actions included a scientific conference engaging the scientific community and relevant stakeholders in a debate on how to exploit the advances in science for the development of scientifically valid non-animal approaches.",
                 "The Commission commits to active monitoring of compliance and enforcement of the legislation, and will continue supporting the development and validation of alternative approaches to the use of animals in research and testing. Dialogue with all stakeholders will continue, especially with the scientific community, to advance towards the goal of phasing out animal testing through knowledge sharing, dissemination, and education and training activities on non-animal alternatives and the Three Rs (Replacement, Reduction and Refinement of animal use in testing).",
             ],
-            ["no repeal of that legislation was proposed"],
+            [
+                "no repeal of that legislation was proposed"
+            ],  # One part of the request rejected but still open for a new legislation
         ),
         (
             True,

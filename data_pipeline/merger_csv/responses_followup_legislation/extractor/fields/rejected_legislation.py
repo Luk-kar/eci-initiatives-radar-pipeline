@@ -36,24 +36,98 @@ def _normalise(text: str) -> str:
     return _MARKDOWN_LINK_REGEX.sub(r"\1", text)
 
 
-REJECTION_REASONING_KEYWORDS = [
-    r"will not make\s.+legisla[a-z]",
-    r"will not propose",
-    r"no legislative proposal",
-    r"no new legislation",
-    r"not to submit a legislative proposal",
-    r"no repeal of that legislation",
-    r"not necessary to propose a new legal",
-    r"not to submit\b.+\blegisla[a-z]+\b",
-    r"(outside|beyond)\b.+\competence",
-    r"not.+propose.+legal",
-    r"no further legal acts",
+# Less safe but more future proof
+# ── Legislative term building blocks ─────────────────────────────────────────
+
+# Inflections of the "legislat-" root:
+_LEGAL = r"legal(?:\'s)?"  # legal / legal's
+# legal / legislate / legislated / legislation / legislative / legislatively / legislator
+_LEGISLATIVE_FORMS = r"legis(?:lat(?:ion|ive|or|e|ed|ing))?"
+
+_LEGISLATION_TERMS = [_LEGAL, _LEGISLATIVE_FORMS]
+
+_NEGATION_TERMS = [
+    r"no",
+    r"not",
+    r"cannot",
+    r"[a-z]+n\'t",  # isn't, wasn't, weren't, shouldn't, wouldn't, couldn't, mightn't, needn't, oughtn't
+    r"outside",
+    r"beyond",
+    r"lack?s",
+    r"exceeds competence",
+    r"refused to",
+    r"declined to",
+    r"rejected",
+    r"decided against",
+    r"chose not to",
+    r"opted not to",
+    r"will refrain from",
+    r"unnecessary to",
 ]
 
+
+# ── Pattern compiler ──────────────────────────────────────────────────────────
+
+
+def _compile_patterns(terms: list[str]) -> list[re.Pattern]:
+    if not terms:
+        raise ValueError(f"Empty terms list: {terms!r}")
+
+    patterns = []
+
+    for term in terms:
+
+        if not term:
+            raise ValueError(f"Empty term string: {term!r}")
+
+        spaced = re.sub(r" ", r"\\s+", term)
+        anchored = rf"\b{spaced}\b"
+        compiled = re.compile(anchored, re.IGNORECASE)
+
+        patterns.append(compiled)
+
+    return patterns
+
+
+# ── Compiled pattern lists ────────────────────────────────────────────────────
+
+_COMPILED_NEGATIONS: list[re.Pattern] = _compile_patterns(_NEGATION_TERMS)
+_COMPILED_LEGISLATION: list[re.Pattern] = _compile_patterns(_LEGISLATION_TERMS)
+
+# Up to 10 whitespace-separated tokens between negation and legislative term.
+# Prevents a match from bridging two unrelated sentences.
+_WORD_GAP = r"(?:\s+\S+){0,10}\s+"
+
 PATTERNS: list[re.Pattern] = [
-    re.compile(rf"\b{re.escape(keyword)}\b", re.IGNORECASE)
-    for keyword in REJECTION_REASONING_KEYWORDS
+    re.compile(
+        # neg.pattern  → \b<negation_phrase>\b  (from _compile_patterns)
+        # _WORD_GAP    → up to 10 intervening tokens + mandatory trailing whitespace
+        # leg.pattern  → \b<legislation_term>\b (from _compile_patterns)
+        rf"{neg.pattern}{_WORD_GAP}{leg.pattern}",
+        re.IGNORECASE,
+    )
+    for neg in _COMPILED_NEGATIONS
+    for leg in _COMPILED_LEGISLATION
 ]
+
+## Safe but not future proof:
+# REJECTION_REASONING_KEYWORDS = [
+#     r"will not make legislation",
+#     r"will not propose",
+#     r"no legislative proposal",
+#     r"no new legislation",
+#     r"not to submit a legislative proposal",
+#     r"no repeal of that legislation",
+#     r"not necessary to propose a new legal",
+#     r"not to submit legislation",
+#     r"not propose legal",
+#     r"no further legal acts",
+# ]
+
+# PATTERNS: list[re.Pattern] = [
+#     re.compile(rf"\b{re.escape(keyword)}\b", re.IGNORECASE)
+#     for keyword in REJECTION_REASONING_KEYWORDS
+# ]
 
 # ── Extractor ─────────────────────────────────────────────────────────────────
 
