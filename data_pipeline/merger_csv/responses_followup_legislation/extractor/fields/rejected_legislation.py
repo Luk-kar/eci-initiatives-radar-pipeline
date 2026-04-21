@@ -21,29 +21,9 @@ from __future__ import annotations
 import logging
 import re
 
+from .utils.pattern_utils import normalise, compile_patterns
+
 logger = logging.getLogger(__name__)
-
-# ── Patterns (compiled once at module load) ───────────────────────────────────
-
-_MARKDOWN_LINK_REGEX: re.Pattern = re.compile(r"\[([^\]]+)\]\([^)]+\)")
-
-
-def _normalise(text: str) -> str:
-    """
-    Strip Markdown hyperlinks, keeping only the visible label text.
-
-    Example:
-        ``[Sustainable Use Directive](https://ec.europa.eu/...)``
-        → ``Sustainable Use Directive``
-
-    Args:
-        text: Raw text fragment from the source CSV.
-
-    Returns:
-        Text with all ``[label](url)`` constructs replaced by ``label``.
-    """
-    return _MARKDOWN_LINK_REGEX.sub(r"\1", text)
-
 
 # Less safe but more future proof
 # ── Legislative term building blocks ─────────────────────────────────────────
@@ -75,33 +55,10 @@ _NEGATION_TERMS = [
 ]
 
 
-# ── Pattern compiler ──────────────────────────────────────────────────────────
-
-
-def _compile_patterns(terms: list[str]) -> list[re.Pattern]:
-    if not terms:
-        raise ValueError(f"Empty terms list: {terms!r}")
-
-    patterns = []
-
-    for term in terms:
-
-        if not term:
-            raise ValueError(f"Empty term string: {term!r}")
-
-        spaced = re.sub(r" ", r"\\s+", term)
-        anchored = rf"\b{spaced}\b"
-        compiled = re.compile(anchored, re.IGNORECASE)
-
-        patterns.append(compiled)
-
-    return patterns
-
-
 # ── Compiled pattern lists ────────────────────────────────────────────────────
 
-_COMPILED_NEGATIONS: list[re.Pattern] = _compile_patterns(_NEGATION_TERMS)
-_COMPILED_LEGISLATION: list[re.Pattern] = _compile_patterns(_LEGISLATION_TERMS)
+_COMPILED_NEGATIONS: list[re.Pattern] = compile_patterns(_NEGATION_TERMS)
+_COMPILED_LEGISLATION: list[re.Pattern] = compile_patterns(_LEGISLATION_TERMS)
 
 # Up to 10 whitespace-separated tokens between negation and legislative term.
 # Prevents a match from bridging two unrelated sentences.
@@ -109,9 +66,9 @@ _WORD_GAP = r"(?:\s+\S+){0,10}\s+"
 
 REJECTED_PATTERNS: list[re.Pattern] = [
     re.compile(
-        # neg.pattern  → \b<negation_phrase>\b  (from _compile_patterns)
+        # neg.pattern  → \b<negation_phrase>\b  (from compile_patterns)
         # _WORD_GAP    → up to 10 intervening tokens + mandatory trailing whitespace
-        # leg.pattern  → \b<legislation_term>\b (from _compile_patterns)
+        # leg.pattern  → \b<legislation_term>\b (from compile_patterns)
         rf"{neg.pattern}{_WORD_GAP}{leg.pattern}",
         re.IGNORECASE,
     )
@@ -179,7 +136,7 @@ def check_tabling_law_committed(text_items: list[str], skip_item: str) -> bool:
     """
     for item in text_items:
 
-        normalised = _normalise(item).strip()
+        normalised = normalise(item).strip()
 
         if not normalised or normalised == skip_item:
             continue
@@ -229,7 +186,7 @@ def extract(text_items: list[str]) -> bool:
     # ── Pass 1: find the first rejection ─────────────────────────────────────
     for item in text_items:
 
-        normalised = _normalise(item).strip()
+        normalised = normalise(item).strip()
 
         if not normalised:
             continue

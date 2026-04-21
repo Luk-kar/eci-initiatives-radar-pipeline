@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 # ── Shared legislative vocabulary ─────────────────────────────────────────────
 
 _LEGISLATIVE_TERMS = (
-    r"directive|regulation|decision|legislation|law|act|measure|proposal"
+    r"directive|regulation|decision|legislation|law|act|measure|proposal|amendment"
 )
 
 # ── Patterns (compiled once at module load) ───────────────────────────────────
