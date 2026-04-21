@@ -1,10 +1,19 @@
 """
-rejected_legislation.py
------------------------
-Regex patterns and extractor for the ``Rejected_Legislation`` output column.
+Determines whether the European Commission's response to a Citizens'
+Initiative constitutes a full rejection of any further legislation.
 
-``extract(text_items)`` returns ``True`` as soon as any REJECTED_LEGISLATION
-pattern fires across the combined text items for an initiative.
+The flag is ``True`` when the Commission explicitly closes the door on new
+legal action — for example by stating there will be no new legislation, no
+legislative proposal, or that the requested repeal will not happen.
+
+The flag is ``False`` in two situations:
+
+- The Commission's response contains no rejection language at all (it
+  commits to follow-up actions, ongoing proposals, or further review).
+- The response does contain a rejection phrase but, elsewhere in the same
+  response, the Commission commits to tabling a different or related
+  legislative proposal — meaning the rejection is only partial and
+  legislation is still forthcoming.
 """
 
 from __future__ import annotations
@@ -154,8 +163,8 @@ NON_REJECTION: list[re.Pattern] = _COMPILED_NEGATIONS
 
 def check_tabling_law_committed(text_items: list[str], skip_item: str) -> bool:
     """
-    Check whether ANY OTHER item in *text_items* mentions a legislative/proposal
-    term WITHOUT a negation — i.e. a commitment rather than a rejection.
+    Decide whether the Commission commits to legislation somewhere in its
+    response, despite a rejection phrase appearing elsewhere.
 
     ``skip_item`` is the normalised item that already triggered the rejection
     hit; it is excluded so the same sentence cannot cancel itself.
@@ -192,20 +201,28 @@ def check_tabling_law_committed(text_items: list[str], skip_item: str) -> bool:
 
 def extract(text_items: list[str]) -> bool:
     """
-    Scan *text_items* for REJECTED_LEGISLATION and LAW_COMMITTED signals.
+    Return ``True`` if the Commission's response constitutes a full rejection
+    of further legislation, ``False`` otherwise.
 
-    Pass 1 — rejection: iterate items, set flag on first hit, then stop.
-    Pass 2 — commitment: only runs when rejection was found; iterates all
-              OTHER items for a legislative commitment (PROPOSAL_PATTERN
-              present, no NON_REJECTION negation).
+    A response is a full rejection when it explicitly rules out new legal
+    action and does not, in any other part of the same response, commit to
+    tabling alternative or related legislation.
+
+    A response is not a rejection when the Commission only commits to
+    follow-up actions, refers to ongoing proposals being handled by
+    co-legislators, or defers a decision pending further evidence.
 
     Args:
-        text_items: Pre-merged list of text fragments for one initiative.
+        text_items: The text fragments that make up the Commission's
+            response to a single Citizens' Initiative.
 
     Returns:
-        ``True``  — rejection found, no commitment in any other item.
-        ``False`` — no rejection found, OR rejection overridden by commitment.
+        ``True`` — legislation was fully rejected with no offsetting
+        commitment elsewhere in the response.
+        ``False`` — no rejection was found, or it was overridden by a
+        commitment to other legislation.
     """
+
     rejected_item: str | None = None
 
     # ── Pass 1: find the first rejection ─────────────────────────────────────
