@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 import re
 
-from .utils.pattern_utils import normalise, compile_patterns
+from .utils.pattern_utils import normalise, compile_patterns, NEGATION_TERMS
 
 logger = logging.getLogger(__name__)
 
@@ -35,29 +35,10 @@ _LEGISLATIVE_FORMS = r"legis(?:lat(?:ion|ive|or|e|ed|ing))?"
 
 _LEGISLATION_TERMS = [_LEGAL, _LEGISLATIVE_FORMS]
 
-_NEGATION_TERMS = [
-    r"no",
-    r"not",
-    r"cannot",
-    r"[a-z]+n\'t",  # isn't, wasn't, weren't, shouldn't, wouldn't, couldn't, mightn't, needn't, oughtn't
-    r"outside",
-    r"beyond",
-    r"lack?s",
-    r"exceeds competence",
-    r"refused to",
-    r"declined to",
-    r"rejected",
-    r"decided against",
-    r"chose not to",
-    r"opted not to",
-    r"will refrain from",
-    r"unnecessary to",
-]
-
 
 # ── Compiled pattern lists ────────────────────────────────────────────────────
 
-_COMPILED_NEGATIONS: list[re.Pattern] = compile_patterns(_NEGATION_TERMS)
+_COMPILED_NEGATIONS: list[re.Pattern] = compile_patterns(NEGATION_TERMS)
 _COMPILED_LEGISLATION: list[re.Pattern] = compile_patterns(_LEGISLATION_TERMS)
 
 # Up to 10 whitespace-separated tokens between negation and legislative term.

@@ -1,5 +1,24 @@
 import re
 
+NEGATION_TERMS = [
+    r"no",
+    r"not",
+    r"cannot",
+    r"[a-z]+n\'t",  # isn't, wasn't, weren't, shouldn't, wouldn't, couldn't, mightn't, needn't, oughtn't
+    r"outside",
+    r"beyond",
+    r"lack?s",
+    r"exceeds competence",
+    r"refused to",
+    r"declined to",
+    r"rejected",
+    r"decided against",
+    r"chose not to",
+    r"opted not to",
+    r"will refrain from",
+    r"unnecessary to",
+]
+
 
 def normalise(text: str) -> str:
     """
