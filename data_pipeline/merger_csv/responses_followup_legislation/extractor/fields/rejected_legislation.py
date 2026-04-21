@@ -119,7 +119,8 @@ REJECTED_PATTERNS: list[re.Pattern] = [
     for leg in _COMPILED_LEGISLATION
 ]
 
-## Safe but not future proof:
+# ── Safe but not future proof, old patterns for reference: ───────────────────
+
 # REJECTION_REASONING_KEYWORDS = [
 #     r"will not make legislation",
 #     r"will not propose",
