@@ -205,15 +205,9 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
         (
             "2012/000003",
             [
-                "ENG) aimed at improving the monitoring of drinking water across Europe came into force on 28 October 2015 (see [press release](http://europa.",
-                "pdf) A proposal for the revision of the Directive on drinking water was adopted by the Commission on 01 February 2018.",
-                "The Directive entered into force on 12 January 2021.",
-                "pdf) was adopted by the Commission in May 2018.",
-                "The Regulation based on this proposal entered into force in June 2020.",
-                "In January 2024, the Commission adopted [new minimum hygiene standards](https://environment.",
-                "eu/legal-content/EN/TXT/?uri=celex:52014DC0335) (COM(2014) 335) adopted on 02/06/2014.",
-                'org/post2015/transforming ourw orld) Sustainable Development Goals in the "2030 Agenda for Sustainable Development" (Goal 6: Ensure availability and sustainable management of water and sanitation for all), adopted by the UN General Assembly on 25/09/2015.',
-                "The European Parliament adopted an [own-initiative report](http://www.",
+                "As a first step following the European Citizens' Initiative Right2Water, an amendment to the Drinking Water Directive aimed at improving the monitoring of drinking water across Europe came into force on 28 October 2015 (see press release).",
+                "On 16 December 2020, the European Parliament formally adopted the revised Drinking Water Directive",
+                "The Regulation based on this proposal entered into force in June 2020",
             ],
             [
                 "As a first step following the European Citizens' Initiative Right2Water, an amendment to the [Drinking Water Directive](http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=uriserv:OJ.L_.2015.260.01.0006.01.ENG) aimed at improving the monitoring of drinking water across Europe came into force on 28 October 2015 (see [press release](http://europa.eu/rapid/press-release_IP-15-5940_en.htm) ).",
@@ -233,9 +227,7 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
         ),
         (
             "2012/000005",
-            [
-                "In the Communication adopted on 28/05/2014, the Commission explains that it has decided not to submit a legislative proposal, given that Member States and the European Parliament had only recently discussed and decided EU policy in this regard."
-            ],
+            None,
             [
                 "In the Communication adopted on 28/05/2014, the Commission explains that it has decided not to submit a legislative proposal, given that Member States and the European Parliament had only recently discussed and decided EU policy in this regard. The Commission has concluded that the existing funding framework, which had been recently debated and agreed by EU Member States and the European Parliament, is the appropriate one. See [press release](http://europa.eu/rapid/press-release_IP-14-608_en.htm) ."
             ],
@@ -243,9 +235,8 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
         (
             "2017/000002",
             [
-                "eu/legal-content/EN/TXT/?uri=CELEX%3A52018PC0179&qid=1616683628859) was adopted by the Commission on 11 April 2018 in response to the second aim of the initiative (see above).",
-                "eu/legal-content/EN/TXT/PDF/?uri=CELEX:32019R1381) of the European Parliament and the Council was published in the Official Journal of the EU on 6 September 2019.",
-                "Following its entry into force 20 days after publication, it became applicable 18 months later, i.",
+                "A proposal for a Regulation of the European Parliament and the Council on the transparency and sustainability of the EU risk assessment in the food chain was adopted by the Commission on 11 April 2018 in response to the second aim of the initiative (see above).",
+                "Following the agreement of the European Parliament and the Council, the Regulation of the European Parliament and the Council of the European Parliament and the Council was published in the Official Journal of the EU on 6 September 2019. Following its entry into force 20 days after publication, it became applicable 18 months later, i.e. on 27 March 2021 .",
             ],
             [
                 "[A proposal for a Regulation of the European Parliament and the Council on the transparency and sustainability of the EU risk assessment in the food chain](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A52018PC0179&qid=1616683628859) was adopted by the Commission on 11 April 2018 in response to the second aim of the initiative (see above).",
@@ -265,9 +256,7 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
         ),
         (
             "2012/000007",
-            [
-                "The Commission adopted a Communication on 03 June 2015 setting out the actions it intended to take in response to the initiative [Stop Vivisection](http://ec."
-            ],
+            None,
             [
                 "The Commission adopted a Communication on 03 June 2015 setting out the actions it intended to take in response to the initiative [Stop Vivisection](http://ec.citizens-initiative.europa.eu/public/initiatives/successful/details/2012/000007) . See [press release](http://europa.eu/rapid/press-release_IP-15-5094_en.htm) .",
                 "The European Commission organised a scientific conference in Brussels on 6-7 December 2016 to engage the scientific community and relevant stakeholders in a debate on how to exploit cutting edge advances in biomedical and other research in the development of scientifically valid non-animal approaches (alternatives to animal testing).",
@@ -295,9 +284,7 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
         ),
         (
             "2018/000004",
-            [
-                "eu/vision-agriculture-food_en) adopted on 19 February 2025, building on the recommendations of the [Strategic Dialogue on the Future of EU Agriculture](https://agriculture."
-            ],
+            None,
             [
                 "In 2022 and 2023 EFSA published scientific opinions concerning the welfare risks associated with cages for all animal species and categories covered by the ECI (pigs, laying hens, broiler breeders, layer breeders, calves, rabbits, ducks, geese and quail). A public consultation was carried out from 15 October 2021 to 21 January 2022. An impact assessment was initiated, with an inception impact assessment published in July 2021, followed by a series of consultation activities, including in the context of the EU animal welfare platform, and its relevant subgroups.",
                 "As part of its 2020 Farm to Fork Strategy, the Commission had already expressed its intention to propose a revision of the animal welfare legislation, including on transport and rearing. This legislation was submitted to a fitness check, concluded in September 2022. Its results were presented in a [Commission Staff Working Document](https://food.ec.europa.eu/document/download/b9cc1000-c978-4895-8e9b-c2e1296adbfe_en?filename=aw_eval_revision_swd_2022-328_en.pdf) Commission Staff Working Document , See [more information on the revision](https://food.ec.europa.eu/animals/animal-welfare/evaluations-and-impact-assessment/revision-animal-welfare-legislation_en) more information on the revision and related developments.",
@@ -315,8 +302,7 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
         (
             "2019/000016",
             [
-                "Proposal for the Nature Restoration Law: following the agreement of the European Parliament on the text (on 27 February 2024), the Council of the EU adopted the regulation on 17 June 2024.",
-                "It entered into force on 18 August 2024 (20 days after its publication in the Official Journal of the EU) and became applicable immediately.",
+                "Proposal for the Nature Restoration Law: following the agreement of the European Parliament on the text (on 27 February 2024), the Council of the EU adopted the regulation on 17 June 2024. It entered into force on 18 August 2024 (20 days after its publication in the Official Journal of the EU) and became applicable immediately."
             ],
             [
                 "On 25 April 2023, Commissioner Virginijus Sinkevičius met with the organisers of 'Save bees and farmers!' to discuss the Commission’s reply to the initiative.",
@@ -331,7 +317,6 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
         (
             "2020/000001",
             [
-                "eu/legal-content/EN/TXT/PDF/?uri=CELEX:32024R2522) tariff codes for sharks and their fins .",
                 "The codes enter in application in January 2025.",
                 "This concerns, among others, implementation of the revised EU fisheries control Regulation and the Regulation on illegal, unreported and unregulated fishing (IUU) that entered into force in January 2024 and the implementation of CITES shark listings.",
             ],
@@ -367,8 +352,7 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
         (
             "2022/000002",
             [
-                "eu/legal-content/EN/TXT/?uri=CELEX%3A32025R1422&qid=1753087782491) , American mink (Neovison vison) is now listed under the Invasive Alien Species Regulation.",
-                "The listing of this species will enter into force in August 2027.",
+                "Through an Implementing Regulation adopted on 17 July 2025, American mink (Neovison vison) is now listed under the Invasive Alien Species Regulation. The listing of this species will enter into force in August 2027.",
             ],
             [
                 "On 9 February 2024, Commissioner Stella Kyriakides met with the organisers of ‘Fur Free Europe’ to discuss the Commission’s reply to the initiative.",
@@ -382,5 +366,5 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
                 "Additional information regarding this European Citizens' Initiative are available on the [organisers' website](https://www.eurogroupforanimals.org/fur-free-europe) organisers' website and the [dedicated Commission's webpage.](https://citizens-initiative.europa.eu/fur-free-europe_en)",
             ],
         ),
-        ("2024/000004", None, None),
+        ("2024/000004", None),
     ]
