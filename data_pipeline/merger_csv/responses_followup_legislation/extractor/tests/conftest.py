@@ -181,7 +181,6 @@ def commission_answers_rejection_legislation() -> list[tuple[bool, str, list[str
         ),
     ]
 
-
 @pytest.fixture
 def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
     """
@@ -208,6 +207,7 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
                 "As a first step following the European Citizens' Initiative Right2Water, an amendment to the Drinking Water Directive aimed at improving the monitoring of drinking water across Europe came into force on 28 October 2015 (see press release).",
                 "On 16 December 2020, the European Parliament formally adopted the revised Drinking Water Directive",
                 "The Regulation based on this proposal entered into force in June 2020",
+                "In January 2024, the Commission adopted new minimum hygiene standards", # Non direct law mention exception
             ],
             [
                 "As a first step following the European Citizens' Initiative Right2Water, an amendment to the [Drinking Water Directive](http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=uriserv:OJ.L_.2015.260.01.0006.01.ENG) aimed at improving the monitoring of drinking water across Europe came into force on 28 October 2015 (see [press release](http://europa.eu/rapid/press-release_IP-15-5940_en.htm) ).",
@@ -237,6 +237,18 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
             [
                 "A proposal for a Regulation of the European Parliament and the Council on the transparency and sustainability of the EU risk assessment in the food chain was adopted by the Commission on 11 April 2018 in response to the second aim of the initiative (see above).",
                 "Following the agreement of the European Parliament and the Council, the Regulation of the European Parliament and the Council of the European Parliament and the Council was published in the Official Journal of the EU on 6 September 2019. Following its entry into force 20 days after publication, it became applicable 18 months later, i.e. on 27 March 2021 .",
+                # False-positive:
+                #
+                # "The new Regulation sets out objectives and general principles of risk communication. 
+                # In the coming years, the Commission, in close cooperation with the Member States and with the European Food Safety Authority, 
+                # will adopt a general plan for risk communication to ensure a coherent risk communication strategy throughout the risk analysis process,
+                #  combined with open dialogue amongst all interested parties."
+                #
+                # "Developing comprehensive risk communication : 
+                # The new Regulation sets out objectives and general principles of risk communication. 
+                # In the coming years, the Commission, in close cooperation with the Member States and with the European Food Safety Authority, 
+                # will adopt a general plan for risk communication to ensure a coherent risk communication strategy throughout 
+                # the risk analysis process, combined with open dialogue amongst all interested parties."
             ],
             [
                 "[A proposal for a Regulation of the European Parliament and the Council on the transparency and sustainability of the EU risk assessment in the food chain](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A52018PC0179&qid=1616683628859) was adopted by the Commission on 11 April 2018 in response to the second aim of the initiative (see above).",
@@ -346,7 +358,7 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
                 "A workshop on future priority research areas for new approach methodologies (NAMs) was held at the European Commission (DG Research and Innovation) on 10–11 April 2025. A report from the workshop is expected to be published at later stage.",
                 "Judgments of the General Court on the relationship between REACH and the Cosmetic Products Regulation ( [T-655/20](https://curia.europa.eu/juris/document/document.jsf?text=&docid=279983&pageIndex=0&doclang=en&mode=req&dir=&occ=first&part=1&cid=1997743) and [T-656/20](https://curia.europa.eu/juris/document/document.jsf?text=&docid=279984&pageIndex=0&doclang=EN&mode=lst&dir=&occ=first&part=1&cid=4301162) )",
                 "As stated in the response to the first objective of the initiative – ‘protect and strengthen the cosmetics animal testing ban’ - the interface between the REACH Regulation and the Cosmetic Products Regulation was at the time being assessed by the Court of Justice of the European Union. The General Court issued its judgments on 22 November 2023 and clarified that the REACH Regulation requires companies that manufacture or import chemical substances that are only used in cosmetic products to provide information (if necessary, generated through animal testing) on hazardous properties for the safety assessment of workers manufacturing or processing these substances.",
-                "The Commission will carefully consider the Court’s judgments in view ofany potential future measures.",
+                "The Commission will carefully consider the Court’s judgments in view of any potential future measures.",
             ],
         ),
         (
