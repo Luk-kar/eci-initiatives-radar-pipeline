@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 
 # ── Shared legislative vocabulary ─────────────────────────────────────────────
 
+NON_EXPLICIT_MENTIONED_LEGISLATION = [r"new minimum hygiene standards?"]
+
 # Based on scope restriction, we only want regulations, directives, and generic legal
 # placeholder acts. We explicitly exclude decisions, recommendations, and opinions.
 _LEGISLATION = [
@@ -32,7 +34,7 @@ _LEGISLATION = [
     r"amendments?",
     r"revisions?",
     r"rules?",
-]
+] + NON_EXPLICIT_MENTIONED_LEGISLATION
 
 # Verb/action lists
 _VERBS = [
@@ -41,7 +43,8 @@ _VERBS = [
     r"force(?:d|s)?\s+into",
     r"repeal(?:ed|s)?",
     r"adopt(?:ed|s|ing)?",
-    r"implement(?:ed|s|ing|ation)?",
+    r"implement(?:ed|s|ing)?",
+    r"implementation(?!\s+reports?)",
     r"came\s+into\s+force",
     r"became\s+applicable",
 ]

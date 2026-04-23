@@ -181,6 +181,7 @@ def commission_answers_rejection_legislation() -> list[tuple[bool, str, list[str
         ),
     ]
 
+
 @pytest.fixture
 def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
     """
@@ -204,10 +205,13 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
         (
             "2012/000003",
             [
-                "As a first step following the European Citizens' Initiative Right2Water, an amendment to the Drinking Water Directive aimed at improving the monitoring of drinking water across Europe came into force on 28 October 2015 (see press release).",
-                "On 16 December 2020, the European Parliament formally adopted the revised Drinking Water Directive",
+                # "As a first step following the European Citizens' Initiative Right2Water, an amendment to the Drinking Water Directive aimed at improving the monitoring of drinking water across Europe came into force on 28 October 2015 (see press release).",
+                "As a first step following the European Citizens' Initiative Right2Water, an amendment to the [Drinking Water Directive](http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=uriserv:OJ.L_.2015.260.01.0006.01.ENG) aimed at improving the monitoring of drinking water across Europe came into force on 28 October 2015 (see [press release](http://europa.eu/rapid/press-release_IP-15-5940_en.htm) ).",
+                # "On 16 December 2020, the European Parliament formally adopted the revised Drinking Water Directive",
+                "[On 16 December 2020](https://ec.europa.eu/commission/presscorner/detail/en/ip_20_2417) , the European Parliament formally adopted [the revised Drinking Water Directive](http://data.europa.eu/eli/dir/2020/2184/oj)",
                 "The Regulation based on this proposal entered into force in June 2020",
-                "In January 2024, the Commission adopted new minimum hygiene standards", # Non direct law mention exception
+                # "In January 2024, the Commission adopted new minimum hygiene standards",  # Non direct law mention exception
+                "In January 2024, the Commission adopted [new minimum hygiene standards](https://environment.ec.europa.eu/publications/delegated-acts-drinking-water-directive_en)",
             ],
             [
                 "As a first step following the European Citizens' Initiative Right2Water, an amendment to the [Drinking Water Directive](http://eur-lex.europa.eu/legal-content/EN/TXT/?uri=uriserv:OJ.L_.2015.260.01.0006.01.ENG) aimed at improving the monitoring of drinking water across Europe came into force on 28 October 2015 (see [press release](http://europa.eu/rapid/press-release_IP-15-5940_en.htm) ).",
@@ -239,15 +243,15 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
                 "Following the agreement of the European Parliament and the Council, the Regulation of the European Parliament and the Council of the European Parliament and the Council was published in the Official Journal of the EU on 6 September 2019. Following its entry into force 20 days after publication, it became applicable 18 months later, i.e. on 27 March 2021 .",
                 # False-positive:
                 #
-                # "The new Regulation sets out objectives and general principles of risk communication. 
-                # In the coming years, the Commission, in close cooperation with the Member States and with the European Food Safety Authority, 
+                # "The new Regulation sets out objectives and general principles of risk communication.
+                # In the coming years, the Commission, in close cooperation with the Member States and with the European Food Safety Authority,
                 # will adopt a general plan for risk communication to ensure a coherent risk communication strategy throughout the risk analysis process,
                 #  combined with open dialogue amongst all interested parties."
                 #
-                # "Developing comprehensive risk communication : 
-                # The new Regulation sets out objectives and general principles of risk communication. 
-                # In the coming years, the Commission, in close cooperation with the Member States and with the European Food Safety Authority, 
-                # will adopt a general plan for risk communication to ensure a coherent risk communication strategy throughout 
+                # "Developing comprehensive risk communication :
+                # The new Regulation sets out objectives and general principles of risk communication.
+                # In the coming years, the Commission, in close cooperation with the Member States and with the European Food Safety Authority,
+                # will adopt a general plan for risk communication to ensure a coherent risk communication strategy throughout
                 # the risk analysis process, combined with open dialogue amongst all interested parties."
             ],
             [

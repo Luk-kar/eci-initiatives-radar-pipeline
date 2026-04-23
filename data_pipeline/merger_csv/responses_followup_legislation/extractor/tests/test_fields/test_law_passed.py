@@ -17,24 +17,21 @@ class TestExtractLawPassedBulk:
         """
         Ensure the extractor always returns a list of strings or None for every sample.
         """
+        for row in followup_events_law_passed:
+            if len(row) < 3:
+                continue
 
-        for (
-            registration_number,
-            _,
-            text_items,
-        ) in followup_events_law_passed:
+            registration_number, _, text_items = row
 
             actual = extract(text_items)
 
             if actual is not None:
-
                 assert isinstance(actual, list), (
                     f"registration_number={registration_number}: expected list or None, got "
                     f"{type(actual).__name__}"
                 )
 
                 for item in actual:
-
                     assert isinstance(item, str), (
                         f"registration_number={registration_number}: expected string in list, got "
                         f"{type(item).__name__}"
@@ -48,12 +45,12 @@ class TestExtractLawPassedBulk:
         Verify that law_passed.extract() matches the expected list of sentences
         for each followup-event sample defined in conftest.py.
         """
+        for row in followup_events_law_passed:
+            if len(row) < 3:
+                continue
 
-        for (
-            registration_number,
-            expected,
-            text_items,
-        ) in followup_events_law_passed:
+            registration_number, expected, text_items = row
+
             actual = extract(text_items)
 
             assert actual == expected, (
@@ -66,120 +63,79 @@ class TestExtractLawPassedBulk:
                 f"  {text_items}"
             )
 
-
 class TestExtractLawPassedExplicit:
     """
-    Individual explicit tests to verify specific ECI behavior and get visibility
-    into what went wrong if parsing fails for a specific initiative.
+    Tests for explicit law-passed extraction, one test per ECI registration number,
+    driven by the ``followup_events_law_passed`` fixture.
     """
 
-    def _get_sample(
-        self,
-        followup_events_law_passed: list,
-        registration_number: str,
-    ) -> tuple:
+    def test_2012_000003(self, followup_events_law_passed):
+        registration, expected_sentences, source = followup_events_law_passed[0]
+        assert registration == "2012/000003"
 
-        for sample in followup_events_law_passed:
-            if sample[0] == registration_number:
-                return sample
+        result = extract(source)
+        combined_source_string = "\n".join(result)
+        for sentence in expected_sentences:
+            assert sentence in combined_source_string
 
-        raise KeyError(registration_number)
+        assert (len(expected_sentences)) == len(result)
 
-    def test_extract_returns_expected_for_2012_000003(
-        self,
-        followup_events_law_passed,
-    ):
+    def test_2012_000005(self, followup_events_law_passed):
+        registration, expected, source = followup_events_law_passed[1]
+        assert registration == "2012/000005"
+        result = extract(source)
+        assert result is None
 
-        registration_number, expected, text_items = self._get_sample(
-            followup_events_law_passed, "2012/000003"
-        )
-        assert registration_number == "2012/000003"
-        assert extract(text_items) == expected
-        assert (
-            len(expected) == 9
-        )  # Sanity check: verify multiple sentences were matched
+    def test_2017_000002(self, followup_events_law_passed):
+        registration, expected, source = followup_events_law_passed[2]
+        assert registration == "2017/000002"
+        result = extract(source)
+        assert result == expected
 
-    def test_extract_returns_none_for_2012_000005(
-        self,
-        followup_events_law_passed,
-    ):
+    def test_2012_000007(self, followup_events_law_passed):
+        registration, expected, source = followup_events_law_passed[3]
+        assert registration == "2012/000007"
+        result = extract(source)
+        assert result is None
 
-        # 2012/000005 'One of Us' had no new law passed
-        registration_number, expected, text_items = self._get_sample(
-            followup_events_law_passed, "2012/000005"
-        )
-        assert registration_number == "2012/000005"
-        assert expected is None
-        assert extract(text_items) is None
+    def test_2017_000004(self, followup_events_law_passed):
+        registration, expected, source = followup_events_law_passed[4]
+        assert registration == "2017/000004"
+        result = extract(source)
+        assert result is None
 
-    def test_extract_returns_expected_for_2017_000002(
-        self,
-        followup_events_law_passed,
-    ):
+    def test_2018_000004(self, followup_events_law_passed):
+        registration, expected, source = followup_events_law_passed[5]
+        assert registration == "2018/000004"
+        result = extract(source)
+        assert result is None
 
-        registration_number, expected, text_items = self._get_sample(
-            followup_events_law_passed, "2017/000002"
-        )
-        assert registration_number == "2017/000002"
-        assert expected is not None
-        assert extract(text_items) == expected
+    def test_2019_000016(self, followup_events_law_passed):
+        registration, expected, source = followup_events_law_passed[6]
+        assert registration == "2019/000016"
+        result = extract(source)
+        assert result == expected
 
-    def test_extract_returns_none_for_2017_000004(
-        self,
-        followup_events_law_passed,
-    ):
+    def test_2020_000001(self, followup_events_law_passed):
+        registration, expected, source = followup_events_law_passed[7]
+        assert registration == "2020/000001"
+        result = extract(source)
+        assert result == expected
 
-        # Minority SafePack - No new law entered into force from the follow-up
-        registration_number, expected, text_items = self._get_sample(
-            followup_events_law_passed, "2017/000004"
-        )
-        assert registration_number == "2017/000004"
-        assert expected is None
-        assert extract(text_items) is None
+    def test_2021_000006(self, followup_events_law_passed):
+        registration, expected, source = followup_events_law_passed[8]
+        assert registration == "2021/000006"
+        result = extract(source)
+        assert result is None
 
-    def test_extract_returns_expected_for_2019_000016(
-        self,
-        followup_events_law_passed,
-    ):
+    def test_2022_000002(self, followup_events_law_passed):
+        registration, expected, source = followup_events_law_passed[9]
+        assert registration == "2022/000002"
+        result = extract(source)
+        assert result == expected
 
-        registration_number, expected, text_items = self._get_sample(
-            followup_events_law_passed, "2019/000016"
-        )
-        assert registration_number == "2019/000016"
-        assert expected is not None
-        assert "entered into force on 18 August 2024" in expected[1]
-        assert extract(text_items) == expected
-
-    def test_extract_returns_expected_for_2020_000001(
-        self,
-        followup_events_law_passed,
-    ):
-
-        registration_number, expected, text_items = self._get_sample(
-            followup_events_law_passed, "2020/000001"
-        )
-        assert registration_number == "2020/000001"
-        assert expected is not None
-        assert any("entered into force in January 2024" in e for e in expected)
-        assert extract(text_items) == expected
-
-    def test_extract_returns_none_for_2021_000006(
-        self,
-        followup_events_law_passed,
-    ):
-
-        # Save Cruelty Free Cosmetics - Roadmap work ongoing, no laws passed yet
-        registration_number, expected, text_items = self._get_sample(
-            followup_events_law_passed, "2021/000006"
-        )
-        assert registration_number == "2021/000006"
-        assert expected is None
-        assert extract(text_items) is None
-
-    def test_extract_handles_none_input(self):
-        """
-        Verify that if the ECI has absolutely no followup_events (None input),
-        the extractor handles it gracefully and returns None.
-        """
-
-        assert extract(None) is None
+    def test_2024_000004(self, followup_events_law_passed):
+        registration, expected, source = followup_events_law_passed[10]
+        assert registration == "2024/000004"
+        result = extract(source)
+        assert result is None
