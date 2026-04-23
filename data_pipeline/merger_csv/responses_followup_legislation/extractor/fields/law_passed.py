@@ -26,7 +26,7 @@ NON_EXPLICIT_MENTIONED_LEGISLATION = [r"new minimum hygiene standards?"]
 _LEGISLATION = [
     r"regulations?",
     r"directives?",
-    r"(?:legislative |legal |delegated |implementing )?acts?",
+    r"(?:legislative |legal )?acts?", # |delegated |implementing
     r"legislations?",
     r"laws?",
     r"(?:legal |legislative )?instruments?",
@@ -34,19 +34,25 @@ _LEGISLATION = [
     r"amendments?",
     r"revisions?",
     r"rules?",
+    r"codes?"
 ] + NON_EXPLICIT_MENTIONED_LEGISLATION
+
+_FALSE_POSITIVE_LEGISLATION = ["proposal to adopt"]
+
 
 # Verb/action lists
 _VERBS = [
-    r"appl(?:y|ies|ied|ying|icable|ication)",
-    r"enter(?:ed|s|ing)?\s+into\s+force",
+    r"appl(?:y|ies|ied|ying|icable)", # ication
+    r"enter(?:ed|s|ing)?\s+(?:into\s+force|in(?:to)?\s+application)",
     r"force(?:d|s)?\s+into",
     r"repeal(?:ed|s)?",
     r"adopt(?:ed|s|ing)?",
-    r"implement(?:ed|s|ing)?",
-    r"implementation(?!\s+reports?)",
+    # r"implement(?:ed|s|ing)?",
+    # r"implementation(?!\s+reports?)",
     r"came\s+into\s+force",
     r"became\s+applicable",
+    # r"application(?!\s+of\s+the\s+(?:rules|directive|regulation))",
+    r"publish(?:ed|s|ing)?\s+in\s+(?:the\s+)?Official\s+Journal"
 ]
 
 _COMPILED_NEGATIONS: list[re.Pattern] = compile_patterns(NEGATION_TERMS)
@@ -54,7 +60,7 @@ _COMPILED_LEGISLATION: list[re.Pattern] = compile_patterns(_LEGISLATION)
 _COMPILED_VERBS: list[re.Pattern] = compile_patterns(_VERBS)
 
 # Up to 20 whitespace-separated tokens between verb and legislation or vice-versa
-_WORD_GAP = r"(?:\s+\S+){0,20}\s+"
+_WORD_GAP = r"(?:\s+\S+){0,30}\s+"
 
 # Compile permutations of Verb + Gap + Legislation and Legislation + Gap + Verb
 LAW_PASSED_PATTERNS: list[re.Pattern] = []
@@ -79,14 +85,31 @@ for verb_pattern in _COMPILED_VERBS:
 
 def _split_into_sentences(text: str) -> list[str]:
     """
-    Splits text into sentence chunks to evaluate negations locally.
+    Splits text into sentence chunks to evaluate negations locally,
+    while ignoring periods in common abbreviations.
     """
-    # Simple split by period, exclamation, or question mark
+    # Mask common abbreviations to prevent incorrect splits
+    text = re.sub(r'\bi\.e\.', 'i<dot>e<dot>', text, flags=re.IGNORECASE)
+    text = re.sub(r'\be\.g\.', 'e<dot>g<dot>', text, flags=re.IGNORECASE)
+    text = re.sub(r'\betc\.', 'etc<dot>', text, flags=re.IGNORECASE)
+    
+    # Split by period, exclamation, or question mark followed by whitespace
     chunks = re.split(r"(?<=[.!?])\s+", text)
-    return [c for c in chunks if c.strip()]
+    
+    # Restore the masked dots and filter empty strings
+    restored_chunks = []
+    for c in chunks:
+        if not c.strip():
+            continue
+        c = c.replace('i<dot>e<dot>', 'i.e.')
+        c = c.replace('e<dot>g<dot>', 'e.g.')
+        c = c.replace('etc<dot>', 'etc.')
+        restored_chunks.append(c)
+        
+    return restored_chunks
 
 
-def extract(text_items: list[str]) -> list[str] | None:
+def extract(text_items: list[str], rejected_legislation: bool = False) -> list[str] | None:
     """
     Scan *text_items* for indications that a law was passed/active.
 
@@ -127,7 +150,7 @@ def extract(text_items: list[str]) -> list[str] | None:
                 # This prevents "we will propose a regulation" from triggering
                 future_conditional = bool(
                     re.search(
-                        r"\b(?:will|expected to|proposes? to)\b",
+                        r"\b(?:will|expected to|proposes? to|proposal to adopt)\b",
                         sentence,
                         re.IGNORECASE,
                     )

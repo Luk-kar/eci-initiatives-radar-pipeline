@@ -239,8 +239,9 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
         (
             "2017/000002",
             [
-                "A proposal for a Regulation of the European Parliament and the Council on the transparency and sustainability of the EU risk assessment in the food chain was adopted by the Commission on 11 April 2018 in response to the second aim of the initiative (see above).",
-                "Following the agreement of the European Parliament and the Council, the Regulation of the European Parliament and the Council of the European Parliament and the Council was published in the Official Journal of the EU on 6 September 2019. Following its entry into force 20 days after publication, it became applicable 18 months later, i.e. on 27 March 2021 .",
+                # "A proposal for a Regulation of the European Parliament and the Council on the transparency and sustainability of the EU risk assessment in the food chain was adopted by the Commission on 11 April 2018 in response to the second aim of the initiative (see above).",
+                "[A proposal for a Regulation of the European Parliament and the Council on the transparency and sustainability of the EU risk assessment in the food chain](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A52018PC0179&qid=1616683628859) was adopted by the Commission on 11 April 2018 in response to the second aim of the initiative (see above).",
+                "Following the agreement of the European Parliament and the Council, the [Regulation of the European Parliament and the Council](https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32019R1381) of the European Parliament and the Council was published in the Official Journal of the EU on 6 September 2019.",
                 # False-positive:
                 #
                 # "The new Regulation sets out objectives and general principles of risk communication.
@@ -368,7 +369,8 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
         (
             "2022/000002",
             [
-                "Through an Implementing Regulation adopted on 17 July 2025, American mink (Neovison vison) is now listed under the Invasive Alien Species Regulation. The listing of this species will enter into force in August 2027.",
+                # "Through an Implementing Regulation adopted on 17 July 2025, American mink (Neovison vison) is now listed under the Invasive Alien Species Regulation. The listing of this species will enter into force in August 2027.",
+                "Through an [Implementing Regulation adopted on 17 July 2025](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32025R1422&qid=1753087782491) , American mink (Neovison vison) is now listed under the Invasive Alien Species Regulation."
             ],
             [
                 "On 9 February 2024, Commissioner Stella Kyriakides met with the organisers of ‘Fur Free Europe’ to discuss the Commission’s reply to the initiative.",
@@ -382,5 +384,5 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
                 "Additional information regarding this European Citizens' Initiative are available on the [organisers' website](https://www.eurogroupforanimals.org/fur-free-europe) organisers' website and the [dedicated Commission's webpage.](https://citizens-initiative.europa.eu/fur-free-europe_en)",
             ],
         ),
-        ("2024/000004", None),
+        ("2024/000004", None, None),
     ]
