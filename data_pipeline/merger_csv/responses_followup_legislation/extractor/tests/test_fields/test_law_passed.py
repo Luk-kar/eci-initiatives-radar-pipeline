@@ -203,3 +203,44 @@ class TestSplitIntoSentences:
         """
         result = _split_into_sentences(input_text)
         assert result == expected_chunks
+
+class TestExtractLawPassedRejectedLegislationArgument:
+    """
+    Tests the early-exit behavior of the `rejected_legislation` argument.
+    """
+
+    def test_returns_none_when_rejected_legislation_is_true(self) -> None:
+        """
+        Ensure that if rejected_legislation=True, the extractor completely 
+        bypasses the regex search and returns None, even with matching text.
+        """
+        text_items = [
+            "The Regulation entered into force in January 2020.",
+            "The Commission adopted the directive."
+        ]
+        
+        result = extract(text_items, rejected_legislation=True)
+        
+        assert result is None, "Expected None when rejected_legislation is True"
+
+    def test_processes_normally_when_rejected_legislation_is_false(self) -> None:
+        """
+        Ensure that if rejected_legislation=False (the default), the extractor 
+        processes the text items and returns matches normally.
+        """
+        text_items = [
+            "The Regulation entered into force in January 2020."
+        ]
+        
+        result = extract(text_items, rejected_legislation=False)
+        
+        assert result is not None
+        assert len(result) == 1
+        assert result[0] == "The Regulation entered into force in January 2020."
+
+    def test_handles_empty_text_items_safely(self) -> None:
+        """
+        Ensure that empty text items return None safely regardless of the flag.
+        """
+        assert extract([], rejected_legislation=True) is None
+        assert extract([], rejected_legislation=False) is None

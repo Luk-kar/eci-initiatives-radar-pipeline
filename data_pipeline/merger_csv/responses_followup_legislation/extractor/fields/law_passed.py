@@ -108,6 +108,27 @@ def _split_into_sentences(text: str) -> list[str]:
         
     return restored_chunks
 
+def _is_future_conditional(text: str) -> bool:
+    """
+    Checks if a sentence uses future conditional language commonly
+    used for proposals, plans, or expected future legislation.
+    """
+    verbs = r"(?:adopt|publish|apply|enter\s+into\s+force|force\s+into|repeal)"
+
+    # Expanded list of future/conditional phrases
+    future_phrases = [
+        rf"shall\s+{verbs}",
+        rf"expected\s+to\s+{verbs}",
+        rf"plans?\s+to\s+{verbs}",
+        rf"preparing\s+to\s+{verbs}",
+        rf"intended\s+to\s+{verbs}",
+        rf"set\s+to\s+{verbs}",
+        rf"proposes?\s+to",
+        rf"proposal\s+to\s+adopt",
+    ]
+    
+    pattern = rf"\b(?:{'|'.join(future_phrases)})\b"
+    return bool(re.search(pattern, text, re.IGNORECASE))
 
 def extract(text_items: list[str], rejected_legislation: bool = False) -> list[str] | None:
     """
@@ -119,12 +140,15 @@ def extract(text_items: list[str], rejected_legislation: bool = False) -> list[s
 
     Args:
         text_items: Pre-merged list of text fragments for one initiative.
+        rejected_legislation: When True, skips all extraction logic and returns
+            None immediately. Use this when the initiative was explicitly rejected
+            and no law-passed extraction is relevant.
 
     Returns:
         ``list[str]`` of original text items when at least one matches,
         ``None`` otherwise.
     """
-    if not text_items:
+    if rejected_legislation or not text_items:
         return None
 
     matched_items: list[str] = []
@@ -139,27 +163,15 @@ def extract(text_items: list[str], rejected_legislation: bool = False) -> list[s
         item_matched = False
 
         for sentence in sentences:
-            # Check if this sentence has a law passed trigger
             sentence_has_match = any(p.search(sentence) for p in LAW_PASSED_PATTERNS)
 
             if sentence_has_match:
-                # Check for negations within the same sentence
                 is_negated = any(neg.search(sentence) for neg in _COMPILED_NEGATIONS)
 
-                # Exclude future conditional "will" or "expected" commonly used for proposals
-                # This prevents "we will propose a regulation" from triggering
-                future_conditional = bool(
-                    re.search(
-                        r"\b(?:will|expected to|proposes? to|proposal to adopt)\b",
-                        sentence,
-                        re.IGNORECASE,
-                    )
-                )
-
-                if not is_negated and not future_conditional:
+                if not is_negated and not _is_future_conditional(sentence):
                     logger.debug("LAW_PASSED hit in sentence: %.80s", sentence)
                     item_matched = True
-                    break  # Found a valid hit in this item, no need to check other sentences
+                    break
 
         if item_matched:
             matched_items.append(item)

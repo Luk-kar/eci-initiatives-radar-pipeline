@@ -19,6 +19,11 @@ def extract(law_passed: list[str] | None) -> bool:
         law_passed: Value already computed by ``law_passed.extract()``.
 
     Returns:
-        ``True`` when *law_passed* is a non-empty list, ``False`` otherwise.
+        ``True`` when *law_passed* contains at least one valid, non-empty string.
+        ``False`` otherwise (e.g., None, [], [" "], [None]).
     """
-    return law_passed is not None
+    if not law_passed:
+        return False
+        
+    # Returns True if any item exists and contains characters other than whitespace
+    return any(item and item.strip() for item in law_passed)

@@ -29,9 +29,9 @@ def analyse_row(
     ``LegislationResult``.
 
     Each field is computed independently:
-    - ``Law_Passed``           → ``fields.law_passed.extract``
-    - ``Is_Law_Passed``        → ``fields.is_law_passed.extract`` (derived from Law_Passed)
     - ``Rejected_Legislation`` → ``fields.rejected_legislation.extract``
+    - ``Law_Passed``           → ``fields.law_passed.extract`` (skips if rejected)
+    - ``Is_Law_Passed``        → ``fields.is_law_passed.extract`` (derived from Law_Passed)
 
     Args:
         registration_number: Unique ECI identifier (e.g. ``"ECI(2019)000007"``).
@@ -41,13 +41,17 @@ def analyse_row(
     Returns:
         Populated ``LegislationResult`` instance.
     """
-    lp = _law_passed.extract(text_items)
+    # 1. Determine if the legislation was explicitly rejected
+    is_rejected = _rejected_legislation.extract(text_items)
+
+    # 2. Extract law passed, skipping the logic if the initiative was rejected
+    lp = _law_passed.extract(text_items, rejected_legislation=is_rejected)
 
     result = LegislationResult(
         registration_number=registration_number,
         Law_Passed=lp,
         Is_Law_Passed=_is_law_passed.extract(lp),
-        Rejected_Legislation=_rejected_legislation.extract(text_items),
+        Rejected_Legislation=is_rejected,
     )
 
     logger.debug(
