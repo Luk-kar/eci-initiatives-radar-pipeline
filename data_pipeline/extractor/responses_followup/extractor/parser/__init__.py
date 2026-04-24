@@ -18,7 +18,12 @@ from .fields import (
 
 logger = logging.getLogger(__name__)
 
-CSV_COLUMNS: list[str] = list(ECIFollowupParseHTMLRecord.model_fields)
+# Pydantic v2 uses model_fields; v1 uses __fields__
+CSV_COLUMNS: list[str] = list(
+    ECIFollowupParseHTMLRecord.model_fields
+    if hasattr(ECIFollowupParseHTMLRecord, "model_fields")
+    else ECIFollowupParseHTMLRecord.__fields__
+)
 
 
 def parse_HTML(html_file: Path, registration_number: str) -> dict:

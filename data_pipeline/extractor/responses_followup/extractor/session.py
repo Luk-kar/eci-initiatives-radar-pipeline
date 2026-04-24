@@ -6,6 +6,7 @@ and validates that all required input paths exist.
 import logging
 from pathlib import Path
 from typing import Optional
+from datetime import datetime
 
 from data_pipeline.pipeline_shared.consts import (
     DATA_DIR,
@@ -13,7 +14,8 @@ from data_pipeline.pipeline_shared.consts import (
     RESPONSES_FOLLOWUP_DIR_NAME,
     LOG_EXTRACTOR_RESPONSES_FOLLOWUP_PATTERN,
     HTML_DOMAIN_EC_FOLLOWUP,
-    ECI_RESPONSES_CSV_GLOB,
+    ECI_RESPONSES_CSV_PATTERN,
+    TIMESTAMP_FORMAT,
 )
 from data_pipeline.pipeline_shared.logger import get_logger
 from data_pipeline.pipeline_shared.locate_run_dir import find_newest_scraped_data_dir
@@ -56,15 +58,33 @@ def setup(
 
     return html_dir, output_csv, followup_list_csv, logger
 
-
 def _find_responses_csv(session_path: Path) -> Optional[Path]:
-    """Return the latest eci_responses_*.csv in *session_path* (not in a subdirectory).
+    """Return the latest eci_responses_*.csv in *session_path* (not in a subdirectory)."""
+    
+    # Creates: "eci_responses_%Y-%m-%d_%H-%M-%S.csv"
+    expected_format = ECI_RESPONSES_CSV_PATTERN.format(timestamp=TIMESTAMP_FORMAT)
+    
+    candidates = []
 
-    Filenames embed a timestamp (eci_responses_2026-04-02_12-39-21.csv), so a
-    lexicographic sort on the name is also a chronological sort.
+    for filepath in session_path.iterdir():
 
-    Returns:
-        Path to the most recent match, or None if none found.
-    """
-    candidates = sorted(session_path.glob(ECI_RESPONSES_CSV_GLOB))
-    return candidates[-1] if candidates else None
+        if filepath.is_file():
+
+            try:
+                # Validates the entire filename structure and timestamp in one pass
+                datetime.strptime(filepath.name, expected_format)
+                candidates.append(filepath)
+
+            except ValueError:
+                # Silently ignore files that don't match the exact structure
+                continue
+                
+    if not candidates:
+        raise FileNotFoundError(
+            f"No responses CSV matching pattern '{ECI_RESPONSES_CSV_PATTERN}' "
+            f"found in session directory: {session_path}"
+        )
+
+    latest_response_csv = sorted(candidates)[-1]
+        
+    return latest_response_csv

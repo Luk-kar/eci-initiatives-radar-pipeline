@@ -51,7 +51,6 @@ class TestExtractMetadata:
 
     def test_different_row_values(self):
 
-        # FIX 2: row dict updated to use current field names
         row = {
             "registration_number": "2021/000042",
             "initiative_url": "https://ec.europa.eu/initiative/42",
@@ -63,5 +62,4 @@ class TestExtractMetadata:
 
         assert result.registration_number == "2021/000042"
         assert result.title == "Clean Air Now"
-        # FIX: added followup_url assertion (field is now part of the model)
         assert result.followup_url == "https://ec.europa.eu/followup/42"

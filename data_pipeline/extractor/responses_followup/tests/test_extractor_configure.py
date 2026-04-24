@@ -2,10 +2,8 @@
 
 from unittest.mock import patch
 
-# FIX: import from responses_followup (not responses)
 from data_pipeline.extractor.responses_followup.extractor import configure
 
-# FIX: pattern updated to match ECI_RESPONSES_FOLLOWUP_CSV_PATTERN naming convention
 PATTERN = "eci_responses_followup_{timestamp}.csv"
 
 

@@ -93,5 +93,3 @@ FILE_ENCODING = "utf-8"
 # expected domain before extraction begins.
 HTML_DOMAIN_ECI_PORTAL = "citizens-initiative.europa.eu"  # initiatives + responses
 HTML_DOMAIN_EC_FOLLOWUP = "ec.europa.eu"  # responses_followup
-
-ECI_RESPONSES_CSV_GLOB: str = "eci_responses_*.csv"

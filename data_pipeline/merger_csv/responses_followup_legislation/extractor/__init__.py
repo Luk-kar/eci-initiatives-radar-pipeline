@@ -49,11 +49,12 @@ def analyse_row(
 
     result = LegislationResult(
         registration_number=registration_number,
+        followup_events=text_items,
         Law_Passed=lp,
         Is_Law_Passed=_is_law_passed.extract(lp),
         Rejected_Legislation=is_rejected,
     )
-
+    
     logger.debug(
         "%s → Is_Law_Passed=%s  Rejected=%s  spans=%d",
         registration_number,

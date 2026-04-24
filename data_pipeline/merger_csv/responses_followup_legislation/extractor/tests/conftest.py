@@ -1,3 +1,14 @@
+"""
+This module provides shared pytest fixtures containing mock data for testing 
+the extraction logic of European Citizens' Initiatives (ECI) follow-up responses. 
+
+It acts as a centralized repository of known inputs and expected outputs, 
+enabling the test suite to verify that the extraction algorithms correctly 
+identify whether the European Commission passed new legislation, rejected 
+legislative demands, or made future commitments based on real-world 
+ECI text patterns.
+"""
+
 import pytest
 
 

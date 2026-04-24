@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 
 from data_pipeline.extractor.responses.extractor.load_metadata import (
-    _load_responses_metadata,
+    _load_responses_metadata, load_metadata
 )
 
 FILE_ENCODING = "utf-8"
@@ -45,11 +45,7 @@ class TestLoadResponsesMetadata:
             ],
         )
 
-        with patch(
-            "data_pipeline.extractor.responses.extractor.load_metadata.FILE_ENCODING",
-            FILE_ENCODING,
-        ):
-            result = _load_responses_metadata(csv_path, reg_numbers={"2020/000001"})
+        result = _load_responses_metadata(csv_path, reg_numbers={"2020/000001"})
 
         assert "2020/000001" in result
         assert "2020/000002" not in result
@@ -69,12 +65,7 @@ class TestLoadResponsesMetadata:
             ],
         )
 
-        with patch(
-            "data_pipeline.extractor.responses.extractor.load_metadata.FILE_ENCODING",
-            FILE_ENCODING,
-        ):
-
-            result = _load_responses_metadata(csv_path, reg_numbers={"2020/000001"})
+        result = _load_responses_metadata(csv_path, reg_numbers={"2020/000001"})
 
         assert result["2020/000001"]["registration_number"] == "2020/000001"
         assert result["2020/000001"]["url"] == "u1"
@@ -95,12 +86,8 @@ class TestLoadResponsesMetadata:
                 },
             ],
         )
-        with patch(
-            "data_pipeline.extractor.responses.extractor.load_metadata.FILE_ENCODING",
-            FILE_ENCODING,
-        ):
 
-            result = _load_responses_metadata(csv_path, reg_numbers=set())
+        result = _load_responses_metadata(csv_path, reg_numbers=set())
 
         assert result == {}
 
@@ -127,16 +114,8 @@ class TestLoadMetadata:
             "2020/000099": tmp_path / "2020_000099_en.html",
         }
 
-        with patch(
-            "data_pipeline.extractor.responses.extractor.load_metadata.FILE_ENCODING",
-            FILE_ENCODING,
-        ):
-            from data_pipeline.extractor.responses.extractor.load_metadata import (
-                load_metadata,
-            )
-
-            with pytest.raises(FileNotFoundError, match="no matching CSV record"):
-                load_metadata(csv_path, html_files)
+        with pytest.raises(FileNotFoundError, match="no matching CSV record"):
+            load_metadata(csv_path, html_files)
 
     def test_happy_path_returns_metadata(self, tmp_path):
 
@@ -155,14 +134,6 @@ class TestLoadMetadata:
 
         html_files = {"2020/000001": tmp_path / "2020_000001_en.html"}
 
-        with patch(
-            "data_pipeline.extractor.responses.extractor.load_metadata.FILE_ENCODING",
-            FILE_ENCODING,
-        ):
-            from data_pipeline.extractor.responses.extractor.load_metadata import (
-                load_metadata,
-            )
-
-            result = load_metadata(csv_path, html_files)
+        result = load_metadata(csv_path, html_files)
 
         assert result["2020/000001"]["title"] == "T1"

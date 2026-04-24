@@ -264,6 +264,7 @@ def _write_output(data_dir: Path, results: list[LegislationResult]) -> Path:
             writer.writerow(
                 {
                     "registration_number": r.registration_number,
+                    "followup_events": r.followup_events,
                     "Law_Passed": r.Law_Passed,
                     "Is_Law_Passed": r.Is_Law_Passed,
                     "Rejected_Legislation": r.Rejected_Legislation,

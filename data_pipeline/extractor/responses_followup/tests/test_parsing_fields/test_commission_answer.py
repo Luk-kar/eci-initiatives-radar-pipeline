@@ -4,7 +4,6 @@ import pytest
 
 from bs4 import BeautifulSoup, Tag
 
-# FIX: import from responses_followup (not responses)
 from data_pipeline.extractor.responses_followup.extractor.parser.fields.commission_answer import (
     extract_commission_answer,
 )
