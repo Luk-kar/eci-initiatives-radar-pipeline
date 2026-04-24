@@ -53,7 +53,7 @@ def parse_text_list(raw: str | None, column: str) -> list[str]:
     return items
 
 
-def parse_optional_textl_ist(raw: str | None, column: str) -> list[str]:
+def parse_optional_text_list(raw: str | None, column: str) -> list[str]:
     """Parse an optional list-literal cell.
 
     Missing values and blank strings are treated as no items. This is used for
@@ -115,14 +115,14 @@ def concatenate_text_lists(
         "commission_answer_text",
     )
 
-    embedded_followup_items = parse_optional_textl_ist(
+    embedded_followup_items = parse_optional_text_list(
         responses_row.get("followup_events"),
         "followup_events",
     )
 
     followup_items: list[str] = []
     if followup_row is not None:
-        followup_items = parse_optional_textl_ist(
+        followup_items = parse_optional_text_list(
             followup_row.get("followup_events"),
             "followup_events",
         )
