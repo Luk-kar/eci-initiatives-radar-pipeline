@@ -25,11 +25,8 @@ class TestParseTextList:
 
         assert actual == ["alpha", "beta"]
 
-    def test_parse_text_list_returns_empty_list_for_literal_none(self):
-
-        raw = "None"
-
-        actual = assemble.parse_text_list(raw, "followup_events")
+    def test_parsetextlist_returns_empty_list_for_literal_none(self) -> None:
+        actual = assemble.parsetextlist('None', 'followupevents')
 
         assert actual == []
 
@@ -38,12 +35,9 @@ class TestParseTextList:
         with pytest.raises(ValueError, match="is missing"):
             assemble.parse_text_list(None, "commission_answer_text")
 
-    def test_parse_text_list_raises_for_invalid_literal(self):
-
-        raw = "[unclosed"
-
-        with pytest.raises(ValueError, match="not a valid Python literal"):
-            assemble.parse_text_list(raw, "commission_answer_text")
+    def test_parsetextlist_raises_for_invalid_literal(self) -> None:
+        with pytest.raises(ValueError, match='not a valid Python literal'):
+            assemble.parsetextlist('[unclosed', 'commissionanswertext')
 
     def test_parse_text_list_raises_for_non_list_literal(self):
 
