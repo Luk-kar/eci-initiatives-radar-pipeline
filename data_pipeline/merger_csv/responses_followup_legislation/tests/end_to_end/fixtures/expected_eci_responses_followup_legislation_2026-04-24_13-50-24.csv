@@ -1,7 +1,7 @@
-registration_number,followup_events,Law_Passed,Is_Law_Passed,Rejected_Legislation
-2012/000001,"['The Commission has decided not to submit a legislative proposal.', 'On 1 March 2025, the Regulation entered into force.']",,False,True
-2012/000002,"['The Commission will continue monitoring implementation.', 'On 16 December 2020, the European Parliament adopted the revised Drinking Water Directive.']","['On 16 December 2020, the European Parliament adopted the revised Drinking Water Directive.']",True,False
-2012/000003,"['The Commission plans to adopt a legislative proposal in 2027.']",,False,False
-2012/000004,"['Consequently, no new legislation will be proposed in response to this initiative.', 'The Commission committed to come forward with a legislative proposal by May 2028.']",,False,False
-2012/000005,"['The [Directive](https://example.com/directive) entered into force on 12 January 2021.']","['The [Directive](https://example.com/directive) entered into force on 12 January 2021.']",True,False
-2012/000006,"['The Regulation was published in the Official Journal on 6 September 2019.', 'The Directive entered into force on 12 January 2021.']","['The Regulation was published in the Official Journal on 6 September 2019.', 'The Directive entered into force on 12 January 2021.']",True,False
+registration_number,commission_answer_text,followup_events,Law_Passed,Is_Law_Passed,Rejected_Legislation
+2012/000001,['The Commission has decided not to submit a legislative proposal.'],"['On 1 March 2025, the Regulation entered into force.']",,False,True
+2012/000002,['The Commission will continue monitoring implementation.'],"['On 16 December 2020, the European Parliament adopted the revised Drinking Water Directive.']","['On 16 December 2020, the European Parliament adopted the revised Drinking Water Directive.']",True,False
+2012/000003,['The Commission plans to adopt a legislative proposal in 2027.'],[],,False,False
+2012/000004,"['Consequently, no new legislation will be proposed in response to this initiative.', 'The Commission committed to come forward with a legislative proposal by May 2028.']",[],,False,False
+2012/000005,['The [Directive](https://example.com/directive) entered into force on 12 January 2021.'],[],['The [Directive](https://example.com/directive) entered into force on 12 January 2021.'],True,False
+2012/000006,['The Regulation was published in the Official Journal on 6 September 2019.'],['The Directive entered into force on 12 January 2021.'],"['The Regulation was published in the Official Journal on 6 September 2019.', 'The Directive entered into force on 12 January 2021.']",True,False

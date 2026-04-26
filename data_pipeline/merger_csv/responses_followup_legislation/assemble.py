@@ -84,29 +84,23 @@ def merge_deduplicated_text_lists(*groups: list[str]) -> list[str]:
     return merged
 
 
-def concatenate_text_lists(
+def split_text_lists(
     responses_row: dict[str, str],
     followup_row: dict[str, str] | None,
-) -> list[str]:
-    """Combine commission_answer_text and follow-up text into one list.
+) -> tuple[list[str], list[str]]:
+    """
+    Parse and split source text into (commission_answer_items, followup_items).
 
-    Sources are merged in this order:
-    1. commission_answer_text from eci_responses.csv
-    2. embedded followup_events from eci_responses.csv, when present
-    3. followup_events from eci_responses_followup.csv, when present
-
-    Exact duplicate items are removed while preserving first-seen order.
-
-    Args:
-        responses_row: Row from responses CSV.
-        followup_row: Matching row from follow-up CSV, if present.
-
-    Returns:
-        Combined text list.
+    - commission_answer_items → parsed list literal from
+      ``eci_responses.commission_answer_text``
+    - followup_items → parsed list literal from
+      ``eci_responses.followup_events`` (when embedded) merged with
+      ``eci_responses_followup.followup_events`` (when present),
+      deduplicated while preserving first-seen order
 
     Raises:
-        ValueError: If commission_answer_text is missing or malformed, or if any
-            present follow-up list literal is malformed.
+        ValueError: missing/malformed commission_answer_text or
+                    malformed follow-up list literal.
     """
     answer_items = parse_text_list(
         responses_row.get("commission_answer_text"),
@@ -125,9 +119,21 @@ def concatenate_text_lists(
             "followup_events",
         )
 
-    return merge_deduplicated_text_lists(
-        answer_items, embedded_followup_items, followup_items
+    merged_followup = merge_deduplicated_text_lists(
+        embedded_followup_items, followup_items
     )
+    return answer_items, merged_followup
+
+
+def concatenate_text_lists(
+    responses_row: dict[str, str],
+    followup_row: dict[str, str] | None,
+) -> list[str]:
+    """Backwards-compatible wrapper — returns answers ⊕ follow-ups, deduplicated."""
+
+    answer_items, followup_items = split_text_lists(responses_row, followup_row)
+
+    return merge_deduplicated_text_lists(answer_items, followup_items)
 
 
 def assemble_results(
@@ -149,7 +155,9 @@ def assemble_results(
     total = len(responses_rows)
 
     for i, response_row in enumerate(responses_rows, start=1):
+
         regnum = response_row.get("registration_number", "").strip()
+
         if not regnum:
             raise ValueError(
                 f"Responses row {i} has an empty registration_number. "
@@ -159,10 +167,23 @@ def assemble_results(
         logger.info("Analysing legislation follow-up for %s (%d/%d)", regnum, i, total)
 
         followup_row = followup_index.get(regnum)
-        text_items = concatenate_text_lists(response_row, followup_row)
-        logger.info("Prepared %d merged text item(s) for %s", len(text_items), regnum)
 
-        result = analyse_row(regnum, text_items)
+        answer_items, followup_items = split_text_lists(response_row, followup_row)
+        text_items = merge_deduplicated_text_lists(answer_items, followup_items)
+
+        logger.info(
+            "Prepared %d answer item(s) and %d follow-up item(s) for %s",
+            len(answer_items),
+            len(followup_items),
+            regnum,
+        )
+
+        result = analyse_row(
+            regnum,
+            text_items=text_items,
+            commission_answer_items=answer_items,
+            followup_items=followup_items,
+        )
         results.append(result)
 
     logger.info("Assembled %d legislation result rows", len(results))
