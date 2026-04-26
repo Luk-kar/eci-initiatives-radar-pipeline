@@ -9,6 +9,7 @@ from pathlib import Path
 from .assemble import assemble_results
 from .collect import collect_source_rows
 from .session import setup
+from .sort import sort_results_by_registration_number
 from .write import write_output
 
 logger = logging.getLogger(__name__)
@@ -39,7 +40,9 @@ def run() -> Path:
     results = assemble_results(responses_rows, followup_rows)
     logger.info("Analysis complete. %d initiative(s) processed", len(results))
 
-    output_path = write_output(data_dir, results)
+    sorted_results = sort_results_by_registration_number(results)
+
+    output_path = write_output(data_dir, sorted_results)
     logger.info("Done. Legislation output written to %s", output_path)
 
     return output_path

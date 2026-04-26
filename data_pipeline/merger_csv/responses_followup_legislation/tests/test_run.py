@@ -40,6 +40,8 @@ class TestRun:
             )
         ]
 
+        sorted_results = list(reversed(assembled_results))
+
         output_path = tmp_path / "output.csv"
 
         calls: list[tuple[str, object]] = []
@@ -60,9 +62,18 @@ class TestRun:
             calls.append(("write_output", (data_dir, results)))
             return output_path
 
+        def fake_sort_results_by_registration_number(results):
+            calls.append(("sort_results_by_registration_number", results))
+            return sorted_results
+
         monkeypatch.setattr(run_module, "setup", fake_setup)
         monkeypatch.setattr(run_module, "collect_source_rows", fake_collect_source_rows)
         monkeypatch.setattr(run_module, "assemble_results", fake_assemble_results)
+        monkeypatch.setattr(
+            run_module,
+            "sort_results_by_registration_number",
+            fake_sort_results_by_registration_number,
+        )
         monkeypatch.setattr(run_module, "write_output", fake_write_output)
 
         actual = run_module.run()
@@ -72,5 +83,6 @@ class TestRun:
             ("setup", None),
             ("collect_source_rows", tmp_path),
             ("assemble_results", (responses_rows, followup_rows)),
-            ("write_output", (tmp_path, assembled_results)),
+            ("sort_results_by_registration_number", assembled_results),
+            ("write_output", (tmp_path, sorted_results)),
         ]
