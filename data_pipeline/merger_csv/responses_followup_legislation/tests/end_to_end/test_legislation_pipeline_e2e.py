@@ -15,9 +15,6 @@ from data_pipeline.merger_csv.responses_followup_legislation import (
     write as write_module,
 )
 from data_pipeline.merger_csv.responses_followup_legislation import (
-    sort as sort_module,
-)
-from data_pipeline.merger_csv.responses_followup_legislation import (
     run as run_module,
 )
 
@@ -129,7 +126,7 @@ class TestResponsesFollowupLegislationMainEndToEnd:
         monkeypatch.setattr(write_module, "datetime", _FrozenDateTime)
 
         captured: dict[str, list] = {"input": [], "output": []}
-        original_sort = sort_module.sort_results_by_registration_number
+        original_sort = run_module.sort_by_registration_number
 
         def spy_sort(results):
             captured["input"] = list(results)
@@ -137,19 +134,21 @@ class TestResponsesFollowupLegislationMainEndToEnd:
             captured["output"] = list(sorted_results)
             return sorted_results
 
-        # Patch on the run module — that's where run.py imported the symbol.
-        monkeypatch.setattr(run_module, "sort_results_by_registration_number", spy_sort)
+        # run.py imported the helper into its own namespace via:
+        #   from data_pipeline.pipeline_shared.sort import sort_by_registration_number
+        # so the patch must target the binding on run_module.
+        monkeypatch.setattr(run_module, "sort_by_registration_number", spy_sort)
 
         main_module.main()
 
-        # Sort was invoked exactly once with non-empty input.
-        assert captured["input"], "sort_results_by_registration_number was not called"
+        # Sort was invoked with non-empty input.
+        assert captured["input"], "sort_by_registration_number was not called"
 
         # Sort produced ascending order.
         sorted_regs = [r.registration_number for r in captured["output"]]
         assert sorted_regs == sorted(sorted_regs)
 
-        # The CSV reflects the sorted order written by the sort step.
+        # The CSV reflects the order produced by the sort step.
         actual_output = (
             data_dir / "eci_responses_followup_legislation_2026-04-24_13-50-24.csv"
         )
