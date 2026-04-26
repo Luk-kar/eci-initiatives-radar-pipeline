@@ -10,6 +10,9 @@ import logging
 from pathlib import Path
 
 from data_pipeline.pipeline_shared.consts import ECI_RESPONSES_FOLLOWUP_CSV_PATTERN
+from data_pipeline.pipeline_shared.sort import (
+    sort_by_registration_number,
+)
 
 from .session import setup
 from .collect import collect_html_files
@@ -43,6 +46,7 @@ def run(output_csv_name: str, timestamp: str) -> None:
     metadata = load_metadata(followup_list_csv, html_files)
     parsed_data = parse_html_files(html_files)
     records = build_records(metadata, parsed_data)
+    records_sorted = sort_by_registration_number(records)
 
-    write_csv(records, output_csv)
+    write_csv(records_sorted, output_csv)
     logger.info("Done. %d records written to %s", len(records), output_csv)

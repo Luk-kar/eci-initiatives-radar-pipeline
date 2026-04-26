@@ -1,25 +1,56 @@
-"""Shared helper: order any record-like sequence by ``registration_number``."""
+"""
+Registration-Number Sorting
+---------------------------
+Shared helper that orders ECI pipeline records by ``registration_number``
+(earliest → latest).
+
+Registration numbers follow the ``YYYY/NNNNNN`` format, so plain
+lexicographic ordering equals chronological ordering.  This module is the
+single source of truth for that invariant across pipeline stages.
+"""
+
+from __future__ import annotations
 
 import logging
-from typing import Protocol, TypeVar
+from typing import Any, Iterable, TypeVar
 
 logger = logging.getLogger(__name__)
 
 
-class _HasRegistrationNumber(Protocol):
-    registration_number: str
+T = TypeVar("T")
 
 
-T = TypeVar("T", bound=_HasRegistrationNumber)
+def _registration_number_of(item: Any) -> str:
+    """Return ``item.registration_number`` for dataclass/pydantic rows,
+    falling back to ``item['registration_number']`` for plain dicts.
 
-
-def sort_by_registration_number(records: list[T]) -> list[T]:
+    Raises:
+        KeyError / AttributeError:  If the record exposes neither — callers
+            must produce records that carry a registration number.
     """
-    Return *records* sorted ascending by ``registration_number``.
 
-    Registration numbers follow ``YYYY/NNNNNN``, so lexicographic ordering
-    yields chronological order (earliest → latest).  The sort is stable.
+    value = getattr(item, "registration_number", None)
+    if value is not None:
+        return value
+    return item["registration_number"]
+
+
+def sort_by_registration_number(results: Iterable[T]) -> list[T]:
     """
-    sorted_records = sorted(records, key=lambda r: r.registration_number)
-    logger.info("Sorted %d record(s) by registration_number", len(sorted_records))
-    return sorted_records
+    Return a new list of *results* sorted by ``registration_number`` ascending.
+
+    Works for any record type exposing ``registration_number`` as either an
+    attribute (dataclass / pydantic model) or a mapping key (``dict`` row).
+
+    Args:
+        results: Unordered records.  Not mutated.
+
+    Returns:
+        New list ordered by ``registration_number``.  Stable: ties
+        (which should not occur in real data) preserve input order.
+    """
+
+    sorted_results = sorted(results, key=_registration_number_of)
+
+    logger.info("Sorted %d result row(s) by registration_number", len(sorted_results))
+    return sorted_results
