@@ -55,11 +55,12 @@ def analyse_row(
         Rejected_Legislation=is_rejected,
     )
     
-    logger.debug(
-        "%s → Is_Law_Passed=%s  Rejected=%s  spans=%d",
+    logger.info(
+        "Analysed %s: rejected=%s, law_passed=%s, matched_items=%d",
         registration_number,
-        result.Is_Law_Passed,
         result.Rejected_Legislation,
+        result.Is_Law_Passed,
         len(result.Law_Passed) if result.Law_Passed else 0,
     )
+    
     return result

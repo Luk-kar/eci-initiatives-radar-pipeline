@@ -8,32 +8,38 @@ from pathlib import Path
 
 from .assemble import assemble_results
 from .collect import collect_source_rows
+from .session import setup
 from .write import write_output
 
 logger = logging.getLogger(__name__)
 
 
-def run(data_dir: Path) -> Path:
+def run() -> Path:
     """
     Execute the full legislation-extraction pipeline step.
-
-    Steps
-    -----
-    1. Resolve the most recent responses and follow-up CSVs.
-    2. Validate and load both CSVs.
-    3. Validate cross-file registration-number consistency.
-    4. Concatenate text fields and run regex extraction for each initiative.
-    5. Write the output CSV and return its path.
-
-    Args:
-        data_dir: Timestamped run directory.
 
     Returns:
         Path to the written output CSV.
     """
+
+    global logger
+
+    data_dir, step_logger = setup()
+    logger = step_logger
+
+    logger.info("Starting legislation extraction in %s", data_dir)
+
     responses_rows, followup_rows = collect_source_rows(data_dir)
+    logger.info(
+        "Source collection complete. responses=%d, follow-up=%d",
+        len(responses_rows),
+        len(followup_rows),
+    )
+
     results = assemble_results(responses_rows, followup_rows)
+    logger.info("Analysis complete. %d initiative(s) processed", len(results))
 
-    logger.info("Regex extraction complete. %d initiative(s) processed.", len(results))
+    output_path = write_output(data_dir, results)
+    logger.info("Done. Legislation output written to %s", output_path)
 
-    return write_output(data_dir, results)
+    return output_path

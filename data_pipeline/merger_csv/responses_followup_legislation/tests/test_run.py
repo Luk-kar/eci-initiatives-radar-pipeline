@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 from data_pipeline.merger_csv.responses_followup_legislation import run as run_module
@@ -7,7 +8,9 @@ from data_pipeline.merger_csv.responses_followup_legislation.extractor import (
 
 
 class TestRun:
-    def test_run_coordinates_collection_assembly_and_writing(self, monkeypatch, tmp_path: Path):
+    def test_run_coordinates_collection_assembly_and_writing(
+        self, monkeypatch, tmp_path: Path
+    ):
         """
         Verify that the pipeline step runs source collection, result assembly,
         and output writing in the expected sequence.
@@ -41,6 +44,10 @@ class TestRun:
 
         calls: list[tuple[str, object]] = []
 
+        def fake_setup():
+            calls.append(("setup", None))
+            return tmp_path, logging.getLogger("test_run")
+
         def fake_collect_source_rows(data_dir):
             calls.append(("collect_source_rows", data_dir))
             return responses_rows, followup_rows
@@ -53,14 +60,16 @@ class TestRun:
             calls.append(("write_output", (data_dir, results)))
             return output_path
 
+        monkeypatch.setattr(run_module, "setup", fake_setup)
         monkeypatch.setattr(run_module, "collect_source_rows", fake_collect_source_rows)
         monkeypatch.setattr(run_module, "assemble_results", fake_assemble_results)
         monkeypatch.setattr(run_module, "write_output", fake_write_output)
 
-        actual = run_module.run(tmp_path)
+        actual = run_module.run()
 
         assert actual == output_path
         assert calls == [
+            ("setup", None),
             ("collect_source_rows", tmp_path),
             ("assemble_results", (responses_rows, followup_rows)),
             ("write_output", (tmp_path, assembled_results)),

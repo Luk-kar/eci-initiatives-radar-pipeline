@@ -5,8 +5,15 @@ from pathlib import Path
 
 import pytest
 
-from data_pipeline.merger_csv.responses_followup_legislation import __main__ as main_module
-from data_pipeline.merger_csv.responses_followup_legislation import write as write_module
+from data_pipeline.merger_csv.responses_followup_legislation import (
+    __main__ as main_module,
+)
+from data_pipeline.merger_csv.responses_followup_legislation import (
+    session as session_module,
+)
+from data_pipeline.merger_csv.responses_followup_legislation import (
+    write as write_module,
+)
 
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -60,17 +67,19 @@ class TestResponsesFollowupLegislationMainEndToEnd:
         Verify that the CLI entry point produces the expected legislation CSV
         from synthetic response and follow-up fixture files.
         """
-        
+
         data_dir = synthetic_legislation_csv_fixture_dir["data_dir"]
         expected_output = synthetic_legislation_csv_fixture_dir["expected_output"]
 
+        # find_newest_scraped_data_dir and get_logger are now imported in
+        # session.py (not __main__.py), so patch them on the session module.
         monkeypatch.setattr(
-            main_module,
+            session_module,
             "find_newest_scraped_data_dir",
             lambda *args, **kwargs: data_dir,
         )
         monkeypatch.setattr(
-            main_module,
+            session_module,
             "get_logger",
             lambda *args, **kwargs: logging.getLogger("test_legislation_e2e"),
         )

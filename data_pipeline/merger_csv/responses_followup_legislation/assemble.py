@@ -69,7 +69,6 @@ def parse_optional_text_list(raw: str | None, column: str) -> list[str]:
     return parse_text_list(raw, column)
 
 
-
 def merge_deduplicated_text_lists(*groups: list[str]) -> list[str]:
     """Merge text groups while preserving order and removing exact duplicates."""
     merged: list[str] = []
@@ -83,7 +82,6 @@ def merge_deduplicated_text_lists(*groups: list[str]) -> list[str]:
             merged.append(item)
 
     return merged
-
 
 
 def concatenate_text_lists(
@@ -127,8 +125,9 @@ def concatenate_text_lists(
             "followup_events",
         )
 
-    return merge_deduplicated_text_lists(answer_items, embedded_followup_items, followup_items)
-
+    return merge_deduplicated_text_lists(
+        answer_items, embedded_followup_items, followup_items
+    )
 
 
 def assemble_results(
@@ -147,7 +146,9 @@ def assemble_results(
     followup_index = index_by_registration(followup_rows) if followup_rows else {}
 
     results: list[LegislationResult] = []
-    for i, response_row in enumerate(responses_rows):
+    total = len(responses_rows)
+
+    for i, response_row in enumerate(responses_rows, start=1):
         regnum = response_row.get("registration_number", "").strip()
         if not regnum:
             raise ValueError(
@@ -155,8 +156,12 @@ def assemble_results(
                 f"Source CSV is malformed. Row={str(response_row)[:120]}"
             )
 
+        logger.info("Analysing legislation follow-up for %s (%d/%d)", regnum, i, total)
+
         followup_row = followup_index.get(regnum)
         text_items = concatenate_text_lists(response_row, followup_row)
+        logger.info("Prepared %d merged text item(s) for %s", len(text_items), regnum)
+
         result = analyse_row(regnum, text_items)
         results.append(result)
 
