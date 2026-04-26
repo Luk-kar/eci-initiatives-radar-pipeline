@@ -55,21 +55,6 @@ def commission_answers_rejection_legislation() -> list[tuple[bool, str, list[str
             ["not to submit a legislative proposal"],
         ),
         (
-            False,
-            "2017/000002",
-            [
-                "Official documents:",
-                "Main conclusions of the Communication:",
-                "On the first aim, to 'ban glyphosate-based herbicides', the Commission concluded that there are neither scientific nor legal grounds to justify a ban of glyphosate, and will not make a legislative proposal to that effect.",
-                "On the second aim, to “ensure that the scientific evaluation of pesticides for EU regulatory approval is based only on published studies, which are commissioned by competent public authorities instead of the pesticide industry”, the Commission committed to come forward with a legislative proposal by May 2018, amongst others, to strengthen the transparency of the EU risk assessment in the food chain and enhance – through a series of measures – the governance for the conduct of industry studies submitted to the European Food Safety Authority (EFSA) for risk assessment. See details below under ‘Follow-up’.",
-                "On the third aim, to 'set EU-wide mandatory reduction targets for pesticide use, with a view to achieving a pesticide-free future', the Commission concluded that it intends to focus on the implementation of the [Sustainable Use Directive](https://ec.europa.eu/food/plant/pesticides/sustainable_use_pesticides_en) , and will re-evaluate the situation, initially in a report to Council and the Parliament on the implementation of the Directive to be produced in 2019. The Commission committed also to establishing harmonised risk indicators to enable the monitoring of trends at EU level and to use the resulting data as a basis for determining future policy options.",
-            ],
-            [
-                "will not make a legislative proposal to that effect"
-            ],  # It is canceled by proposition of other later point legislation
-            # e. g. "the Commission committed to come forward with a legislative proposal"
-        ),
-        (
             True,
             "2012/000007",
             [
@@ -84,6 +69,21 @@ def commission_answers_rejection_legislation() -> list[tuple[bool, str, list[str
             [
                 "no repeal of that legislation was proposed"
             ],  # One part of the request rejected but still open for a new legislation
+        ),
+        (
+            False,
+            "2017/000002",
+            [
+                "Official documents:",
+                "Main conclusions of the Communication:",
+                "On the first aim, to 'ban glyphosate-based herbicides', the Commission concluded that there are neither scientific nor legal grounds to justify a ban of glyphosate, and will not make a legislative proposal to that effect.",
+                "On the second aim, to “ensure that the scientific evaluation of pesticides for EU regulatory approval is based only on published studies, which are commissioned by competent public authorities instead of the pesticide industry”, the Commission committed to come forward with a legislative proposal by May 2018, amongst others, to strengthen the transparency of the EU risk assessment in the food chain and enhance – through a series of measures – the governance for the conduct of industry studies submitted to the European Food Safety Authority (EFSA) for risk assessment. See details below under ‘Follow-up’.",
+                "On the third aim, to 'set EU-wide mandatory reduction targets for pesticide use, with a view to achieving a pesticide-free future', the Commission concluded that it intends to focus on the implementation of the [Sustainable Use Directive](https://ec.europa.eu/food/plant/pesticides/sustainable_use_pesticides_en) , and will re-evaluate the situation, initially in a report to Council and the Parliament on the implementation of the Directive to be produced in 2019. The Commission committed also to establishing harmonised risk indicators to enable the monitoring of trends at EU level and to use the resulting data as a basis for determining future policy options.",
+            ],
+            [
+                "will not make a legislative proposal to that effect"
+            ],  # It is canceled by proposition of other later point legislation
+            # e. g. "the Commission committed to come forward with a legislative proposal"
         ),
         (
             True,
@@ -248,6 +248,18 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
             ],
         ),
         (
+            "2012/000007",
+            None,
+            [
+                "The Commission adopted a Communication on 03 June 2015 setting out the actions it intended to take in response to the initiative [Stop Vivisection](http://ec.citizens-initiative.europa.eu/public/initiatives/successful/details/2012/000007) . See [press release](http://europa.eu/rapid/press-release_IP-15-5094_en.htm) .",
+                "The European Commission organised a scientific conference in Brussels on 6-7 December 2016 to engage the scientific community and relevant stakeholders in a debate on how to exploit cutting edge advances in biomedical and other research in the development of scientifically valid non-animal approaches (alternatives to animal testing).",
+                "On the occasion of the conference, the Commission reported on the progress made in implementing the follow-up actions to the initiative Stop Vivisection. See the [conference report](http://ec.europa.eu/environment/chemicals/lab_animals/3r/pdf/scientific_conference/non_animal_approaches_conference_report.pdf) (point 5, pp. 16-20).",
+                "[The Commission published a]() [review report](https://eur-lex.europa.eu/legal-content/EN/TXT/?qid=1510219889073&uri=COM:2017:631:FIN) of the Directive 2010/63/EU in 2017. In addition, it published a [report on implementation](https://eur-lex.europa.eu/legal-content/EN/TXT/?qid=1581689520921&uri=CELEX:52020DC0015) of this Directive in February 2020. These reports provided the first assessments of the extent to which the Directive is reaching its objectives and is implemented by the Member States.",
+                "Further information can be found on the [dedicated Commission website](http://ec.europa.eu/environment/chemicals/lab_animals/index_en.htm) .",
+                "On 18 April 2017, the European Ombudsman issued a [decision](https://www.ombudsman.europa.eu/en/cases/decision.faces/en/78182/html.bookmark) concerning the initiative 'Stop Vivisection'. The Ombudsman concluded that there was no maladministration by the Commission.",
+            ],
+        ),
+        (
             "2017/000002",
             [
                 # "A proposal for a Regulation of the European Parliament and the Council on the transparency and sustainability of the EU risk assessment in the food chain was adopted by the Commission on 11 April 2018 in response to the second aim of the initiative (see above).",
@@ -280,18 +292,6 @@ def followup_events_law_passed() -> list[tuple[bool, str, list[str]]]:
                 "Pesticides reduction: a key priority for the Farm to Fork Strategy",
                 "The [Farm to Fork Strategy](https://food.ec.europa.eu/horizontal-topics/farm-fork-strategy_en) , published in May 2020, sets ambitious targets for pesticides, notably a reduction by 50% of the use and risk of chemical and most hazardous pesticides .",
                 "For up-to-date information on the developments in the field of sustainable use of pesticides and harmonised risk indicators, see the [dedicated Commission website](https://food.ec.europa.eu/plants/pesticides/sustainable-use-pesticides_en) .",
-            ],
-        ),
-        (
-            "2012/000007",
-            None,
-            [
-                "The Commission adopted a Communication on 03 June 2015 setting out the actions it intended to take in response to the initiative [Stop Vivisection](http://ec.citizens-initiative.europa.eu/public/initiatives/successful/details/2012/000007) . See [press release](http://europa.eu/rapid/press-release_IP-15-5094_en.htm) .",
-                "The European Commission organised a scientific conference in Brussels on 6-7 December 2016 to engage the scientific community and relevant stakeholders in a debate on how to exploit cutting edge advances in biomedical and other research in the development of scientifically valid non-animal approaches (alternatives to animal testing).",
-                "On the occasion of the conference, the Commission reported on the progress made in implementing the follow-up actions to the initiative Stop Vivisection. See the [conference report](http://ec.europa.eu/environment/chemicals/lab_animals/3r/pdf/scientific_conference/non_animal_approaches_conference_report.pdf) (point 5, pp. 16-20).",
-                "[The Commission published a]() [review report](https://eur-lex.europa.eu/legal-content/EN/TXT/?qid=1510219889073&uri=COM:2017:631:FIN) of the Directive 2010/63/EU in 2017. In addition, it published a [report on implementation](https://eur-lex.europa.eu/legal-content/EN/TXT/?qid=1581689520921&uri=CELEX:52020DC0015) of this Directive in February 2020. These reports provided the first assessments of the extent to which the Directive is reaching its objectives and is implemented by the Member States.",
-                "Further information can be found on the [dedicated Commission website](http://ec.europa.eu/environment/chemicals/lab_animals/index_en.htm) .",
-                "On 18 April 2017, the European Ombudsman issued a [decision](https://www.ombudsman.europa.eu/en/cases/decision.faces/en/78182/html.bookmark) concerning the initiative 'Stop Vivisection'. The Ombudsman concluded that there was no maladministration by the Commission.",
             ],
         ),
         (

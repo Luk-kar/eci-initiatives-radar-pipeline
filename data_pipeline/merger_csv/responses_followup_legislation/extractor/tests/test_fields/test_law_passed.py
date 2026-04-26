@@ -1,8 +1,10 @@
 import pytest
 
 from data_pipeline.merger_csv.responses_followup_legislation.extractor.fields.law_passed import (
-    extract,_split_into_sentences
+    extract,
+    _split_into_sentences,
 )
+
 
 class TestExtractLawPassedBulk:
     """
@@ -82,40 +84,41 @@ class TestExtractLawPassedBulk:
                 f"Got:\n  {actual}"
             )
 
+
 class TestExtractLawPassedExplicit:
     """
-    Tests for explicit law-passed extraction, one test per ECI registration number,
-    driven by the ``followup_events_law_passed`` fixture.
+    Tests for explicit law-passed extraction, one test per ECI registration
+    number, driven by the ``followup_events_law_passed`` fixture.
     """
 
     def _assert_extraction(self, expected_registration: str, test_data: tuple):
-        """
-        Common assertion logic to validate the extracted law-passed text.
-        """
+        """Common assertion logic to validate the extracted law-passed text."""
+
         registration, expected_sentences, source = test_data
-        
-        # Ensure the test is checking the correct registration data
+
+        # Ensure the test is checking the correct registration data.
         assert registration == expected_registration
-        
+
         result = extract(source)
-        
-        # Handle cases where no extraction is expected
+
+        # No-extraction case.
         if not expected_sentences:
             assert not result, f"Expected no results, but got {result}"
             return
 
-        assert result is not None, f"Expected {len(expected_sentences)} sentences, but extract() returned None"
-        
+        assert result is not None, (
+            f"Expected {len(expected_sentences)} sentences, but extract() "
+            "returned None"
+        )
+
         combined_source_string = "\n".join(result)
-        
-        # Verify that all expected sentences were captured
+
         for sentence in expected_sentences:
             assert sentence in combined_source_string
 
-        # Verify that no extra/false-positive sentences were captured
-        assert len(expected_sentences) == len(result), (
-            f"Expected {len(expected_sentences)} results, got {len(result)}"
-        )
+        assert len(expected_sentences) == len(
+            result
+        ), f"Expected {len(expected_sentences)} results, got {len(result)}"
 
     def test_2012_000003(self, followup_events_law_passed):
         self._assert_extraction("2012/000003", followup_events_law_passed[0])
@@ -123,11 +126,11 @@ class TestExtractLawPassedExplicit:
     def test_2012_000005(self, followup_events_law_passed):
         self._assert_extraction("2012/000005", followup_events_law_passed[1])
 
-    def test_2017_000002(self, followup_events_law_passed):
-        self._assert_extraction("2017/000002", followup_events_law_passed[2])
-
     def test_2012_000007(self, followup_events_law_passed):
-        self._assert_extraction("2012/000007", followup_events_law_passed[3])
+        self._assert_extraction("2012/000007", followup_events_law_passed[2])
+
+    def test_2017_000002(self, followup_events_law_passed):
+        self._assert_extraction("2017/000002", followup_events_law_passed[3])
 
     def test_2017_000004(self, followup_events_law_passed):
         self._assert_extraction("2017/000004", followup_events_law_passed[4])
@@ -152,7 +155,7 @@ class TestExtractLawPassedExplicit:
 
 
 class TestSplitIntoSentences:
-    
+
     @pytest.mark.parametrize(
         "input_text, expected_chunks",
         [
@@ -161,48 +164,42 @@ class TestSplitIntoSentences:
                 "The Regulation was published in the Official Journal of the EU on 6 September 2019. Following its entry into force 20 days after publication, it became applicable 18 months later, i.e. on 27 March 2021 .",
                 [
                     "The Regulation was published in the Official Journal of the EU on 6 September 2019.",
-                    "Following its entry into force 20 days after publication, it became applicable 18 months later, i.e. on 27 March 2021 ."
-                ]
+                    "Following its entry into force 20 days after publication, it became applicable 18 months later, i.e. on 27 March 2021 .",
+                ],
             ),
             # 2. Standard sentence splitting with multiple punctuation types
             (
                 "First sentence. Second sentence! Third sentence?",
-                [
-                    "First sentence.",
-                    "Second sentence!",
-                    "Third sentence?"
-                ]
+                ["First sentence.", "Second sentence!", "Third sentence?"],
             ),
             # 3. Handling 'e.g.'
             (
                 "This applies to many things, e.g. water and air. We need them to survive.",
                 [
                     "This applies to many things, e.g. water and air.",
-                    "We need them to survive."
-                ]
+                    "We need them to survive.",
+                ],
             ),
             # 4. Handling 'etc.'
             (
                 "They bought apples, bananas, etc. at the market. Then they went home.",
                 [
                     "They bought apples, bananas, etc. at the market.",
-                    "Then they went home."
-                ]
+                    "Then they went home.",
+                ],
             ),
             # 5. Empty or whitespace-only strings
-            (
-                "   ",
-                []
-            )
-        ]
+            ("   ", []),
+        ],
     )
     def test_abbreviation_handling(self, input_text: str, expected_chunks: list[str]):
         """
-        Ensures text is split on terminal punctuation (.!?) but ignores periods 
+        Ensures text is split on terminal punctuation (.!?) but ignores periods
         inside common abbreviations like i.e., e.g., and etc.
         """
         result = _split_into_sentences(input_text)
         assert result == expected_chunks
+
 
 class TestExtractLawPassedRejectedLegislationArgument:
     """
@@ -211,29 +208,27 @@ class TestExtractLawPassedRejectedLegislationArgument:
 
     def test_returns_none_when_rejected_legislation_is_true(self) -> None:
         """
-        Ensure that if rejected_legislation=True, the extractor completely 
+        Ensure that if rejected_legislation=True, the extractor completely
         bypasses the regex search and returns None, even with matching text.
         """
         text_items = [
             "The Regulation entered into force in January 2020.",
-            "The Commission adopted the directive."
+            "The Commission adopted the directive.",
         ]
-        
+
         result = extract(text_items, rejected_legislation=True)
-        
+
         assert result is None, "Expected None when rejected_legislation is True"
 
     def test_processes_normally_when_rejected_legislation_is_false(self) -> None:
         """
-        Ensure that if rejected_legislation=False (the default), the extractor 
+        Ensure that if rejected_legislation=False (the default), the extractor
         processes the text items and returns matches normally.
         """
-        text_items = [
-            "The Regulation entered into force in January 2020."
-        ]
-        
+        text_items = ["The Regulation entered into force in January 2020."]
+
         result = extract(text_items, rejected_legislation=False)
-        
+
         assert result is not None
         assert len(result) == 1
         assert result[0] == "The Regulation entered into force in January 2020."

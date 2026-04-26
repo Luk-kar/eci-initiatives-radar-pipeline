@@ -62,190 +62,105 @@ class TestExtractRejectedLegislationBulk:
 
 class TestExtractRejectedLegislationExplicit:
     """
-    Individual explicit tests to get visibility, what went wrong.
+    Individual explicit tests to get visibility on what went wrong.
+
+    Indices map directly to ``commission_answers_rejection_legislation``,
+    which is sorted ascending by registration number in conftest.py.
     """
 
-    def _get_sample(
+    def _assert_sample(
         self,
-        commission_answers_rejection_legislation: list,
-        registration_number: str,
-    ) -> tuple:
+        sample: tuple,
+        expected_registration: str,
+        expected_flag: bool,
+        expected_phrases: list[str] | None,
+    ) -> None:
+        expected, registration_number, text_items, rejection_phrases = sample
 
-        for sample in commission_answers_rejection_legislation:
-            if sample[1] == registration_number:
-                return sample
-
-        raise KeyError(registration_number)
+        assert registration_number == expected_registration
+        assert expected is expected_flag
+        assert rejection_phrases == expected_phrases
+        assert extract(text_items) is expected_flag
 
     def test_extract_returns_false_for_2012_000003(
-        self,
-        commission_answers_rejection_legislation,
+        self, commission_answers_rejection_legislation
     ):
-
-        expected, registration_number, text_items, rejection_phrases = self._get_sample(
-            commission_answers_rejection_legislation, "2012/000003"
+        self._assert_sample(
+            commission_answers_rejection_legislation[0],
+            "2012/000003",
+            expected_flag=False,
+            expected_phrases=None,
         )
-
-        assert expected is False
-        assert registration_number == "2012/000003"
-        assert rejection_phrases is None
-        assert extract(text_items) is False
 
     def test_extract_returns_true_for_2012_000005(
-        self,
-        commission_answers_rejection_legislation,
+        self, commission_answers_rejection_legislation
     ):
-
-        expected, registration_number, text_items, rejection_phrases = self._get_sample(
-            commission_answers_rejection_legislation, "2012/000005"
+        self._assert_sample(
+            commission_answers_rejection_legislation[1],
+            "2012/000005",
+            expected_flag=True,
+            expected_phrases=["not to submit a legislative proposal"],
         )
-
-        assert expected is True
-        assert registration_number == "2012/000005"
-        assert rejection_phrases == ["not to submit a legislative proposal"]
-        assert extract(text_items) is True
-
-    def test_extract_returns_false_for_2017_000002(
-        self,
-        commission_answers_rejection_legislation,
-    ):
-
-        expected, registration_number, text_items, rejection_phrases = self._get_sample(
-            commission_answers_rejection_legislation, "2017/000002"
-        )
-
-        assert expected is False
-        assert registration_number == "2017/000002"
-        assert rejection_phrases == [
-            "will not make a legislative proposal to that effect"
-        ]  # It is canceled by proposition of other legislation
-        assert extract(text_items) is False
 
     def test_extract_returns_true_for_2012_000007(
-        self,
-        commission_answers_rejection_legislation,
+        self, commission_answers_rejection_legislation
     ):
-
-        expected, registration_number, text_items, rejection_phrases = self._get_sample(
-            commission_answers_rejection_legislation, "2012/000007"
+        self._assert_sample(
+            commission_answers_rejection_legislation[2],
+            "2012/000007",
+            expected_flag=True,
+            expected_phrases=["no repeal of that legislation was proposed"],
         )
 
-        assert expected is True
-        assert registration_number == "2012/000007"
-        assert rejection_phrases == ["no repeal of that legislation was proposed"]
-        assert extract(text_items) is True
+    def test_extract_returns_false_for_2017_000002(
+        self, commission_answers_rejection_legislation
+    ):
+        self._assert_sample(
+            commission_answers_rejection_legislation[3],
+            "2017/000002",
+            expected_flag=False,
+            expected_phrases=["will not make a legislative proposal to that effect"],
+        )
 
     def test_extract_returns_true_for_2017_000004(
-        self,
-        commission_answers_rejection_legislation,
+        self, commission_answers_rejection_legislation
     ):
-
-        expected, registration_number, text_items, rejection_phrases = self._get_sample(
-            commission_answers_rejection_legislation, "2017/000004"
+        self._assert_sample(
+            commission_answers_rejection_legislation[4],
+            "2017/000004",
+            expected_flag=True,
+            expected_phrases=["no further legal acts are proposed"],
         )
-
-        assert expected is True
-        assert registration_number == "2017/000004"
-        assert rejection_phrases == ["no further legal acts are proposed"]
-        assert extract(text_items) is True
 
     def test_extract_returns_false_for_2018_000004(
-        self,
-        commission_answers_rejection_legislation,
+        self, commission_answers_rejection_legislation
     ):
-
-        expected, registration_number, text_items, rejection_phrases = self._get_sample(
-            commission_answers_rejection_legislation, "2018/000004"
+        self._assert_sample(
+            commission_answers_rejection_legislation[5],
+            "2018/000004",
+            expected_flag=False,
+            expected_phrases=None,
         )
-
-        assert expected is False
-        assert registration_number == "2018/000004"
-        assert rejection_phrases is None
-        assert extract(text_items) is False
 
     def test_extract_returns_true_for_2019_000007(
-        self,
-        commission_answers_rejection_legislation,
+        self, commission_answers_rejection_legislation
     ):
-
-        expected, registration_number, text_items, rejection_phrases = self._get_sample(
-            commission_answers_rejection_legislation, "2019/000007"
+        self._assert_sample(
+            commission_answers_rejection_legislation[6],
+            "2019/000007",
+            expected_flag=True,
+            expected_phrases=["no new legislation will be proposed "],
         )
-
-        assert expected is True
-        assert registration_number == "2019/000007"
-        assert rejection_phrases == ["no new legislation will be proposed "]
-        assert extract(text_items) is True
 
     def test_extract_returns_false_for_2019_000016(
-        self,
-        commission_answers_rejection_legislation,
+        self, commission_answers_rejection_legislation
     ):
-
-        expected, registration_number, text_items, rejection_phrases = self._get_sample(
-            commission_answers_rejection_legislation, "2019/000016"
+        self._assert_sample(
+            commission_answers_rejection_legislation[7],
+            "2019/000016",
+            expected_flag=False,
+            expected_phrases=None,
         )
-
-        assert expected is False
-        assert registration_number == "2019/000016"
-        assert rejection_phrases is None
-        assert extract(text_items) is False
-
-    def test_extract_returns_false_for_2020_000001(
-        self,
-        commission_answers_rejection_legislation,
-    ):
-
-        expected, registration_number, text_items, rejection_phrases = self._get_sample(
-            commission_answers_rejection_legislation, "2020/000001"
-        )
-
-        assert expected is False
-        assert registration_number == "2020/000001"
-        assert rejection_phrases is None
-        assert extract(text_items) is False
-
-    def test_extract_returns_false_for_2021_000006(
-        self,
-        commission_answers_rejection_legislation,
-    ):
-
-        expected, registration_number, text_items, rejection_phrases = self._get_sample(
-            commission_answers_rejection_legislation, "2021/000006"
-        )
-
-        assert expected is False
-        assert registration_number == "2021/000006"
-        assert rejection_phrases is None
-        assert extract(text_items) is False
-
-    def test_extract_returns_false_for_2022_000002(
-        self,
-        commission_answers_rejection_legislation,
-    ):
-
-        expected, registration_number, text_items, rejection_phrases = self._get_sample(
-            commission_answers_rejection_legislation, "2022/000002"
-        )
-
-        assert expected is False
-        assert registration_number == "2022/000002"
-        assert rejection_phrases is None
-        assert extract(text_items) is False
-
-    def test_extract_returns_true_for_2024_000004(
-        self,
-        commission_answers_rejection_legislation,
-    ):
-
-        expected, registration_number, text_items, rejection_phrases = self._get_sample(
-            commission_answers_rejection_legislation, "2024/000004"
-        )
-
-        assert expected is True
-        assert registration_number == "2024/000004"
-        assert rejection_phrases == ["not necessary to propose a new legal instrument"]
-        assert extract(text_items) is True
 
 
 class TestCheckTablingLawCommitted:
