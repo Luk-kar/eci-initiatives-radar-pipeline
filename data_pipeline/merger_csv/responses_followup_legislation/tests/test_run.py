@@ -62,8 +62,8 @@ class TestRun:
             calls.append(("write_output", (data_dir, results)))
             return output_path
 
-        def fake_sort_results_by_registration_number(results):
-            calls.append(("sort_results_by_registration_number", results))
+        def fake_sort_by_registration_number(results):
+            calls.append(("sort_by_registration_number", results))
             return sorted_results
 
         monkeypatch.setattr(run_module, "setup", fake_setup)
@@ -71,8 +71,8 @@ class TestRun:
         monkeypatch.setattr(run_module, "assemble_results", fake_assemble_results)
         monkeypatch.setattr(
             run_module,
-            "sort_results_by_registration_number",
-            fake_sort_results_by_registration_number,
+            "sort_by_registration_number",
+            fake_sort_by_registration_number,
         )
         monkeypatch.setattr(run_module, "write_output", fake_write_output)
 
@@ -83,6 +83,6 @@ class TestRun:
             ("setup", None),
             ("collect_source_rows", tmp_path),
             ("assemble_results", (responses_rows, followup_rows)),
-            ("sort_results_by_registration_number", assembled_results),
+            ("sort_by_registration_number", assembled_results),
             ("write_output", (tmp_path, sorted_results)),
         ]
