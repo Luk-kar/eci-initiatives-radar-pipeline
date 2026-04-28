@@ -81,8 +81,8 @@ LOG_EXTRACTOR_RESPONSES_PATTERN = "extractor_responses_{timestamp}.log"
 LOG_EXTRACTOR_RESPONSES_FOLLOWUP_PATTERN = (
     "extractor_responses_followup_{timestamp}.log"
 )
-LOG_LEGISLATION_PATTERN = "responses_followup_legislation_{timestamp}.log"
-LOG_DASHBOARD_PATTERN = "dashboard_{timestamp}.log"
+LOG_LEGISLATION_PATTERN = "merger_responses_followup_legislation_{timestamp}.log"
+LOG_DASHBOARD_PATTERN = "merger_dashboard_{timestamp}.log"
 
 # Formats
 TIMESTAMP_FORMAT = "%Y-%m-%d_%H-%M-%S"
