@@ -19,17 +19,18 @@ from dataclasses import dataclass
 class DashboardRow:
     """One row of the merged dashboard CSV (one initiative)."""
 
+    registration_number: str
     title: str
     registration_year: str
     registration_date: str
     current_status: str
     objective: str
     commission_answer_text: str
-    url: str
+    initiative_url: str
     signatures_collected_by_country: str
     signatures_threshold_met: str
     signatures_collected: str
     funding_total: str
     timeline_collection_closed: str
     timeline_collection_start: str
-    legislation: str
+    law_passed: str

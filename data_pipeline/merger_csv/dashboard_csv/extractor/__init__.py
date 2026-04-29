@@ -9,22 +9,19 @@ under :mod:`data_pipeline.merger_csv.responses_followup_legislation.extractor.fi
 Why those modules live in the legislation directory, not next to this one:
 the project has standardised on a single ``extractor/fields/`` directory
 for **all** column-level extraction logic, so dashboard-specific extractors
-sit alongside the legislation-specific ones rather than being duplicated
+sit alongside the law_passed-specific ones rather than being duplicated
 in a sibling module. See task requirement 6.
 """
-
-from __future__ import annotations
 
 import logging
 
 from data_pipeline.merger_csv.dashboard_csv.extractor.fields import (
     commission_answer_text as _commission_answer_text,
     current_status as _current_status,
-    legislation as _legislation,
+    law_passed as _legislation,  # FIX
+    registration_year as _registration_year,
     signatures_collected_by_country as _signatures_collected_by_country,
-    url as _url,
 )
-
 from ..input_models import InitiativeRow, LegislationRow, ResponseRow
 from .fields.model import DashboardRow
 
@@ -77,20 +74,15 @@ def analyse_row(
     # registration_date is already DD/MM/YYYY in the source.
     registration_date = initiative.timeline_registered
 
-    # Year prefix of registration_number is the most reliable source.
-    registration_year = (
-        initiative.registration_number.split("/", 1)[0]
-        if "/" in initiative.registration_number
-        else ""
-    )
-
     # Whitespace cleanup for the multiline objective text.
     objective = " ".join(initiative.objective.split()) if initiative.objective else ""
+
+    initiative_url = initiative.initiative_url
 
     # ── Delegated, complex fields ─────────────────────────────────────────────
     return DashboardRow(
         title=initiative.title,
-        registration_year=registration_year,
+        registration_year=_registration_year.extract(initiative.registration_number),
         registration_date=registration_date,
         current_status=_current_status.extract(
             raw_status=initiative.current_status,
@@ -101,7 +93,7 @@ def analyse_row(
         commission_answer_text=_commission_answer_text.extract(
             response.commission_answer_text if response else None,
         ),
-        url=_url.extract(initiative.initiative_url),
+        initiative_url=initiative_url,
         signatures_collected_by_country=_signatures_collected_by_country.extract(
             initiative.signatures_collected_by_country,
         ),
@@ -113,7 +105,5 @@ def analyse_row(
         timeline_collection_start=initiative.timeline_collection_start_date,
         legislation=_legislation.extract(
             law_passed_raw=legislation.Law_Passed if legislation else None,
-            is_law_passed=is_law_passed,
-            rejected_legislation=rejected,
         ),
     )
