@@ -16,11 +16,11 @@ in a sibling module. See task requirement 6.
 import logging
 
 from data_pipeline.merger_csv.dashboard_csv.extractor.fields import (
-    commission_answer_text as _commission_answer_text,
-    current_status as _current_status,
-    law_passed as _legislation,  # FIX
-    registration_year as _registration_year,
-    signatures_collected_by_country as _signatures_collected_by_country,
+    commission_answer_text,
+    current_status,
+    law_passed,
+    registration_year,
+    signatures_collected_by_country,
 )
 from ..input_models import InitiativeRow, LegislationRow, ResponseRow
 from .fields.model import DashboardRow
@@ -38,6 +38,7 @@ def _parse_bool(value: str | None) -> bool:
     """
     if not value:
         return False
+
     return value.strip().lower() == "true"
 
 
@@ -67,43 +68,37 @@ def analyse_row(
         A populated ``DashboardRow``.
     """
     # ── Legislation flags (used by current_status / legislation) ──────────────
+    # Provide a fallback value (e.g., False) if legislation is None
     is_law_passed = _parse_bool(legislation.Is_Law_Passed) if legislation else False
     rejected = _parse_bool(legislation.Rejected_Legislation) if legislation else False
 
-    # ── Simple, inline-handled fields ─────────────────────────────────────────
-    # registration_date is already DD/MM/YYYY in the source.
-    registration_date = initiative.timeline_registered
-
-    # Whitespace cleanup for the multiline objective text.
-    objective = " ".join(initiative.objective.split()) if initiative.objective else ""
-
-    initiative_url = initiative.initiative_url
-
     # ── Delegated, complex fields ─────────────────────────────────────────────
     return DashboardRow(
+        registration_number=initiative.registration_number,
         title=initiative.title,
-        registration_year=_registration_year.extract(initiative.registration_number),
-        registration_date=registration_date,
-        current_status=_current_status.extract(
+        registration_year=registration_year.extract(initiative.registration_number),
+        registration_date=initiative.timeline_registered,
+        current_status=current_status.extract(
             raw_status=initiative.current_status,
-            is_law_passed=is_law_passed if legislation else None,
-            rejected_legislation=rejected if legislation else None,
+            is_law_passed=is_law_passed,
+            rejected_legislation=rejected,
         ),
-        objective=objective,
-        commission_answer_text=_commission_answer_text.extract(
-            response.commission_answer_text if response else None,
+        objective=initiative.objective,
+        commission_answer_text=commission_answer_text.extract(
+            response.commission_answer_text if response else "",
         ),
-        initiative_url=initiative_url,
-        signatures_collected_by_country=_signatures_collected_by_country.extract(
+        initiative_url=initiative.initiative_url,
+        signatures_collected_by_country=signatures_collected_by_country.extract(
             initiative.signatures_collected_by_country,
         ),
-        signatures_threshold_met=initiative.signatures_threshold_met,
+        # Column rename: fro explicity
+        signatures_countries_threshold_met_count=initiative.signatures_threshold_met,
         signatures_collected=initiative.signatures_collected,
         funding_total=initiative.funding_total,
         timeline_collection_closed=initiative.timeline_collection_closed,
         # Column rename: timeline_collection_start_date -> timeline_collection_start.
         timeline_collection_start=initiative.timeline_collection_start_date,
-        legislation=_legislation.extract(
-            law_passed_raw=legislation.Law_Passed if legislation else None,
+        law_passed=law_passed.extract(
+            legislation.Law_Passed if legislation else "",
         ),
     )

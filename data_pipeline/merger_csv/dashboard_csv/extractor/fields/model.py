@@ -28,7 +28,7 @@ class DashboardRow:
     commission_answer_text: str
     initiative_url: str
     signatures_collected_by_country: str
-    signatures_threshold_met: str
+    signatures_countries_threshold_met_count: str
     signatures_collected: str
     funding_total: str
     timeline_collection_closed: str
