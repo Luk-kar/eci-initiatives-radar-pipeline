@@ -10,7 +10,7 @@ from data_pipeline.extractor.responses.extractor.parse import (
 )
 
 PARSED_DICT = {
-    "commission_answer_text": None,
+    "commission_answer": None,
     "followup_additional_website": None,
     "followup_events": None,
 }

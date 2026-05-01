@@ -4,8 +4,8 @@ Dashboard Merger Source Collection
 Locates, loads, filters, and dataclass-wraps the three source CSVs:
 
 * ``eci_initiatives_*.csv``
-* ``eci_responses_*.csv`` (only ``commission_answer_text``)
-* ``eci_responses_followup_legislation_*.csv`` (without ``commission_answer_text``)
+* ``eci_responses_*.csv`` (only ``commission_answer``)
+* ``eci_responses_followup_legislation_*.csv`` (without ``commission_answer``)
 """
 
 import logging

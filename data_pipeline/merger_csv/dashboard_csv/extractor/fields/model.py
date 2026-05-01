@@ -38,7 +38,7 @@ class DashboardRow(BaseModel):
     ]
 
     objective: str = Field(min_length=1)
-    commission_answer_text: str
+    commission_answer: str
 
     initiative_url: str = Field(
         pattern=r"^https://citizens-initiative\.europa\.eu/initiatives/details/\d{4}/\d{6}_en$"

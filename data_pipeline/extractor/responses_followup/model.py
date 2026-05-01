@@ -21,7 +21,7 @@ class ECIFollowupRecord(BaseModel):
 
     # --- Extracted from response followup HTML ---
     # List instead of a single string to keep text partitioned by HTML code
-    commission_answer_text: List[str]
+    commission_answer: List[str]
     followup_events: Optional[List[str]] = None
 
     @field_serializer("followup_events")

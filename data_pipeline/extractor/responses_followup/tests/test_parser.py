@@ -67,7 +67,7 @@ class TestParseHTML:
 
         assert set(result.keys()) == set(ECIFollowupParseHTMLRecord.model_fields.keys())
 
-    def test_commission_answer_text_in_result(self, tmp_path):
+    def test_commission_answer_in_result(self, tmp_path):
 
         html_file = _write_html(tmp_path)
 
@@ -75,12 +75,12 @@ class TestParseHTML:
 
             result = parse_HTML(html_file, "2020/000001")
 
-        commission_answer_text = result["commission_answer_text"]
+        commission_answer = result["commission_answer"]
 
-        assert isinstance(commission_answer_text, list)
-        assert all(isinstance(item, str) for item in commission_answer_text)
-        assert len(commission_answer_text) == 1
-        assert commission_answer_text == ["The Commission responds."]
+        assert isinstance(commission_answer, list)
+        assert all(isinstance(item, str) for item in commission_answer)
+        assert len(commission_answer) == 1
+        assert commission_answer == ["The Commission responds."]
 
     def test_list_fields_preserved(self, tmp_path):
 
@@ -93,7 +93,7 @@ class TestParseHTML:
 
             result = parse_HTML(html_file, "2020/000001")
 
-        assert result["commission_answer_text"] == ["Commission answer text here."]
+        assert result["commission_answer"] == ["Commission answer text here."]
         assert result["followup_events"] == ["Event 1", "Event 2"]
 
     def test_missing_file_raises(self, tmp_path):

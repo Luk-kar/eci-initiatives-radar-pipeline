@@ -6,14 +6,13 @@ import pytest
 
 from data_pipeline.extractor.responses_followup.model import ECIFollowupRecord
 
-
 MINIMAL = {
     "registration_number": "2020/000001",
     "initiative_url": "https://ec.europa.eu/initiative/1",
     "response_url": "https://ec.europa.eu/response/1",
     "followup_url": "https://ec.europa.eu/followup/1",
     "title": "Test Initiative",
-    "commission_answer_text": ["The Commission will act on this matter."],
+    "commission_answer": ["The Commission will act on this matter."],
 }
 
 
@@ -24,9 +23,7 @@ class TestECIFollowupRecord:
         record = ECIFollowupRecord(**MINIMAL)
 
         assert record.registration_number == "2020/000001"
-        assert record.commission_answer_text == [
-            "The Commission will act on this matter."
-        ]
+        assert record.commission_answer == ["The Commission will act on this matter."]
         assert record.followup_events is None
 
     def test_all_fields(self):

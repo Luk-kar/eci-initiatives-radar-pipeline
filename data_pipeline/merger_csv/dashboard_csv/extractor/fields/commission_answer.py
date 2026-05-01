@@ -44,14 +44,14 @@ def extract(raw_cell: str | None) -> str:
 
     except (ValueError, SyntaxError) as exc:
         logger.warning(
-            "Failed to parse commission_answer_text literal. Returning empty string. Error: %s",
+            "Failed to parse commission_answer literal. Returning empty string. Error: %s",
             exc,
         )
         return ""
 
     if not isinstance(parsed_paragraphs, list):
         logger.warning(
-            "Expected commission_answer_text to parse into a list, got: %s",
+            "Expected commission_answer to parse into a list, got: %s",
             type(parsed_paragraphs).__name__,
         )
         return ""

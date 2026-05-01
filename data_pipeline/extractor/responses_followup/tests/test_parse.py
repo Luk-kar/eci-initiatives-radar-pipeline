@@ -11,9 +11,8 @@ from data_pipeline.extractor.responses_followup.extractor.parse import (
     parse_html_files,
 )
 
-
 PARSED_DICT = {
-    "commission_answer_text": None,
+    "commission_answer": None,
     "followup_events": None,
 }
 

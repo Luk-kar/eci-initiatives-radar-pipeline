@@ -28,7 +28,7 @@ OUTPUT_FIELDNAMES: list[str] = [f.name for f in dataclass_fields(LegislationResu
 RESPONSES_GLOB = "eci_responses_[0-9]*.csv"
 FOLLOWUP_GLOB = "eci_responses_followup_[0-9]*.csv"
 
-RESPONSES_COLS = ("registration_number", "commission_answer_text")
+RESPONSES_COLS = ("registration_number", "commission_answer")
 FOLLOWUP_COLS = ("registration_number", "followup_events")
 
 

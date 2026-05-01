@@ -1,5 +1,5 @@
 """
-Tests for ``data_pipeline.merger_csv.dashboard_csv.extractor.fields.commission_answer_text``.
+Tests for ``data_pipeline.merger_csv.dashboard_csv.extractor.fields.commission_answer``.
 
 Covered behaviour:
   * None / empty string / whitespace normalisation.
@@ -13,7 +13,7 @@ import logging
 
 import pytest
 
-from data_pipeline.merger_csv.dashboard_csv.extractor.fields.commission_answer_text import (
+from data_pipeline.merger_csv.dashboard_csv.extractor.fields.commission_answer import (
     _summarise_paragraphs,
     extract,
 )
@@ -51,7 +51,7 @@ class TestExtractCore:
             result = extract(invalid_literal)
 
         assert result == ""
-        assert "Failed to parse commission_answer_text literal" in caplog.text
+        assert "Failed to parse commission_answer literal" in caplog.text
 
     @pytest.mark.parametrize(
         "valid_but_not_list",
@@ -70,7 +70,7 @@ class TestExtractCore:
             result = extract(valid_but_not_list)
 
         assert result == ""
-        assert "Expected commission_answer_text to parse into a list" in caplog.text
+        assert "Expected commission_answer to parse into a list" in caplog.text
 
     def test_valid_list(self) -> None:
         """A valid stringified list of paragraphs is parsed and joined."""

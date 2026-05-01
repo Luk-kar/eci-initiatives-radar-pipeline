@@ -12,7 +12,7 @@ from dataclasses import dataclass
 @dataclass
 class LegislationResult:
     registration_number: str
-    commission_answer_text: list[str] | None = None  # For debugging
+    commission_answer: list[str] | None = None  # For debugging
     followup_events: list[str] | None = None  # For debugging
     Law_Passed: list[str] | None = None
     """Matched text spans from LAW_MENTIONED patterns, or None if no match fired."""

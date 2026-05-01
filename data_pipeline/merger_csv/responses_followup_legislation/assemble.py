@@ -92,19 +92,19 @@ def split_text_lists(
     Parse and split source text into (commission_answer_items, followup_items).
 
     - commission_answer_items → parsed list literal from
-      ``eci_responses.commission_answer_text``
+      ``eci_responses.commission_answer``
     - followup_items → parsed list literal from
       ``eci_responses.followup_events`` (when embedded) merged with
       ``eci_responses_followup.followup_events`` (when present),
       deduplicated while preserving first-seen order
 
     Raises:
-        ValueError: missing/malformed commission_answer_text or
+        ValueError: missing/malformed commission_answer or
                     malformed follow-up list literal.
     """
     answer_items = parse_text_list(
-        responses_row.get("commission_answer_text"),
-        "commission_answer_text",
+        responses_row.get("commission_answer"),
+        "commission_answer",
     )
 
     embedded_followup_items = parse_optional_text_list(

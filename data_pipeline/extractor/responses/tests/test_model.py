@@ -6,7 +6,6 @@ import pytest
 
 from data_pipeline.extractor.responses.model import ECIResponseRecord
 
-
 MINIMAL = {
     "registration_number": "2020/000001",
     "initiative_url": "https://ec.europa.eu/initiative/1",
@@ -20,14 +19,14 @@ class TestECIResponseRecord:
 
         record = ECIResponseRecord(**MINIMAL)
         assert record.registration_number == "2020/000001"
-        assert record.commission_answer_text is None
+        assert record.commission_answer is None
         assert record.followup_events is None
 
     def test_all_fields(self):
 
         record = ECIResponseRecord(
             **MINIMAL,
-            commission_answer_text=["The Commission answers…", "and that's all folks!"],
+            commission_answer=["The Commission answers…", "and that's all folks!"],
             followup_additional_website="https://example.com",
             followup_events=["Event A", "Event B"],
         )

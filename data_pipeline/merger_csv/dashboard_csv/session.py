@@ -51,10 +51,10 @@ INITIATIVE_COLS: tuple[str, ...] = (
 # are duplicated elsewhere or unused by the dashboard schema.
 RESPONSE_COLS: tuple[str, ...] = (
     "registration_number",
-    "commission_answer_text",
+    "commission_answer",
 )
 
-# commission_answer_text is intentionally **excluded** here because the same
+# commission_answer is intentionally **excluded** here because the same
 # information is sourced from eci_responses (see RESPONSE_COLS).
 LEGISLATION_COLS: tuple[str, ...] = (
     "registration_number",

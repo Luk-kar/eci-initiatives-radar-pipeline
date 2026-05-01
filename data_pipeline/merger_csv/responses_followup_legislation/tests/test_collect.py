@@ -12,7 +12,7 @@ class TestIndexByRegistration:
         actual = collect.index_by_registration(responses_rows)
 
         assert set(actual.keys()) == {"2012/000001", "2012/000002"}
-        assert actual["2012/000001"]["commission_answer_text"] == (
+        assert actual["2012/000001"]["commission_answer"] == (
             "['Commission answer 1', 'Commission answer 2']"
         )
 
@@ -21,7 +21,7 @@ class TestIndexByRegistration:
         rows = [
             {
                 "registration_number": "",
-                "commission_answer_text": "['Answer 1']",
+                "commission_answer": "['Answer 1']",
             }
         ]
 
@@ -32,7 +32,6 @@ class TestIndexByRegistration:
 class TestValidateFollowupRegistrationNumbers:
 
     def test_validate_followup_registration_numbers_accepts_matching_rows(
-
         self,
         responses_rows,
         followup_rows,
@@ -42,7 +41,6 @@ class TestValidateFollowupRegistrationNumbers:
         collect.validate_followup_registration_numbers(followup_rows, responses_index)
 
     def test_validate_followup_registration_numbers_raises_for_unknown_registration(
-
         self,
         responses_rows,
     ):
@@ -63,7 +61,9 @@ class TestValidateFollowupRegistrationNumbers:
 
 class TestCollectSourceRows:
 
-    def test_collect_source_rows_resolves_validates_and_loads_files(self, monkeypatch, tmp_path):
+    def test_collect_source_rows_resolves_validates_and_loads_files(
+        self, monkeypatch, tmp_path
+    ):
         """
         Verify that source collection resolves the expected input files, validates them,
         and loads both response and follow-up rows.
@@ -90,17 +90,17 @@ class TestCollectSourceRows:
             calls.append(("load_csv", path.name))
             if path == responses_path:
                 return [
-                        {
-                            "registration_number": "2012/000001",
-                            "commission_answer_text": "['Answer 1']",
-                        }
-                    ]
-            return [
                     {
                         "registration_number": "2012/000001",
-                        "followup_events": "['Follow-up 1']",
+                        "commission_answer": "['Answer 1']",
                     }
                 ]
+            return [
+                {
+                    "registration_number": "2012/000001",
+                    "followup_events": "['Follow-up 1']",
+                }
+            ]
 
         monkeypatch.setattr(collect, "find_latest_csv", fake_find_latest_csv)
         monkeypatch.setattr(collect, "validate_csv_exists", fake_validate_csv_exists)
@@ -111,7 +111,7 @@ class TestCollectSourceRows:
         assert responses_rows == [
             {
                 "registration_number": "2012/000001",
-                "commission_answer_text": "['Answer 1']",
+                "commission_answer": "['Answer 1']",
             }
         ]
         assert followup_rows == [

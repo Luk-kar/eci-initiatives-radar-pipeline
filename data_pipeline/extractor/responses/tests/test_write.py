@@ -84,5 +84,5 @@ class TestWriteCsv:
         with open(out, encoding="utf-8") as f:
             row = next(csv.DictReader(f))
 
-        assert row["commission_answer_text"] == ""
+        assert row["commission_answer"] == ""
         assert row["followup_events"] == ""

@@ -34,15 +34,15 @@ class TestSessionConstants:
         assert "objective" in INITIATIVE_COLS
 
     def test_response_cols(self):
-        """It should extract only the registration_number and commission_answer_text."""
+        """It should extract only the registration_number and commission_answer."""
 
-        assert list(RESPONSE_COLS) == ["registration_number", "commission_answer_text"]
+        assert list(RESPONSE_COLS) == ["registration_number", "commission_answer"]
 
     def test_legislation_cols(self):
-        """It should explicitly omit commission_answer_text from legislation."""
+        """It should explicitly omit commission_answer from legislation."""
 
         assert "registration_number" in LEGISLATION_COLS
-        assert "commission_answer_text" not in LEGISLATION_COLS
+        assert "commission_answer" not in LEGISLATION_COLS
         assert "Is_Law_Passed" in LEGISLATION_COLS
         assert "Rejected_Legislation" in LEGISLATION_COLS
 

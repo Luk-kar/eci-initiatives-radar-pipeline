@@ -15,7 +15,7 @@ METADATA = {
 }
 PARSED = {
     "2020/000001": {
-        "commission_answer_text": ["The Commission will act."],
+        "commission_answer": ["The Commission will act."],
         "followup_additional_website": None,
         "followup_events": None,
     }
@@ -41,7 +41,7 @@ class TestBuildRecords:
 
     def test_parsed_fields_merged(self):
 
-        assert build_records(METADATA, PARSED)[0].commission_answer_text == [
+        assert build_records(METADATA, PARSED)[0].commission_answer == [
             "The Commission will act."
         ]
 
@@ -63,7 +63,7 @@ class TestBuildRecords:
         parsed = {
             **PARSED,
             "2021/000002": {
-                "commission_answer_text": None,
+                "commission_answer": None,
                 "followup_additional_website": None,
                 "followup_events": None,
             },
@@ -81,7 +81,7 @@ class TestBuildRecords:
 
         parsed = {
             "2020/MISSING": {
-                "commission_answer_text": None,
+                "commission_answer": None,
                 "followup_additional_website": None,
                 "followup_events": None,
             }

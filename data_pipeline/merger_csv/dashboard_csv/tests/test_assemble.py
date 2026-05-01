@@ -35,7 +35,7 @@ def response_index():
     return {
         "2024/000001": ResponseRow(
             registration_number="2024/000001",
-            commission_answer_text="['Answer paragraph 1']",
+            commission_answer="['Answer paragraph 1']",
         )
     }
 

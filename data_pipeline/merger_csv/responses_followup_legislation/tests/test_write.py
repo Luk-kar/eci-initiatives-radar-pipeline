@@ -43,7 +43,7 @@ class TestWriteOutput:
 
         assert header == [
             "registration_number",
-            "commission_answer_text",
+            "commission_answer",
             "followup_events",
             "Law_Passed",
             "Is_Law_Passed",
@@ -54,7 +54,7 @@ class TestWriteOutput:
 
         # Row 0
         assert rows[0]["registration_number"] == "2012/000001"
-        assert rows[0]["commission_answer_text"] == (
+        assert rows[0]["commission_answer"] == (
             "['Commission answer 1', 'Commission answer 2']"
         )
         assert rows[0]["followup_events"] == "['Follow-up 1', 'Follow-up 2']"
@@ -64,7 +64,7 @@ class TestWriteOutput:
 
         # Row 1
         assert rows[1]["registration_number"] == "2012/000002"
-        assert rows[1]["commission_answer_text"] == "['Commission answer 3']"
+        assert rows[1]["commission_answer"] == "['Commission answer 3']"
         assert rows[1]["followup_events"] == "['Follow-up 3']"
         assert rows[1]["Law_Passed"] == ""
         assert rows[1]["Is_Law_Passed"] == "False"

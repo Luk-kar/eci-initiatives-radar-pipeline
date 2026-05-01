@@ -16,7 +16,6 @@ from .fields import (
     extract_followup_events,
 )
 
-
 logger = logging.getLogger(__name__)
 
 CSV_COLUMNS: list[str] = list(ECIResponseParseHTMLRecord.model_fields)
@@ -44,7 +43,7 @@ def parse_HTML(html_file: Path, registration_number: str) -> dict:
         soup = BeautifulSoup(f.read(), "html.parser")
 
     record = ECIResponseParseHTMLRecord(
-        commission_answer_text=extract_commission_answer(soup, registration_number),
+        commission_answer=extract_commission_answer(soup, registration_number),
         followup_url=extract_followup_additional_website(soup, registration_number),
         followup_events=extract_followup_events(soup, registration_number),
     )

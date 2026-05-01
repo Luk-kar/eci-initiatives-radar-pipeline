@@ -27,7 +27,7 @@ def dummy_dashboard_row():
         registration_date="01/01/2024",
         current_status="Collection Ongoing",
         objective="Test Objective",
-        commission_answer_text="",
+        commission_answer="",
         initiative_url="https://citizens-initiative.europa.eu/initiatives/details/2024/000001_en",
         signatures_collected_by_country="",
         signatures_countries_threshold_met_count="0",

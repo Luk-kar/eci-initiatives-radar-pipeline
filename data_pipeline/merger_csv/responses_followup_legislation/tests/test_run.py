@@ -19,7 +19,7 @@ class TestRun:
         responses_rows = [
             {
                 "registration_number": "2012/000001",
-                "commission_answer_text": "['Answer 1']",
+                "commission_answer": "['Answer 1']",
             }
         ]
 

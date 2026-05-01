@@ -5,9 +5,9 @@ Dataclasses that mirror the **filtered** rows read from each of the three
 source CSVs consumed by the dashboard merger:
 
 * ``InitiativeRow``  ← ``eci_initiatives_*.csv`` (subset of columns)
-* ``ResponseRow``    ← ``eci_responses_*.csv`` (only ``commission_answer_text``)
+* ``ResponseRow``    ← ``eci_responses_*.csv`` (only ``commission_answer``)
 * ``LegislationRow`` ← ``eci_responses_followup_legislation_*.csv``
-                       (``commission_answer_text`` is omitted because it has
+                       (``commission_answer`` is omitted because it has
                        already been read from the responses CSV)
 
 The output row dataclass (``DashboardRow``) lives next to the field
@@ -49,13 +49,13 @@ class InitiativeRow:
 class ResponseRow:
     """A single row read from ``eci_responses_*.csv``.
 
-    Only ``commission_answer_text`` is retained alongside the join key.
+    Only ``commission_answer`` is retained alongside the join key.
     Follow-up information already lives in the legislation merge output
     and is read from there.
     """
 
     registration_number: str
-    commission_answer_text: str
+    commission_answer: str
 
 
 # ── eci_responses_followup_legislation_*.csv ──────────────────────────────────
@@ -63,7 +63,7 @@ class ResponseRow:
 class LegislationRow:
     """A single row read from ``eci_responses_followup_legislation_*.csv``.
 
-    The ``commission_answer_text`` column is intentionally **not** materialised
+    The ``commission_answer`` column is intentionally **not** materialised
     here because the same content is already loaded from
     ``eci_responses_*.csv`` (see :class:`ResponseRow`).
     """

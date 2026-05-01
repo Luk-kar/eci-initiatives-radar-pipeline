@@ -18,7 +18,7 @@ def _record(reg: str) -> ECIResponseRecord:
         title=f"Title {reg}",
         initiative_url=f"https://example.test/{reg}",
         response_url=f"https://example.test/r/{reg}",
-        commission_answer_text=None,
+        commission_answer=None,
         followup_additional_website=None,
         followup_events=None,
     )

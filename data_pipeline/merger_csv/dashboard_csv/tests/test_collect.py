@@ -83,7 +83,7 @@ class TestLoaders:
     ):
         mock_find_latest_csv.return_value = Path("dummy_responses.csv")
         mock_filter_columns.return_value = [
-            {"registration_number": "2024/000001", "commission_answer_text": "Answer"}
+            {"registration_number": "2024/000001", "commission_answer": "Answer"}
         ]
 
         result = _load_responses(mock_data_dir)

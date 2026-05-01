@@ -23,7 +23,7 @@ class TestDashboardRow:
             registration_date="01/01/2024",
             current_status="Collection Ongoing",
             objective="To protect bees in the EU",
-            commission_answer_text="",
+            commission_answer="",
             # URL updated to match new domain and _en suffix regex
             initiative_url="https://citizens-initiative.europa.eu/initiatives/details/2024/000001_en",
             signatures_collected_by_country='{"Germany": {"signatures": 137874, "threshold": 74250, "percentage": 185.68}, "Austria": {"signatures": 24973, "threshold": 14250, "percentage": 175.25}, "Poland": {"signatures": 38000, "threshold": 36660, "percentage": 103.65}}',
@@ -55,7 +55,7 @@ class TestDashboardRow:
             "registration_date",
             "current_status",
             "objective",
-            "commission_answer_text",
+            "commission_answer",
             "initiative_url",
             "signatures_collected_by_country",
             "signatures_countries_threshold_met_count",

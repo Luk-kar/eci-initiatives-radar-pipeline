@@ -12,11 +12,11 @@ def responses_rows() -> list[dict[str, str]]:
     return [
         {
             "registration_number": "2012/000001",
-            "commission_answer_text": "['Commission answer 1', 'Commission answer 2']",
+            "commission_answer": "['Commission answer 1', 'Commission answer 2']",
         },
         {
             "registration_number": "2012/000002",
-            "commission_answer_text": "['Commission answer 3']",
+            "commission_answer": "['Commission answer 3']",
         },
     ]
 
@@ -40,7 +40,7 @@ def legislation_results() -> list[LegislationResult]:
     return [
         LegislationResult(
             registration_number="2012/000001",
-            commission_answer_text=["Commission answer 1", "Commission answer 2"],
+            commission_answer=["Commission answer 1", "Commission answer 2"],
             followup_events=["Follow-up 1", "Follow-up 2"],
             Law_Passed=["Follow-up 1"],
             Is_Law_Passed=True,
@@ -48,7 +48,7 @@ def legislation_results() -> list[LegislationResult]:
         ),
         LegislationResult(
             registration_number="2012/000002",
-            commission_answer_text=["Commission answer 3"],
+            commission_answer=["Commission answer 3"],
             followup_events=["Follow-up 3"],
             Law_Passed=None,
             Is_Law_Passed=False,

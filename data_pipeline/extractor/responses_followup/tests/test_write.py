@@ -16,7 +16,7 @@ def _make_record(**kwargs):
 
     FIX: added required fields that were missing:
       - 'followup_url'           (str, required)
-      - 'commission_answer_text' (List[str], required, non-Optional)
+      - 'commission_answer' (List[str], required, non-Optional)
     """
     return ECIFollowupRecord(
         **{
@@ -25,7 +25,7 @@ def _make_record(**kwargs):
             "response_url": "https://ec.europa.eu/response/1",
             "followup_url": "https://ec.europa.eu/followup/1",
             "title": "Test Initiative",
-            "commission_answer_text": ["The Commission will act."],
+            "commission_answer": ["The Commission will act."],
             **kwargs,
         }
     )
@@ -88,7 +88,7 @@ class TestWriteCsv:
     def test_none_followup_events_written_as_empty_string(self, tmp_path):
         """
         FIX: renamed and narrowed from the previous test_none_fields_written_as_empty_string.
-        Only 'followup_events' is Optional — 'commission_answer_text' is a required
+        Only 'followup_events' is Optional — 'commission_answer' is a required
         List[str] and is therefore always present in a valid record.
         """
 

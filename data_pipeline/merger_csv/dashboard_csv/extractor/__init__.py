@@ -17,7 +17,7 @@ import logging
 
 from data_pipeline.merger_csv.dashboard_csv.extractor.fields import (
     objective,
-    commission_answer_text,
+    commission_answer,
     current_status,
     law_passed,
     registration_year,
@@ -85,8 +85,8 @@ def analyse_row(
             rejected_legislation=rejected,
         ),
         objective=objective.extract(initiative.objective),
-        commission_answer_text=commission_answer_text.extract(
-            response.commission_answer_text if response else "",
+        commission_answer=commission_answer.extract(
+            response.commission_answer if response else "",
         ),
         initiative_url=initiative.initiative_url,
         signatures_collected_by_country=signatures_collected_by_country.extract(

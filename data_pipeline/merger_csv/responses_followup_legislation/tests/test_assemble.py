@@ -10,7 +10,7 @@ class TestParseTextList:
     def test_parse_text_list_returns_items_for_valid_list_literal(self):
 
         raw = "['alpha', 'beta']"
-        actual = assemble.parse_text_list(raw, "commission_answer_text")
+        actual = assemble.parse_text_list(raw, "commission_answer")
 
         assert actual == ["alpha", "beta"]
 
@@ -30,17 +30,17 @@ class TestParseTextList:
     def test_parse_text_list_raises_for_missing_value(self):
 
         with pytest.raises(ValueError, match="is missing"):
-            assemble.parse_text_list(None, "commission_answer_text")
+            assemble.parse_text_list(None, "commission_answer")
 
     def test_parse_text_list_raises_for_invalid_literal(self) -> None:
 
         with pytest.raises(ValueError, match="not a valid Python literal"):
-            assemble.parse_text_list("[unclosed", "commission_answer_text")
+            assemble.parse_text_list("[unclosed", "commission_answer")
 
     def test_parse_text_list_raises_for_non_list_literal(self):
 
         with pytest.raises(ValueError, match="expected a list"):
-            assemble.parse_text_list("'plain string'", "commission_answer_text")
+            assemble.parse_text_list("'plain string'", "commission_answer")
 
 
 class TestParseOptionalTextList:
@@ -77,7 +77,7 @@ class TestConcatenateTextLists:
     def test_concatenate_text_lists_combines_answer_embedded_and_followup(self) -> None:
 
         responses_row = {
-            "commission_answer_text": "['Answer 1', 'Answer 2']",
+            "commission_answer": "['Answer 1', 'Answer 2']",
             "followup_events": "['Embedded follow-up 1']",
         }
         followup_row = {
@@ -99,7 +99,7 @@ class TestConcatenateTextLists:
     ) -> None:
 
         responses_row = {
-            "commission_answer_text": "['Answer 1']",
+            "commission_answer": "['Answer 1']",
         }
 
         actual = assemble.concatenate_text_lists(responses_row, None)
@@ -111,7 +111,7 @@ class TestConcatenateTextLists:
     ) -> None:
 
         responses_row = {
-            "commission_answer_text": "['Answer 1']",
+            "commission_answer": "['Answer 1']",
             "followup_events": "['Embedded follow-up 1']",
         }
 
@@ -124,7 +124,7 @@ class TestConcatenateTextLists:
     ) -> None:
 
         responses_row = {
-            "commission_answer_text": "['Answer 1']",
+            "commission_answer": "['Answer 1']",
             "followup_events": "['Shared follow-up', 'Embedded only']",
         }
         followup_row = {
@@ -145,7 +145,7 @@ class TestConcatenateTextLists:
     ) -> None:
 
         responses_row = {
-            "commission_answer_text": "['Answer 1']",
+            "commission_answer": "['Answer 1']",
             "followup_events": "[unclosed",
         }
 
@@ -161,12 +161,12 @@ class TestAssembleResults:
         responses_rows = [
             {
                 "registration_number": "2012/000001",
-                "commission_answer_text": "['Commission answer 1', 'Commission answer 2']",
+                "commission_answer": "['Commission answer 1', 'Commission answer 2']",
                 "followup_events": "['Embedded follow-up 1']",
             },
             {
                 "registration_number": "2012/000002",
-                "commission_answer_text": "['Commission answer 3']",
+                "commission_answer": "['Commission answer 3']",
             },
         ]
 
@@ -191,7 +191,7 @@ class TestAssembleResults:
             )
             return LegislationResult(
                 registration_number=regnum,
-                commission_answer_text=commission_answer_items,
+                commission_answer=commission_answer_items,
                 followup_events=followup_items,
             )
 
@@ -230,7 +230,7 @@ class TestAssembleResults:
         responses_rows = [
             {
                 "registration_number": "2012/000001",
-                "commission_answer_text": "['Answer 1']",
+                "commission_answer": "['Answer 1']",
                 "followup_events": "['Embedded follow-up 1']",
             },
         ]
@@ -245,7 +245,7 @@ class TestAssembleResults:
             )
             return LegislationResult(
                 registration_number=regnum,
-                commission_answer_text=commission_answer_items,
+                commission_answer=commission_answer_items,
                 followup_events=followup_items,
             )
 
@@ -268,7 +268,7 @@ class TestAssembleResults:
     ) -> None:
 
         rows = [
-            {"registration_number": "", "commission_answer_text": "['Answer 1']"},
+            {"registration_number": "", "commission_answer": "['Answer 1']"},
         ]
 
         def fake_analyse_row(*args, **kwargs):
@@ -283,7 +283,7 @@ class TestAssembleResults:
 class TestSplitTextLists:
     def test_returns_separate_answer_and_followup_lists(self):
         responses_row = {
-            "commission_answer_text": "['Answer 1', 'Answer 2']",
+            "commission_answer": "['Answer 1', 'Answer 2']",
             "followup_events": "['Embedded follow-up 1']",
         }
         followup_row = {
@@ -302,7 +302,7 @@ class TestSplitTextLists:
         ]
 
     def test_returns_empty_followups_when_no_followup_sources_present(self):
-        responses_row = {"commission_answer_text": "['Answer 1']"}
+        responses_row = {"commission_answer": "['Answer 1']"}
 
         answer_items, followup_items = assemble.split_text_lists(responses_row, None)
 
@@ -311,7 +311,7 @@ class TestSplitTextLists:
 
     def test_deduplicates_across_embedded_and_separate_followups(self):
         responses_row = {
-            "commission_answer_text": "['Answer 1']",
+            "commission_answer": "['Answer 1']",
             "followup_events": "['Shared follow-up', 'Embedded only']",
         }
         followup_row = {
@@ -325,7 +325,7 @@ class TestSplitTextLists:
     def test_does_not_deduplicate_answer_items_against_followups(self):
         """Answer items stay in their column even when they recur in follow-ups."""
         responses_row = {
-            "commission_answer_text": "['Shared text']",
+            "commission_answer": "['Shared text']",
             "followup_events": "['Shared text', 'Other follow-up']",
         }
 

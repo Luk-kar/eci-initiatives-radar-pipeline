@@ -12,14 +12,14 @@ All modules below are placeholders and raise ``NotImplementedError``.
 
 from . import (
     current_status,
-    commission_answer_text,
+    commission_answer,
     law_passed,
     signatures_collected_by_country,
 )
 
 __all__ = [
     "current_status",
-    "commission_answer_text",
+    "commission_answer",
     "law_passed",
     "signatures_collected_by_country",
 ]

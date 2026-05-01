@@ -15,7 +15,6 @@ from .fields import (
     extract_followup_events,
 )
 
-
 logger = logging.getLogger(__name__)
 
 # Pydantic v2 uses model_fields; v1 uses __fields__
@@ -48,7 +47,7 @@ def parse_HTML(html_file: Path, registration_number: str) -> dict:
         soup = BeautifulSoup(f.read(), "html.parser")
 
     record = ECIFollowupParseHTMLRecord(
-        commission_answer_text=extract_commission_answer(soup, registration_number),
+        commission_answer=extract_commission_answer(soup, registration_number),
         followup_events=extract_followup_events(soup, registration_number),
     )
 
