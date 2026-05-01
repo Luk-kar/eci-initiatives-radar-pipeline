@@ -17,6 +17,8 @@ Covered behaviour:
     truthy (defence-in-depth: a stray flag must not corrupt the mapping).
 """
 
+from typing import get_args
+
 import pytest
 
 from data_pipeline.merger_csv.dashboard_csv.extractor.fields import current_status
@@ -24,6 +26,8 @@ from data_pipeline.merger_csv.dashboard_csv.extractor.fields.current_status impo
     _STATUS_MAP,
     extract,
 )
+
+from data_pipeline.merger_csv.dashboard_csv.extractor.fields.model import DashboardRow
 
 # (raw_status, expected_dashboard_label)
 _NON_ANSWERED_CASES: list[tuple[str, str]] = [
@@ -43,10 +47,12 @@ class TestDirectMapping:
     @pytest.mark.parametrize("raw, expected", _NON_ANSWERED_CASES)
     def test_direct_mapping(self, raw: str, expected: str) -> None:
         """Every non-answered source value maps to its dashboard label."""
+
         assert extract(raw, None, None) == expected
 
     def test_status_map_covers_all_source_values(self) -> None:
         """Guard against silent drift between the docstring vocabulary and the map."""
+
         expected_keys = {
             "Registered",
             "Collection ongoing",
@@ -65,15 +71,11 @@ class TestDirectMapping:
         Note: ``Law Passed`` and ``Rejected Legislation`` are not values of the
         map — they are produced by the ``Answered initiative`` upgrade branch.
         """
-        canonical = {
-            "Awaiting Collection",
-            "Collection Ongoing",
-            "Collection Verification",
-            "Collection Unsuccessful",
-            "Awaiting Response",
-            "Commission Engaged",
-            "Withdrawn",
-        }
+
+        canonical = set(
+            get_args(DashboardRow.model_fields["current_status"].annotation)
+        )
+
         assert set(_STATUS_MAP.values()).issubset(canonical)
 
 

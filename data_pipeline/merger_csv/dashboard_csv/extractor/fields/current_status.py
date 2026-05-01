@@ -32,9 +32,16 @@ between *engaged*, *law passed*, and *rejected* outcomes.
 
 import logging
 import re
+from typing import get_args
+
+from .model import DashboardRow
 
 logger = logging.getLogger(__name__)
 
+# Extract the allowed strings directly from the Pydantic Literal type
+_DASHBOARD_VOCABULARY = set(
+    get_args(DashboardRow.model_fields["current_status"].annotation)
+)
 
 # Source -> dashboard vocabulary mapping.
 #
@@ -51,6 +58,10 @@ _STATUS_MAP: dict[str, str] = {
     "Unsuccessful collection": "Collection Unsuccessful",
     "Withdrawn": "Withdrawn",
 }
+
+# (Optional safety check - this enforces that your MAP values only use valid Pydantic literals)
+for v in _STATUS_MAP.values():
+    assert v in _DASHBOARD_VOCABULARY, f"Invalid mapped status: {v}"
 
 _ANSWERED = "Answered initiative"
 

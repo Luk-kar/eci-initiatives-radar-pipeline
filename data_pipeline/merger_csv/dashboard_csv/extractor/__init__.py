@@ -16,6 +16,7 @@ in a sibling module. See task requirement 6.
 import logging
 
 from data_pipeline.merger_csv.dashboard_csv.extractor.fields import (
+    objective,
     commission_answer_text,
     current_status,
     law_passed,
@@ -83,7 +84,7 @@ def analyse_row(
             is_law_passed=is_law_passed,
             rejected_legislation=rejected,
         ),
-        objective=initiative.objective,
+        objective=objective.extract(initiative.objective),
         commission_answer_text=commission_answer_text.extract(
             response.commission_answer_text if response else "",
         ),

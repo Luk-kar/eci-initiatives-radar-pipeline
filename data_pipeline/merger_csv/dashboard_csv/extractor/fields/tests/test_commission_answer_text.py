@@ -14,7 +14,7 @@ import logging
 import pytest
 
 from data_pipeline.merger_csv.dashboard_csv.extractor.fields.commission_answer_text import (
-    _summarise,
+    _summarise_paragraphs,
     extract,
 )
 
@@ -84,19 +84,35 @@ class TestSummarise:
     def test_filters_empty_and_whitespace(self) -> None:
         """Empty strings and whitespace-only strings are ignored."""
         paragraphs = ["First.", "", "   ", "\n", "Second."]
-        assert _summarise(paragraphs) == "First.\nSecond."
+        assert _summarise_paragraphs(paragraphs) == "First.\nSecond."
 
     def test_filters_non_strings(self) -> None:
         """Non-string elements in the parsed list are safely ignored."""
         # Using type: ignore because we are deliberately testing runtime safety
         # against dirty data that bypassed the type checker.
         paragraphs = ["First.", 42, None, ["nested"], "Second."]  # type: ignore
-        assert _summarise(paragraphs) == "First.\nSecond."
+        assert _summarise_paragraphs(paragraphs) == "First.\nSecond."
 
     def test_strips_paragraphs(self) -> None:
         """Leading and trailing whitespace on individual paragraphs is stripped."""
         paragraphs = ["  First.  ", "\tSecond.\n"]
-        assert _summarise(paragraphs) == "First.\nSecond."
+        assert _summarise_paragraphs(paragraphs) == "First.\nSecond."
+
+    def test_collapses_multiple_newlines(self) -> None:
+        """
+        Multiple newlines within the raw paragraph strings are collapsed
+        into a single newline during summarisation.
+        """
+
+        paragraphs = [
+            "The Commission agrees.\n\n\nWe will take action.",
+            "Further steps are planned.\n\nPending review.",
+        ]
+
+        # Paragraphs are joined by a space, and internal multi-newlines are collapsed
+        expected = "The Commission agrees.\nWe will take action.\nFurther steps are planned.\nPending review."
+
+        assert _summarise_paragraphs(paragraphs) == expected
 
 
 class TestIntegration:

@@ -1,27 +1,16 @@
-"""
-commission_answer_text
-----------------------
-Convert the raw ``commission_answer_text`` cell loaded from
-``eci_responses_*.csv`` (a stringified Python list of paragraph strings)
-into the single, narrative paragraph used in the dashboard CSV.
-
-The reference output (``initiatives_*.csv``) shows one concise paragraph per
-initiative, not a verbatim concatenation of the raw paragraphs,
-that reduces multi-paragraph Commission answers to a
-single readable sentence/paragraph.
-"""
-
 import ast
 import logging
+import re
+
+from .utils._regex import normalize_newlines
 
 logger = logging.getLogger(__name__)
 
 
-def _summarise(paragraphs: list[str]) -> str:
+def _summarise_paragraphs(paragraphs: list[str]) -> str:
     """Summarise the parsed paragraphs into a single narrative paragraph.
 
-    Note:
-        This currently implements a basic concatenation and boilerplate filter.
+    Note: This currently implements a basic concatenation and boilerplate filter.
     """
     cleaned_paragraphs = []
 
@@ -37,22 +26,14 @@ def _summarise(paragraphs: list[str]) -> str:
 
         cleaned_paragraphs.append(cleaned)
 
-    return "\n".join(cleaned_paragraphs)
+    joined_text = "\n".join(cleaned_paragraphs)
+
+    # Use the shared utility to collapse any multi-newlines
+    return normalize_newlines(joined_text)
 
 
 def extract(raw_cell: str | None) -> str:
-    """Return the dashboard-ready commission answer text.
-
-    Args:
-        raw_cell: Raw value of the ``commission_answer_text`` column for an
-                  initiative, or ``None`` / empty string when the Commission
-                  has not yet answered the initiative.
-
-    Returns:
-        Single-paragraph narrative summary, or an empty string when the
-        initiative has no Commission answer.
-    """
-
+    """Return the dashboard-ready commission answer text."""
     # 1. Handle None / empty
     if not raw_cell or not str(raw_cell).strip():
         return ""
@@ -70,10 +51,10 @@ def extract(raw_cell: str | None) -> str:
 
     if not isinstance(parsed_paragraphs, list):
         logger.warning(
-            "Expected commission_answer_text to parse into a list, got %s",
+            "Expected commission_answer_text to parse into a list, got: %s",
             type(parsed_paragraphs).__name__,
         )
         return ""
 
     # 3. Summarise the parsed paragraphs into a single narrative paragraph
-    return _summarise(parsed_paragraphs)
+    return _summarise_paragraphs(parsed_paragraphs)

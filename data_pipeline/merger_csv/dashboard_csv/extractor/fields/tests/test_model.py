@@ -2,14 +2,15 @@
 Tests for data_pipeline.merger_csv.dashboard_csv.extractor.fields.model
 """
 
-from dataclasses import fields
+import typing
+
 import pytest
 
 from data_pipeline.merger_csv.dashboard_csv.extractor.fields.model import DashboardRow
 
 
 class TestDashboardRow:
-    """Tests for the DashboardRow output dataclass."""
+    """Tests for the DashboardRow output dataclass/model."""
 
     def test_dashboard_row_instantiation(self) -> None:
         """DashboardRow can be instantiated with all required fields."""
@@ -18,17 +19,21 @@ class TestDashboardRow:
             registration_number="2024/000001",
             title="Save the Bees",
             registration_year="2024",
-            registration_date="2024-01-01",
+            # Dates updated to DD/MM/YYYY
+            registration_date="01/01/2024",
             current_status="Collection Ongoing",
             objective="To protect bees in the EU",
             commission_answer_text="",
-            initiative_url="https://europa.eu/citizens-initiative/initiatives/details/2024/000001",
+            # URL updated to match new domain and _en suffix regex
+            initiative_url="https://citizens-initiative.europa.eu/initiatives/details/2024/000001_en",
             signatures_collected_by_country='{"Germany": {"signatures": 137874, "threshold": 74250, "percentage": 185.68}, "Austria": {"signatures": 24973, "threshold": 14250, "percentage": 175.25}, "Poland": {"signatures": 38000, "threshold": 36660, "percentage": 103.65}}',
             signatures_countries_threshold_met_count="3",
-            signatures_collected="1120000",
-            funding_total="150000",
-            timeline_collection_closed="2025-01-01",
-            timeline_collection_start="2024-01-01",
+            # Numbers updated to use comma formatting
+            signatures_collected="1,120,000",
+            funding_total="150,000",
+            # Dates updated to DD/MM/YYYY
+            timeline_collection_closed="01/01/2025",
+            timeline_collection_start="01/01/2024",
             law_passed="",
         )
 
@@ -40,10 +45,9 @@ class TestDashboardRow:
         """
         Ensure the field order matches the legacy reference CSV schema.
 
-        The CSV writer uses dataclasses.fields() which returns fields in
+        The CSV writer uses the model fields which returns fields in
         declaration order. Changing this order breaks downstream consumers.
         """
-
         expected_fields = [
             "registration_number",
             "title",
@@ -62,22 +66,34 @@ class TestDashboardRow:
             "law_passed",
         ]
 
-        actual_fields = [f.name for f in fields(DashboardRow)]
+        # Updated to use Pydantic's internal model_fields
+        actual_fields = list(DashboardRow.model_fields.keys())
 
         assert actual_fields == expected_fields, (
-            "Field order or presence has changed! The CSV writer depends on "
-            "the declaration order in the dataclass."
+            "Field order or presence has changed! "
+            "The CSV writer depends on the declaration order in the model."
         )
 
     def test_all_fields_are_strings(self) -> None:
         """
-        Verify that all fields are strictly typed as strings.
-
-        Since this dataclass represents a CSV row intended for text serialization,
-        all types must be stringly-typed as defined by the model schema.
+        Verify that all fields are strictly typed as strings or string literals.
         """
+        for field_name, field_info in DashboardRow.model_fields.items():
 
-        for f in fields(DashboardRow):
-            assert (
-                f.type == "str"
-            ), f"Expected field '{f.name}' to be typed as 'str', got '{f.type}'"
+            annotation = field_info.annotation
+            origin = typing.get_origin(annotation)
+
+            if origin is typing.Literal:
+
+                # If it's a Literal, ensure all literal arguments are strings
+                all_args_are_strings = all(
+                    isinstance(arg, str) for arg in typing.get_args(annotation)
+                )
+                assert (
+                    all_args_are_strings
+                ), f"Expected Literal args for {field_name} to be strings"
+            else:
+                # Otherwise, strictly check for str
+                assert (
+                    annotation == str
+                ), f"Expected field {field_name} to be typed as str or Literal[str], got {annotation}"
