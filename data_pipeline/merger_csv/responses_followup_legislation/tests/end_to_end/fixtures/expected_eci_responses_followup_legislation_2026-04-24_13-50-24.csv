@@ -1,4 +1,4 @@
-registration_number,commission_answer,followup_events,law_passed,is_law_passed,Rejected_Legislation
+registration_number,commission_answer,followup_events,law_passed,is_law_passed,rejected_legislation
 2012/000001,['The Commission has decided not to submit a legislative proposal.'],"['On 1 March 2025, the Regulation entered into force.']",,False,True
 2012/000002,['The Commission will continue monitoring implementation.'],"['On 16 December 2020, the European Parliament adopted the revised Drinking Water Directive.']","['On 16 December 2020, the European Parliament adopted the revised Drinking Water Directive.']",True,False
 2012/000003,['The Commission plans to adopt a legislative proposal in 2027.'],[],,False,False

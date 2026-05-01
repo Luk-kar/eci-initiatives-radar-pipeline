@@ -61,7 +61,7 @@ LEGISLATION_COLS: tuple[str, ...] = (
     "followup_events",
     "law_passed",
     "is_law_passed",
-    "Rejected_Legislation",
+    "rejected_legislation",
 )
 
 # ── Output column metadata ────────────────────────────────────────────────────

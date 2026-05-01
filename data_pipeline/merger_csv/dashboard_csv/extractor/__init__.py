@@ -71,7 +71,7 @@ def analyse_row(
     # ── Legislation flags (used by current_status / legislation) ──────────────
     # Provide a fallback value (e.g., False) if legislation is None
     is_law_passed = _parse_bool(legislation.is_law_passed) if legislation else False
-    rejected = _parse_bool(legislation.Rejected_Legislation) if legislation else False
+    rejected = _parse_bool(legislation.rejected_legislation) if legislation else False
 
     # ── Delegated, complex fields ─────────────────────────────────────────────
     return DashboardRow(

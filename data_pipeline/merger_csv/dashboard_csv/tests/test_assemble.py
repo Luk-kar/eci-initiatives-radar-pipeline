@@ -48,7 +48,7 @@ def legislation_index():
             followup_events="['Follow-up event 1']",
             law_passed="['Law was passed']",
             is_law_passed="True",
-            Rejected_Legislation="False",
+            rejected_legislation="False",
         )
     }
 

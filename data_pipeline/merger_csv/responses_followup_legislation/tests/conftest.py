@@ -44,7 +44,7 @@ def legislation_results() -> list[LegislationResult]:
             followup_events=["Follow-up 1", "Follow-up 2"],
             law_passed=["Follow-up 1"],
             is_law_passed=True,
-            Rejected_Legislation=False,
+            rejected_legislation=False,
         ),
         LegislationResult(
             registration_number="2012/000002",
@@ -52,6 +52,6 @@ def legislation_results() -> list[LegislationResult]:
             followup_events=["Follow-up 3"],
             law_passed=None,
             is_law_passed=False,
-            Rejected_Legislation=True,
+            rejected_legislation=True,
         ),
     ]

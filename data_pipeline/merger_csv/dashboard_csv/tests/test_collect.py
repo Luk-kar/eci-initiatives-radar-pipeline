@@ -111,7 +111,7 @@ class TestLoaders:
                 "followup_events": "Events",
                 "law_passed": "Yes",
                 "is_law_passed": "True",
-                "Rejected_Legislation": "False",
+                "rejected_legislation": "False",
             }
         ]
 

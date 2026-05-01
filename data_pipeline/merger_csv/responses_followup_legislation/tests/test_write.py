@@ -47,7 +47,7 @@ class TestWriteOutput:
             "followup_events",
             "law_passed",
             "is_law_passed",
-            "Rejected_Legislation",
+            "rejected_legislation",
         ]
 
         assert len(rows) == 2
@@ -60,7 +60,7 @@ class TestWriteOutput:
         assert rows[0]["followup_events"] == "['Follow-up 1', 'Follow-up 2']"
         assert rows[0]["law_passed"] == "['Follow-up 1']"
         assert rows[0]["is_law_passed"] == "True"
-        assert rows[0]["Rejected_Legislation"] == "False"
+        assert rows[0]["rejected_legislation"] == "False"
 
         # Row 1
         assert rows[1]["registration_number"] == "2012/000002"
@@ -68,4 +68,4 @@ class TestWriteOutput:
         assert rows[1]["followup_events"] == "['Follow-up 3']"
         assert rows[1]["law_passed"] == ""
         assert rows[1]["is_law_passed"] == "False"
-        assert rows[1]["Rejected_Legislation"] == "True"
+        assert rows[1]["rejected_legislation"] == "True"

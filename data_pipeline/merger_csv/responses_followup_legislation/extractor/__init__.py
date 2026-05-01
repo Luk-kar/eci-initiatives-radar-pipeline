@@ -39,5 +39,5 @@ def analyse_row(
         followup_events=followup_items,
         law_passed=lp,
         is_law_passed=_is_law_passed.extract(lp),
-        Rejected_Legislation=is_rejected,
+        rejected_legislation=is_rejected,
     )
