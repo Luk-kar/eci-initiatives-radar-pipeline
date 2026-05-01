@@ -60,7 +60,7 @@ LEGISLATION_COLS: tuple[str, ...] = (
     "registration_number",
     "followup_events",
     "law_passed",
-    "Is_Law_Passed",
+    "is_law_passed",
     "Rejected_Legislation",
 )
 

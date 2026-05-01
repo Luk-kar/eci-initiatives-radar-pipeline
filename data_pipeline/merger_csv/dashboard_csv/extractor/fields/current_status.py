@@ -25,7 +25,7 @@ Source vocabulary (raw, observed in ``eci_initiatives.current_status``):
   ``Unsuccessful collection``, ``Withdrawn``.
 
 For ``Answered initiative`` rows, the verdict is refined using the
-legislation flags (``Is_Law_Passed`` / ``Rejected_Legislation``) produced
+legislation flags (``is_law_passed`` / ``Rejected_Legislation``) produced
 by the legislation merge step, so that the dashboard can distinguish
 between *engaged*, *law passed*, and *rejected* outcomes.
 """

@@ -43,7 +43,7 @@ class TestSessionConstants:
 
         assert "registration_number" in LEGISLATION_COLS
         assert "commission_answer" not in LEGISLATION_COLS
-        assert "Is_Law_Passed" in LEGISLATION_COLS
+        assert "is_law_passed" in LEGISLATION_COLS
         assert "Rejected_Legislation" in LEGISLATION_COLS
 
     def test_output_fieldnames_matches_model(self):

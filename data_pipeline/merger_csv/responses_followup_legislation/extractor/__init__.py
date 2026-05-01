@@ -38,6 +38,6 @@ def analyse_row(
         commission_answer=commission_answer_items,
         followup_events=followup_items,
         law_passed=lp,
-        Is_Law_Passed=_is_law_passed.extract(lp),
+        is_law_passed=_is_law_passed.extract(lp),
         Rejected_Legislation=is_rejected,
     )

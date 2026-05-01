@@ -16,7 +16,7 @@ class LegislationResult:
     followup_events: list[str] | None = None  # For debugging
     law_passed: list[str] | None = None
     """Matched text spans from LAW_MENTIONED patterns, or None if no match fired."""
-    Is_Law_Passed: bool = False
+    is_law_passed: bool = False
     """True when law_passed is a non-empty list."""
     Rejected_Legislation: bool = False
     """True when any REJECTED_LEGISLATION pattern matched."""

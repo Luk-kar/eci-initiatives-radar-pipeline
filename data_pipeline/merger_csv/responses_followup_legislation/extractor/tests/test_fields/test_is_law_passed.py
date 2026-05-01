@@ -7,7 +7,7 @@ from data_pipeline.merger_csv.responses_followup_legislation.extractor.fields.is
 
 class TestIsLawPassed:
     """
-    Tests for the derivation logic of ``Is_Law_Passed`` from ``law_passed``.
+    Tests for the derivation logic of ``is_law_passed`` from ``law_passed``.
     """
 
     @pytest.mark.parametrize(

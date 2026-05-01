@@ -71,5 +71,5 @@ class LegislationRow:
     registration_number: str
     followup_events: str
     law_passed: str
-    Is_Law_Passed: str
+    is_law_passed: str
     Rejected_Legislation: str

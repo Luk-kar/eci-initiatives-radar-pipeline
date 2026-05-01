@@ -43,7 +43,7 @@ def legislation_results() -> list[LegislationResult]:
             commission_answer=["Commission answer 1", "Commission answer 2"],
             followup_events=["Follow-up 1", "Follow-up 2"],
             law_passed=["Follow-up 1"],
-            Is_Law_Passed=True,
+            is_law_passed=True,
             Rejected_Legislation=False,
         ),
         LegislationResult(
@@ -51,7 +51,7 @@ def legislation_results() -> list[LegislationResult]:
             commission_answer=["Commission answer 3"],
             followup_events=["Follow-up 3"],
             law_passed=None,
-            Is_Law_Passed=False,
+            is_law_passed=False,
             Rejected_Legislation=True,
         ),
     ]
