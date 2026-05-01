@@ -6,7 +6,6 @@ Writes the assembled ``DashboardRow`` objects to the final dashboard CSV.
 
 import csv
 import logging
-from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 
@@ -44,7 +43,8 @@ def write_output(data_dir: Path, results: list[DashboardRow]) -> Path:
         writer.writeheader()
 
         for result in results:
-            writer.writerow(asdict(result))
+            # Use Pydantic's native model_dump() instead of dataclasses.asdict()
+            writer.writerow(result.model_dump())
 
     logger.info("Wrote %d row(s) to %s", len(results), output_path)
     return output_path

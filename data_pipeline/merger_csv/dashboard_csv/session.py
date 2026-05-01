@@ -7,7 +7,6 @@ logging for the dashboard merger step.
 """
 
 import logging
-from dataclasses import fields as dataclass_fields
 from pathlib import Path
 
 from data_pipeline.pipeline_shared.consts import (
@@ -26,7 +25,6 @@ from .io import find_latest_data_dir
 INITIATIVES_GLOB = "eci_initiatives_[0-9]*.csv"
 RESPONSES_GLOB = "eci_responses_[0-9]*.csv"
 LEGISLATION_GLOB = "eci_responses_followup_legislation_[0-9]*.csv"
-
 
 # ── Column allow-lists per source CSV ─────────────────────────────────────────
 # Loaded rows are filtered down to these columns before any analysis runs;
@@ -66,9 +64,8 @@ LEGISLATION_COLS: tuple[str, ...] = (
     "Rejected_Legislation",
 )
 
-
 # ── Output column metadata ────────────────────────────────────────────────────
-OUTPUT_FIELDNAMES: list[str] = [f.name for f in dataclass_fields(DashboardRow)]
+OUTPUT_FIELDNAMES: list[str] = list(DashboardRow.model_fields.keys())
 
 
 # ── Session bootstrap ─────────────────────────────────────────────────────────
