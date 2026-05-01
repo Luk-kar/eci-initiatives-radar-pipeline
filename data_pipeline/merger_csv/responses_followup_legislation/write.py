@@ -48,7 +48,7 @@ def write_output(data_dir: Path, results: list[LegislationResult]) -> Path:
                     "registration_number": result.registration_number,
                     "commission_answer": result.commission_answer,
                     "followup_events": result.followup_events,
-                    "Law_Passed": result.Law_Passed,
+                    "law_passed": result.law_passed,
                     "Is_Law_Passed": result.Is_Law_Passed,
                     "Rejected_Legislation": result.Rejected_Legislation,
                 }

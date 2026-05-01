@@ -59,7 +59,7 @@ RESPONSE_COLS: tuple[str, ...] = (
 LEGISLATION_COLS: tuple[str, ...] = (
     "registration_number",
     "followup_events",
-    "Law_Passed",
+    "law_passed",
     "Is_Law_Passed",
     "Rejected_Legislation",
 )

@@ -100,6 +100,6 @@ def analyse_row(
         # Column rename: timeline_collection_start_date -> timeline_collection_start.
         timeline_collection_start=initiative.timeline_collection_start_date,
         law_passed=law_passed.extract(
-            legislation.Law_Passed if legislation else "",
+            legislation.law_passed if legislation else "",
         ),
     )

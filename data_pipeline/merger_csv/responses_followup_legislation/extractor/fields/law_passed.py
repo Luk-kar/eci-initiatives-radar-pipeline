@@ -1,7 +1,7 @@
 """
 law_passed.py
 -------------
-Regex patterns and extractor for the ``Law_Passed`` output column.
+Regex patterns and extractor for the ``law_passed`` output column.
 
 ``extract(text_items)`` scans each item in the combined text list for evidence
 that a piece of EU legislation was adopted, applied, or entered into force and
@@ -26,7 +26,7 @@ NON_EXPLICIT_MENTIONED_LEGISLATION = [r"new minimum hygiene standards?"]
 _LEGISLATION = [
     r"regulations?",
     r"directives?",
-    r"(?:legislative |legal )?acts?", # |delegated |implementing
+    r"(?:legislative |legal )?acts?",  # |delegated |implementing
     r"legislations?",
     r"laws?",
     r"(?:legal |legislative )?instruments?",
@@ -34,7 +34,7 @@ _LEGISLATION = [
     r"amendments?",
     r"revisions?",
     r"rules?",
-    r"codes?"
+    r"codes?",
 ] + NON_EXPLICIT_MENTIONED_LEGISLATION
 
 _FALSE_POSITIVE_LEGISLATION = ["proposal to adopt"]
@@ -42,7 +42,7 @@ _FALSE_POSITIVE_LEGISLATION = ["proposal to adopt"]
 
 # Verb/action lists
 _VERBS = [
-    r"appl(?:y|ies|ied|ying|icable)", # ication
+    r"appl(?:y|ies|ied|ying|icable)",  # ication
     r"enter(?:ed|s|ing)?\s+(?:into\s+force|in(?:to)?\s+application)",
     r"force(?:d|s)?\s+into",
     r"repeal(?:ed|s)?",
@@ -52,7 +52,7 @@ _VERBS = [
     r"came\s+into\s+force",
     r"became\s+applicable",
     # r"application(?!\s+of\s+the\s+(?:rules|directive|regulation))",
-    r"publish(?:ed|s|ing)?\s+in\s+(?:the\s+)?Official\s+Journal"
+    r"publish(?:ed|s|ing)?\s+in\s+(?:the\s+)?Official\s+Journal",
 ]
 
 _COMPILED_NEGATIONS: list[re.Pattern] = compile_patterns(NEGATION_TERMS)
@@ -89,24 +89,25 @@ def _split_into_sentences(text: str) -> list[str]:
     while ignoring periods in common abbreviations.
     """
     # Mask common abbreviations to prevent incorrect splits
-    text = re.sub(r'\bi\.e\.', 'i<dot>e<dot>', text, flags=re.IGNORECASE)
-    text = re.sub(r'\be\.g\.', 'e<dot>g<dot>', text, flags=re.IGNORECASE)
-    text = re.sub(r'\betc\.', 'etc<dot>', text, flags=re.IGNORECASE)
-    
+    text = re.sub(r"\bi\.e\.", "i<dot>e<dot>", text, flags=re.IGNORECASE)
+    text = re.sub(r"\be\.g\.", "e<dot>g<dot>", text, flags=re.IGNORECASE)
+    text = re.sub(r"\betc\.", "etc<dot>", text, flags=re.IGNORECASE)
+
     # Split by period, exclamation, or question mark followed by whitespace
     chunks = re.split(r"(?<=[.!?])\s+", text)
-    
+
     # Restore the masked dots and filter empty strings
     restored_chunks = []
     for c in chunks:
         if not c.strip():
             continue
-        c = c.replace('i<dot>e<dot>', 'i.e.')
-        c = c.replace('e<dot>g<dot>', 'e.g.')
-        c = c.replace('etc<dot>', 'etc.')
+        c = c.replace("i<dot>e<dot>", "i.e.")
+        c = c.replace("e<dot>g<dot>", "e.g.")
+        c = c.replace("etc<dot>", "etc.")
         restored_chunks.append(c)
-        
+
     return restored_chunks
+
 
 def _is_future_conditional(text: str) -> bool:
     """
@@ -126,11 +127,14 @@ def _is_future_conditional(text: str) -> bool:
         rf"proposes?\s+to",
         rf"proposal\s+to\s+adopt",
     ]
-    
+
     pattern = rf"\b(?:{'|'.join(future_phrases)})\b"
     return bool(re.search(pattern, text, re.IGNORECASE))
 
-def extract(text_items: list[str], rejected_legislation: bool = False) -> list[str] | None:
+
+def extract(
+    text_items: list[str], rejected_legislation: bool = False
+) -> list[str] | None:
     """
     Scan *text_items* for indications that a law was passed/active.
 

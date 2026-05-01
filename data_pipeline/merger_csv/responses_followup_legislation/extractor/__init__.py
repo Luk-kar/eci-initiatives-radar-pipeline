@@ -37,7 +37,7 @@ def analyse_row(
         registration_number=registration_number,
         commission_answer=commission_answer_items,
         followup_events=followup_items,
-        Law_Passed=lp,
+        law_passed=lp,
         Is_Law_Passed=_is_law_passed.extract(lp),
         Rejected_Legislation=is_rejected,
     )

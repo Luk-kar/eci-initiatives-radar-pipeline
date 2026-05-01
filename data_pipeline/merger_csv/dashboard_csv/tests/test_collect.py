@@ -109,7 +109,7 @@ class TestLoaders:
             {
                 "registration_number": "2024/000001",
                 "followup_events": "Events",
-                "Law_Passed": "Yes",
+                "law_passed": "Yes",
                 "Is_Law_Passed": "True",
                 "Rejected_Legislation": "False",
             }

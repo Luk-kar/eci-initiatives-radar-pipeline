@@ -25,7 +25,7 @@ def extract(law_passed_raw: str | None) -> str:
     """Return the dashboard ``legislation`` narrative.
 
     Args:
-        law_passed_raw:        Raw value of the ``Law_Passed`` column
+        law_passed_raw:        Raw value of the ``law_passed`` column
                                (Python list literal, or empty / ``None``).
 
     Returns:

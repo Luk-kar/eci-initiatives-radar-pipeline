@@ -46,7 +46,7 @@ def legislation_index():
         "2024/000001": LegislationRow(
             registration_number="2024/000001",
             followup_events="['Follow-up event 1']",
-            Law_Passed="['Law was passed']",
+            law_passed="['Law was passed']",
             Is_Law_Passed="True",
             Rejected_Legislation="False",
         )

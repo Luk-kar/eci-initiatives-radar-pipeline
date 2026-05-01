@@ -34,7 +34,7 @@ class TestRun:
             LegislationResult(
                 registration_number="2012/000001",
                 followup_events=["Answer 1", "Follow-up 1"],
-                Law_Passed=["Follow-up 1"],
+                law_passed=["Follow-up 1"],
                 Is_Law_Passed=True,
                 Rejected_Legislation=False,
             )
