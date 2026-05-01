@@ -25,7 +25,7 @@ def initiative_rows():
             funding_total="100,000",
             signatures_collected="1,000,000",
             signatures_collected_by_country="{'Germany': {'signatures': 100000, 'threshold': 70000, 'percentage': 142.85}}",
-            signatures_threshold_met="1",
+            signatures_countries_threshold_met_count="1",
         )
     ]
 
@@ -86,7 +86,7 @@ class TestAssembleResults:
                 funding_total="100,000",
                 signatures_collected="1,000,000",
                 signatures_collected_by_country="",
-                signatures_threshold_met="1",
+                signatures_countries_threshold_met_count="1",
             )
         ]
 

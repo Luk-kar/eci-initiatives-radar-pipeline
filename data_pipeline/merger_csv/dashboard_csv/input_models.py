@@ -41,7 +41,7 @@ class InitiativeRow:
     funding_total: str
     signatures_collected: str
     signatures_collected_by_country: str
-    signatures_threshold_met: str
+    signatures_countries_threshold_met_count: str
 
 
 # ── eci_responses_*.csv ───────────────────────────────────────────────────────

@@ -9,7 +9,9 @@ from .utils import get_signature_table_rows
 logger = logging.getLogger(__name__)
 
 
-def extract_signatures_threshold_met(soup: BeautifulSoup) -> Optional[str]:
+def extract_signatures_countries_threshold_met_count(
+    soup: BeautifulSoup,
+) -> Optional[str]:
     """Extract number of countries with threshold met (percentage >= 100)."""
     try:
         rows_data = get_signature_table_rows(soup, skip_total=True)

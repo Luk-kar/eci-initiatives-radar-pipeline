@@ -10,7 +10,7 @@ from .url import construct_url
 from .signatures import (
     extract_signatures_by_country,
     extract_signatures_collected,
-    extract_signatures_threshold_met,
+    extract_signatures_countries_threshold_met_count,
 )
 
 __all__ = [
@@ -23,7 +23,7 @@ __all__ = [
     "extract_response_commission_url",
     "extract_signatures_by_country",
     "extract_signatures_collected",
-    "extract_signatures_threshold_met",
+    "extract_signatures_countries_threshold_met_count",
     "extract_timeline_data",
     "extract_title",
     "construct_url",

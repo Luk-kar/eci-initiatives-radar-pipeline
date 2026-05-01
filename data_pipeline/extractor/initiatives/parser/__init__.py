@@ -23,7 +23,7 @@ from .fields import (
     extract_response_commission_url,
     extract_signatures_by_country,
     extract_signatures_collected,
-    extract_signatures_threshold_met,
+    extract_signatures_countries_threshold_met_count,
     extract_timeline_data,
     extract_title,
 )
@@ -100,7 +100,9 @@ class ECIHTMLParser:
                 signatures_collected_by_country=extract_signatures_by_country(
                     soup, html_file, title, url
                 ),
-                signatures_threshold_met=extract_signatures_threshold_met(soup),
+                signatures_countries_threshold_met_count=extract_signatures_countries_threshold_met_count(
+                    soup
+                ),
                 response_url=extract_response_commission_url(soup),
             )
 

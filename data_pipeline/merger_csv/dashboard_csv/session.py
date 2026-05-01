@@ -43,7 +43,7 @@ INITIATIVE_COLS: tuple[str, ...] = (
     "funding_total",
     "signatures_collected",
     "signatures_collected_by_country",
-    "signatures_threshold_met",
+    "signatures_countries_threshold_met_count",
 )
 
 # Only the answer paragraphs are needed from eci_responses; the rest of the

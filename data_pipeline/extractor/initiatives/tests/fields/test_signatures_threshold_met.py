@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
 from data_pipeline.extractor.initiatives.parser.fields.signatures.threshold_met import (
-    extract_signatures_threshold_met,
+    extract_signatures_countries_threshold_met_count,
 )
 
 
@@ -9,13 +9,13 @@ def _soup(html: str) -> BeautifulSoup:
     return BeautifulSoup(html, "html.parser")
 
 
-def test_signatures_threshold_met_returns_none_when_no_table():
+def test_signatures_countries_threshold_met_count_returns_none_when_no_table():
 
     html = "<html><body><p>No signatures table here.</p></body></html>"
-    assert extract_signatures_threshold_met(_soup(html)) is None
+    assert extract_signatures_countries_threshold_met_count(_soup(html)) is None
 
 
-def test_signatures_threshold_met_counts_countries_with_percentage_at_least_100():
+def test_signatures_countries_threshold_met_count_counts_countries_with_percentage_at_least_100():
 
     html = """
     <html><body>
@@ -42,11 +42,11 @@ def test_signatures_threshold_met_counts_countries_with_percentage_at_least_100(
     </body></html>
     """
     # Germany (209.82%) and Italy (100%) count; France (99.9%) does not.
-    result = extract_signatures_threshold_met(_soup(html))
+    result = extract_signatures_countries_threshold_met_count(_soup(html))
     assert result == "2"
 
 
-def test_signatures_threshold_met_handles_non_numeric_percentage_gracefully():
+def test_signatures_countries_threshold_met_count_handles_non_numeric_percentage_gracefully():
 
     html = """
     <html><body>
@@ -61,5 +61,5 @@ def test_signatures_threshold_met_handles_non_numeric_percentage_gracefully():
     </body></html>
     """
     # Regex will fail to find a number in "N/A", so this row is ignored.
-    result = extract_signatures_threshold_met(_soup(html))
+    result = extract_signatures_countries_threshold_met_count(_soup(html))
     assert result == "0"

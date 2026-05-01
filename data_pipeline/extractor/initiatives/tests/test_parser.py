@@ -71,7 +71,9 @@ class TestECIHTMLParserParse:
             extract_funding_by=MagicMock(return_value=None),
             extract_signatures_collected=MagicMock(return_value="1145525"),
             extract_signatures_by_country=MagicMock(return_value=None),
-            extract_signatures_threshold_met=MagicMock(return_value=None),
+            extract_signatures_countries_threshold_met_count=MagicMock(
+                return_value=None
+            ),
             extract_response_commission_url=MagicMock(return_value=None),
         ):
             result = parser.parse(sample_html)
@@ -97,7 +99,9 @@ class TestECIHTMLParserParse:
             extract_funding_by=MagicMock(return_value=None),
             extract_signatures_collected=MagicMock(return_value="1145525"),
             extract_signatures_by_country=MagicMock(return_value=None),
-            extract_signatures_threshold_met=MagicMock(return_value=None),
+            extract_signatures_countries_threshold_met_count=MagicMock(
+                return_value=None
+            ),
             extract_response_commission_url=MagicMock(return_value=None),
         ):
             result = parser.parse(sample_html)

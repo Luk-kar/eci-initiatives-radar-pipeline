@@ -93,7 +93,7 @@ def analyse_row(
             initiative.signatures_collected_by_country,
         ),
         # Column rename: fro explicity
-        signatures_countries_threshold_met_count=initiative.signatures_threshold_met,
+        signatures_countries_threshold_met_count=initiative.signatures_countries_threshold_met_count,
         signatures_collected=initiative.signatures_collected,
         funding_total=initiative.funding_total,
         timeline_collection_closed=initiative.timeline_collection_closed,

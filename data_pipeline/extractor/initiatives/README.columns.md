@@ -23,7 +23,7 @@ This document describes the fields extracted from the European Citizens' Initiat
 | `funding_by` | `Optional[str]` | No | Follows the same rules as `funding_total`. If no sponsors gave over the reporting threshold (typically €500), no specific donors will be listed in the HTML. |
 | `signatures_collected` | `Optional[str]` | No | The portal displays this based on the Central Online Collection System. Newly registered initiatives will have no data. Older initiatives might lack this if they used private collection systems or if final verified numbers haven't been published yet. |
 | `signatures_collected_by_country` | `Optional[str]` | No | The HTML map/table showing the breakdown by member state is only populated when active collection data is available or after final verification is published. |
-| `signatures_threshold_met` | `Optional[str]` | No | An initiative must reach a minimum threshold of signatures in at least 7 member states. The portal only confirms this status after national authorities complete the official verification phase. |
+| `signatures_countries_threshold_met_count` | `Optional[str]` | No | An initiative must reach a minimum threshold of signatures in at least 7 member states. The portal only confirms this status after national authorities complete the official verification phase. |
 | `response_url` | `Optional[str]` | No | This link is only added to the HTML if the initiative succeeds and the Commission publishes its official legal communication in response. |
 
 ## Expected Structure Notes

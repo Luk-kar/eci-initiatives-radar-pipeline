@@ -103,6 +103,6 @@ class ECIInitiativeDetailsRecord(BaseModel):
     signatures_collected_by_country: Optional[
         Json[dict[str, CountrySignatureStats]]
     ] = None
-    signatures_threshold_met: Optional[str]
+    signatures_countries_threshold_met_count: Optional[str]
 
     response_url: Optional[str]
