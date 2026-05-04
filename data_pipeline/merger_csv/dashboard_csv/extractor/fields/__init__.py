@@ -14,12 +14,10 @@ from . import (
     current_status,
     commission_answer,
     law_passed,
-    signatures_collected_by_country,
 )
 
 __all__ = [
     "current_status",
     "commission_answer",
     "law_passed",
-    "signatures_collected_by_country",
 ]

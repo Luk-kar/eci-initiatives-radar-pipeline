@@ -21,7 +21,6 @@ from data_pipeline.merger_csv.dashboard_csv.extractor.fields import (
     current_status,
     law_passed,
     registration_year,
-    signatures_collected_by_country,
 )
 from ..input_models import InitiativeRow, LegislationRow, ResponseRow
 from .fields.model import DashboardRow
@@ -89,9 +88,7 @@ def analyse_row(
             response.commission_answer if response else "",
         ),
         initiative_url=initiative.initiative_url,
-        signatures_collected_by_country=signatures_collected_by_country.extract(
-            initiative.signatures_collected_by_country,
-        ),
+        signatures_collected_by_country=initiative.signatures_collected_by_country,
         # Column rename: fro explicity
         signatures_countries_threshold_met_count=initiative.signatures_countries_threshold_met_count,
         signatures_collected=initiative.signatures_collected,

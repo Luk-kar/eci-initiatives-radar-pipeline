@@ -44,7 +44,11 @@ def write_output(data_dir: Path, results: list[DashboardRow]) -> Path:
 
         for result in results:
             # Use Pydantic's native model_dump() instead of dataclasses.asdict()
-            writer.writerow(result.model_dump())
+            row_dict = result.model_dump()
+
+            # Convert None to empty string for clean CSV output
+            sanatatized_row = {k: ("" if v is None else v) for k, v in row_dict.items()}
+            writer.writerow(sanatatized_row)
 
     logger.info("Wrote %d row(s) to %s", len(results), output_path)
     return output_path
