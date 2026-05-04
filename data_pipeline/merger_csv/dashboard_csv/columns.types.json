@@ -9,8 +9,8 @@
   "initiative_url": { "type": "string", "required": true },
   "signatures_collected_by_country": { "type": "json", "required": false },
   "signatures_countries_threshold_met_count": { "type": "Int64", "required": false },
-  "signatures_collected": { "type": "string", "required": false },
-  "funding_total": { "type": "string", "required": false },
+  "signatures_collected": { "type": "Int64", "required": false },
+  "funding_total": { "type": "float64", "required": false },
   "timeline_collection_closed": { "type": "datetime", "required": false, "format": "%d/%m/%Y" },
   "timeline_collection_start": { "type": "datetime", "required": false, "format": "%d/%m/%Y" },
   "law_passed": { "type": "string", "required": false }
