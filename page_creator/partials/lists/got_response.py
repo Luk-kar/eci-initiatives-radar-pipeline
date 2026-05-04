@@ -47,8 +47,8 @@ def generate_got_response(df: pd.DataFrame) -> str:
 
     Args:
         df: The full ECI initiatives DataFrame. Must contain ``current_status``,
-            ``title``, ``url``, ``objective``, ``registration_date``, and
-            ``commission_answer_text`` columns.
+            ``title``, ``initiative_url``, ``objective``, ``registration_date``, and
+            ``commission_answer`` columns.
 
     Returns:
         An HTML string wrapping the table in a ``card`` div, or a card with a

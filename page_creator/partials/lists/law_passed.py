@@ -46,7 +46,7 @@ def _build_row(row: pd.Series) -> str:
     """Return a ``<tr>`` for a single initiative that law passed.
 
     Args:
-        row: A DataFrame row. Must contain ``title``, ``url``, ``registration_date``,
+        row: A DataFrame row. Must contain ``title``, ``initiative_url``, ``registration_date``,
              ``objective``, and ``legislation``.
 
     Returns:
@@ -76,7 +76,7 @@ def generate_law_passed(df: pd.DataFrame) -> str:
 
     Args:
         df: The full ECI initiatives DataFrame. Must contain ``current_status``,
-            ``title``, ``url``, ``objective``, ``registration_date``, and
+            ``title``, ``initiative_url``, ``objective``, ``registration_date``, and
             ``legislation`` columns.
 
     Returns:

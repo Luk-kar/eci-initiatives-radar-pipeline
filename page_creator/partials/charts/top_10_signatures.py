@@ -10,7 +10,6 @@ from page_creator.utils import wrap_card
 from page_creator.partials.charts.utils import hover_wrap
 from page_creator.partials.styles.colors import STATUS_COLORS, kpi_colors
 
-
 # ── Constants ──────────────────────────────────────────────────────────────
 
 ECI_THRESHOLD = 1_000_000
@@ -115,10 +114,13 @@ def _aggregate_top10(df: pd.DataFrame) -> pd.DataFrame:
         df.groupby("title", as_index=False)
         .agg(
             signatures_collected=("signatures_collected", "sum"),
-            signatures_threshold_met=("signatures_threshold_met", "first"),
+            signatures_countries_threshold_met_count=(
+                "signatures_countries_threshold_met_count",
+                "first",
+            ),
             objective=("objective", "first"),
-            commission_answer_text=("commission_answer_text", "first"),
-            url=("url", "first"),
+            commission_answer=("commission_answer", "first"),
+            initiative_url=("initiative_url", "first"),
             registration_year=("registration_year", "first"),
             current_status=("current_status", "first"),
         )
@@ -128,10 +130,10 @@ def _aggregate_top10(df: pd.DataFrame) -> pd.DataFrame:
 
     agg["objective"] = agg["objective"].apply(hover_wrap)
 
-    agg["commission_answer_text"] = agg.apply(
+    agg["commission_answer"] = agg.apply(
         lambda row: hover_wrap(
-            row["commission_answer_text"]
-            if pd.notna(row["commission_answer_text"])
+            row["commission_answer"]
+            if pd.notna(row["commission_answer"])
             else _COMMISSION_ANSWER_FALLBACK.get(row["current_status"])
         ),
         axis=1,
@@ -150,10 +152,10 @@ def _build_bar_trace(agg: pd.DataFrame) -> go.Bar:
     colors = [_bar_color(s, max_sigs) for s in agg["signatures_collected"]]
     customdata = agg[
         [
-            "signatures_threshold_met",
+            "signatures_countries_threshold_met_count",
             "objective",
-            "commission_answer_text",
-            "url",
+            "commission_answer",
+            "initiative_url",
             "registration_year",
         ]
     ].values
@@ -249,9 +251,11 @@ def _group_markers_by_status(agg: pd.DataFrame) -> dict[str, list[dict]]:
                 {
                     "x": row["signatures_collected"],
                     "y": row["title"],
-                    "url": row["url"],
-                    "signatures_threshold_met": row["signatures_threshold_met"],  # [0]
-                    "commission_answer_text": row["commission_answer_text"],  # [2]
+                    "initiative_url": row["initiative_url"],
+                    "signatures_countries_threshold_met_count": row[
+                        "signatures_countries_threshold_met_count"
+                    ],  # [0]
+                    "commission_answer": row["commission_answer"],  # [2]
                     "registration_year": row["registration_year"],  # [4]
                 }
             )
@@ -264,10 +268,10 @@ def _build_marker_customdata(data: list[dict], status: str) -> list[list]:
 
     return [
         [
-            d["signatures_threshold_met"],  # [0]
+            d["signatures_countries_threshold_met_count"],  # [0]
             None,  # [1]
-            d["commission_answer_text"],  # [2]
-            d["url"],  # [3]
+            d["commission_answer"],  # [2]
+            d["initiative_url"],  # [3]
             d["registration_year"],  # [4]
             status,  # [5] ← status label for hover
         ]
@@ -331,8 +335,8 @@ def _build_click_js() -> str:
     if (drag) drag.style.cursor = "default";
   }});
   el.on("plotly_click", function (data) {{
-    var url = data.points[0].customdata[3];
-    if (url) window.open(url, "_blank", "noopener,noreferrer");
+    var initiative_url = data.points[0].customdata[3];
+    if (initiative_url) window.open(initiative_url, "_blank", "noopener,noreferrer");
   }});
 }})();
 </script>"""

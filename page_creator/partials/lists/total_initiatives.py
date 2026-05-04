@@ -32,9 +32,9 @@ def generate_total_initiatives(df: pd.DataFrame) -> str:
     ``COUNTRIES_THRESHOLD``.
 
     Args:
-        df: The full ECI initiatives DataFrame. Must contain ``title``, ``url``,
+        df: The full ECI initiatives DataFrame. Must contain ``title``, ``initiative_url``,
             ``objective``, ``registration_date``, ``signatures_collected``, and
-            ``signatures_threshold_met`` columns.
+            ``signatures_countries_threshold_met_count`` columns.
 
     Returns:
         An HTML string wrapping the table in a ``card`` div.

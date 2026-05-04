@@ -46,8 +46,8 @@ def generate_reached_signatures(df: pd.DataFrame) -> str:
 
     Args:
         df: The full ECI initiatives DataFrame. Must contain ``signatures_collected``,
-            ``title``, ``url``, ``objective``, ``registration_date``, and
-            ``signatures_threshold_met`` columns.
+            ``title``, ``initiative_url``, ``objective``, ``registration_date``, and
+            ``signatures_countries_threshold_met_count`` columns.
 
     Returns:
         An HTML string wrapping the table in a ``card`` div, or a card with a

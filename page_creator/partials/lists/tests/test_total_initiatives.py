@@ -28,8 +28,8 @@ def base_df():
                 "05/05/2017",
             ],
             "signatures_collected": [300_000, 1_200_000, 1_100_000, 500_000, None],
-            "signatures_threshold_met": [3, 13, 10, 4, None],
-            "url": [f"u{i}" for i in range(5)],
+            "signatures_countries_threshold_met_count": [3, 13, 10, 4, None],
+            "initiative_url": [f"u{i}" for i in range(5)],
             "objective": [f"o{i}" for i in range(5)],
         }
     )
@@ -92,8 +92,8 @@ class TestSort:
                 "registration_date": ["01/06/2021"],
                 "current_status": ["Withdrawn"],
                 "signatures_collected": [50_000],
-                "signatures_threshold_met": [1],
-                "url": ["u"],
+                "signatures_countries_threshold_met_count": [1],
+                "initiative_url": ["u"],
                 "objective": ["o"],
             }
         )
@@ -108,14 +108,14 @@ class TestSort:
                 "registration_date": ["01/06/2021"],
                 "current_status": ["Collection Ongoing"],
                 "signatures_collected": [None],
-                "signatures_threshold_met": [None],
-                "url": ["u"],
+                "signatures_countries_threshold_met_count": [None],
+                "initiative_url": ["u"],
                 "objective": ["o"],
             }
         )
         result = _sort(df)
         assert pd.isna(result.iloc[0]["signatures_collected"])
-        assert pd.isna(result.iloc[0]["signatures_threshold_met"])
+        assert pd.isna(result.iloc[0]["signatures_countries_threshold_met_count"])
 
     def test_zero_signatures_does_not_render_collection_not_started(self):
         df = pd.DataFrame(
@@ -124,11 +124,11 @@ class TestSort:
                 "registration_date": ["01/06/2021"],
                 "current_status": ["Collection Ongoing"],
                 "signatures_collected": [0],
-                "signatures_threshold_met": [0],
-                "url": ["u"],
+                "signatures_countries_threshold_met_count": [0],
+                "initiative_url": ["u"],
                 "objective": ["o"],
             }
         )
         result = _sort(df)
         assert result.iloc[0]["signatures_collected"] == 0
-        assert result.iloc[0]["signatures_threshold_met"] == 0
+        assert result.iloc[0]["signatures_countries_threshold_met_count"] == 0

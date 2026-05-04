@@ -31,9 +31,9 @@ def base_df():
                 "20/08/2016",
                 "05/02/2020",
             ],
-            "url": [f"u{i}" for i in range(7)],
+            "initiative_url": [f"u{i}" for i in range(7)],
             "objective": [f"o{i}" for i in range(7)],
-            "commission_answer_text": [f"ans{i}" for i in range(7)],
+            "commission_answer": [f"ans{i}" for i in range(7)],
         }
     )
 

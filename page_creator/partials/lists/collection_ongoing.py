@@ -90,14 +90,14 @@ def _build_row(row: pd.Series) -> str:
     """Return a fully assembled ``<tr>`` for a single open initiative.
 
     Args:
-        row: A DataFrame row. Must contain ``title``, ``url``, ``objective``,
+        row: A DataFrame row. Must contain ``title``, ``initiative_url``, ``objective``,
              ``timeline_collection_start``, ``timeline_collection_closed``,
-             ``signatures_collected``, and ``signatures_threshold_met``.
+             ``signatures_collected``, and ``signatures_countries_threshold_met_count``.
 
     Returns:
         A ``<tr>...</tr>`` HTML string.
     """
-    url = row.get("url") or "#"
+    initiative_url = row.get("initiative_url") or "#"
     objective = truncate(row.get("objective", ""))
 
     date_start = row.get("timeline_collection_start", "")
@@ -107,11 +107,11 @@ def _build_row(row: pd.Series) -> str:
 
     return f"""
         <tr>
-          <td><a href="{url}" target="_blank" rel="noopener noreferrer">{row["title"]}</a></td>
+          <td><a href="{initiative_url}" target="_blank" rel="noopener noreferrer">{row["title"]}</a></td>
           <td>{objective}</td>
           {_days_left_cell(date_start, date_closed)}
           <td>{sig_cell(row["signatures_collected"])}</td>
-          <td>{threshold_cell(row["signatures_threshold_met"])}</td>
+          <td>{threshold_cell(row["signatures_countries_threshold_met_count"])}</td>
         </tr>"""
 
 
@@ -138,8 +138,8 @@ def generate_collection_ongoing(df: pd.DataFrame) -> str:
 
     Args:
         df: The full ECI initiatives DataFrame. Must contain ``current_status``,
-            ``title``, ``url``, ``objective``, ``signatures_collected``,
-            ``signatures_threshold_met``, ``timeline_collection_start``, and
+            ``title``, ``initiative_url``, ``objective``, ``signatures_collected``,
+            ``signatures_countries_threshold_met_count``, ``timeline_collection_start``, and
             ``timeline_collection_closed`` columns.
 
     Returns:

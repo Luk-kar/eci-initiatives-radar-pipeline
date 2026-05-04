@@ -11,7 +11,6 @@ from page_creator.partials.charts.top_10_signatures import (
     STATUS_MARKERS,
 )
 
-
 # ── Fixtures ───────────────────────────────────────────────────────────────
 
 
@@ -21,10 +20,10 @@ def base_df():
         {
             "title": [f"ECI {i}" for i in range(15)],
             "signatures_collected": [i * 100_000 for i in range(15)],
-            "signatures_threshold_met": [i % 14 for i in range(15)],
+            "signatures_countries_threshold_met_count": [i % 14 for i in range(15)],
             "objective": [f"obj {i}" for i in range(15)],
-            "commission_answer_text": [f"ans {i}" for i in range(15)],
-            "url": [f"https://example.com/{i}" for i in range(15)],
+            "commission_answer": [f"ans {i}" for i in range(15)],
+            "initiative_url": [f"https://example.com/{i}" for i in range(15)],
             "registration_year": [2012 + i for i in range(15)],
             "current_status": ["Law Passed" for _ in range(15)],
         }
@@ -84,10 +83,10 @@ class TestAggregateTop10:
             {
                 "title": ["A", "B", "C"],
                 "signatures_collected": [100, 200, 300],
-                "signatures_threshold_met": [1, 2, 3],
+                "signatures_countries_threshold_met_count": [1, 2, 3],
                 "objective": ["o", "o", "o"],
-                "commission_answer_text": ["a", "a", "a"],
-                "url": ["u", "u", "u"],
+                "commission_answer": ["a", "a", "a"],
+                "initiative_url": ["u", "u", "u"],
                 "registration_year": [2020, 2021, 2022],
                 "current_status": [
                     "Law Passed",
@@ -115,16 +114,16 @@ class TestCommissionAnswerFallback:
             {
                 "title": ["ECI X"],
                 "signatures_collected": [500_000],
-                "signatures_threshold_met": [0],
+                "signatures_countries_threshold_met_count": [0],
                 "objective": ["some objective"],
-                "commission_answer_text": [None],  # ← no answer
-                "url": ["https://example.com"],
+                "commission_answer": [None],  # ← no answer
+                "initiative_url": ["https://example.com"],
                 "registration_year": [2020],
                 "current_status": [status],
             }
         )
         result = _aggregate_top10(df)
-        answer = result["commission_answer_text"].iloc[0]
+        answer = result["commission_answer"].iloc[0]
         assert answer != "nan"
         assert len(answer) > 0
 
@@ -133,13 +132,13 @@ class TestCommissionAnswerFallback:
             {
                 "title": ["ECI Y"],
                 "signatures_collected": [500_000],
-                "signatures_threshold_met": [0],
+                "signatures_countries_threshold_met_count": [0],
                 "objective": ["obj"],
-                "commission_answer_text": ["The real answer"],
-                "url": ["https://example.com"],
+                "commission_answer": ["The real answer"],
+                "initiative_url": ["https://example.com"],
                 "registration_year": [2021],
                 "current_status": ["Commission Engaged"],
             }
         )
         result = _aggregate_top10(df)
-        assert "real answer" in result["commission_answer_text"].iloc[0]
+        assert "real answer" in result["commission_answer"].iloc[0]

@@ -42,7 +42,7 @@ def generate_commission_engaged(df: pd.DataFrame) -> str:
 
     Args:
         df: The full ECI initiatives DataFrame. Must contain ``current_status``,
-            ``title``, ``url``, ``objective``, ``registration_date``, and
+            ``title``, ``initiative_url``, ``objective``, ``registration_date``, and
             ``legislation`` columns.
 
     Returns:

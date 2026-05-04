@@ -27,8 +27,8 @@ def base_df():
             ],
             "timeline_collection_closed": [None, None, None, None, "15/09/2025"],
             "signatures_collected": [500_000, 200_000, 800_000, 1_200_000, 300_000],
-            "signatures_threshold_met": [5, 3, 8, 13, 2],
-            "url": ["u1", "u2", "u3", "u4", "u5"],
+            "signatures_countries_threshold_met_count": [5, 3, 8, 13, 2],
+            "initiative_url": ["u1", "u2", "u3", "u4", "u5"],
             "objective": ["o1", "o2", "o3", "o4", "o5"],
         }
     )
@@ -105,8 +105,8 @@ class TestSort:
                 "timeline_collection_start": ["10/10/2024"],
                 "timeline_collection_closed": [None],
                 "signatures_collected": [100_000],
-                "signatures_threshold_met": [1],
-                "url": ["u"],
+                "signatures_countries_threshold_met_count": [1],
+                "initiative_url": ["u"],
                 "objective": ["o"],
             }
         )

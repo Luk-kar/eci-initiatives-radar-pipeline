@@ -27,7 +27,7 @@ def base_df():
                 "20/03/2017",
                 "11/11/2020",
             ],
-            "url": [f"u{i}" for i in range(5)],
+            "initiative_url": [f"u{i}" for i in range(5)],
             "objective": [f"o{i}" for i in range(5)],
             "legislation": [
                 "Directive (EU) 2020/1234 adopted.",

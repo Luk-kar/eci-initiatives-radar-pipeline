@@ -18,7 +18,6 @@ from page_creator.partials.charts.bubble_finance_plot import (
     _LOG_ZERO_DISPLAY,
 )
 
-
 # ── Fixtures ───────────────────────────────────────────────────────────────
 
 
@@ -34,8 +33,8 @@ def base_df():
             ],
             "funding_total": ["1,000.00", "500", "0"],
             "objective": ["obj a", "obj b", "obj c"],
-            "commission_answer_text": ["ans a", None, "ans c"],
-            "url": ["https://a.com", "https://b.com", "https://c.com"],
+            "commission_answer": ["ans a", None, "ans c"],
+            "initiative_url": ["https://a.com", "https://b.com", "https://c.com"],
         }
     )
 
@@ -124,8 +123,8 @@ class TestPrepareDataframe:
                 "current_status": ["Unknown Status"],
                 "funding_total": ["100"],
                 "objective": ["o"],
-                "commission_answer_text": ["a"],
-                "url": ["https://x.com"],
+                "commission_answer": ["a"],
+                "initiative_url": ["https://x.com"],
             }
         )
         result = _prepare_dataframe(df)
@@ -139,8 +138,8 @@ class TestPrepareDataframe:
                     "current_status": [alias],
                     "funding_total": ["100"],
                     "objective": ["o"],
-                    "commission_answer_text": ["a"],
-                    "url": ["https://y.com"],
+                    "commission_answer": ["a"],
+                    "initiative_url": ["https://y.com"],
                 }
             )
             result = _prepare_dataframe(df)
@@ -153,8 +152,8 @@ class TestPrepareDataframe:
                 "current_status": ["Law Passed"],
                 "funding_total": [0],
                 "objective": ["o"],
-                "commission_answer_text": ["a"],
-                "url": ["https://z.com"],
+                "commission_answer": ["a"],
+                "initiative_url": ["https://z.com"],
             }
         )
         result = _prepare_dataframe(df)
@@ -167,8 +166,8 @@ class TestPrepareDataframe:
                 "current_status": ["Law Passed"],
                 "funding_total": ["5000"],
                 "objective": ["o"],
-                "commission_answer_text": ["a"],
-                "url": ["https://z.com"],
+                "commission_answer": ["a"],
+                "initiative_url": ["https://z.com"],
             }
         )
         result = _prepare_dataframe(df)
@@ -181,8 +180,8 @@ class TestPrepareDataframe:
                 "current_status": ["Law Passed", "Law Passed"],
                 "funding_total": [0, "1000"],
                 "objective": ["o", "o"],
-                "commission_answer_text": ["a", "a"],
-                "url": ["https://a.com", "https://b.com"],
+                "commission_answer": ["a", "a"],
+                "initiative_url": ["https://a.com", "https://b.com"],
             }
         )
         result = _prepare_dataframe(df)
@@ -233,8 +232,8 @@ class TestComputeMarkerSizes:
                 "current_status": ["Law Passed"],
                 "funding_total": ["1000"],
                 "objective": ["o"],
-                "commission_answer_text": ["a"],
-                "url": ["https://solo.com"],
+                "commission_answer": ["a"],
+                "initiative_url": ["https://solo.com"],
             }
         )
         df = _prepare_dataframe(df)

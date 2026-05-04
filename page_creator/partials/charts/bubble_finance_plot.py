@@ -121,10 +121,10 @@ def _add_traces(fig: go.Figure, df: pd.DataFrame, present: list[str]) -> None:
     for category in present:
         cat_df = df[df["bubble_category"] == category].copy()
         cat_df["objective"] = cat_df["objective"].apply(hover_wrap)
-        cat_df["commission_answer_text"] = cat_df.apply(
+        cat_df["commission_answer"] = cat_df.apply(
             lambda row: hover_wrap(
-                row["commission_answer_text"]
-                if pd.notna(row["commission_answer_text"])
+                row["commission_answer"]
+                if pd.notna(row["commission_answer"])
                 else _COMMISSION_ANSWER_FALLBACK.get(row["bubble_category"], "—")
             ),
             axis=1,
@@ -133,9 +133,9 @@ def _add_traces(fig: go.Figure, df: pd.DataFrame, present: list[str]) -> None:
         hover_texts = [_build_hover(row) for _, row in cat_df.iterrows()]
         customdata = cat_df[
             [
-                "url",  # [0] ← click JS
+                "initiative_url",  # [0] ← click JS
                 "objective",  # [1]
-                "commission_answer_text",  # [2]
+                "commission_answer",  # [2]
             ]
         ].copy()
         customdata["_pad3"] = None  # [3]
@@ -280,8 +280,8 @@ def generate_chart_bubble_finance_plot(df: pd.DataFrame) -> str:
 
     Args:
         df: The full ECI initiatives DataFrame. Must contain ``current_status``,
-            ``funding_total``, ``objective``, ``commission_answer_text``, and
-            ``url`` columns.
+            ``funding_total``, ``objective``, ``commission_answer``, and
+            ``initiative_url`` columns.
 
     Returns:
         An HTML string wrapping the Plotly chart and its click handler script

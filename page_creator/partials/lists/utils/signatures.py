@@ -30,7 +30,7 @@ def threshold_cell(value) -> str:
     or ``Collection not started``.
 
     Args:
-        value: Raw ``signatures_threshold_met`` value from a DataFrame row.
+        value: Raw ``signatures_countries_threshold_met_count`` value from a DataFrame row.
 
     Returns:
         An HTML string for the threshold table cell content (without ``<td>`` tags).

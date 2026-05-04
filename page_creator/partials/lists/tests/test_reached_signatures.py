@@ -35,8 +35,8 @@ def base_df():
                 236_000,  # below threshold
                 1_050_000,  # above threshold
             ],
-            "signatures_threshold_met": [13, 11, 3, 2, 7],
-            "url": [f"u{i}" for i in range(5)],
+            "signatures_countries_threshold_met_count": [13, 11, 3, 2, 7],
+            "initiative_url": [f"u{i}" for i in range(5)],
             "objective": [f"o{i}" for i in range(5)],
         }
     )

@@ -22,19 +22,19 @@ def build_initiative_row(row: pd.Series, extra_cells: str = "") -> str:
     """Return a ``<tr>`` with the common Initiative / Registration / Objective cells.
 
     Args:
-        row:         A DataFrame row. Must contain ``title``, ``url``,
+        row:         A DataFrame row. Must contain ``title``, ``initiative_url``,
                      ``registration_date``, and ``objective``.
         extra_cells: Additional ``<td>`` HTML appended after the three base cells.
 
     Returns:
         A ``<tr>...</tr>`` HTML string.
     """
-    url = row.get("url") or "#"
+    initiative_url = row.get("initiative_url") or "#"
     registration = row["registration_date"]
     objective = truncate(row.get("objective", ""))
     return f"""
         <tr>
-          <td><a href="{url}" target="_blank" rel="noopener noreferrer">{row["title"]}</a></td>
+          <td><a href="{initiative_url}" target="_blank" rel="noopener noreferrer">{row["title"]}</a></td>
           <td>{registration}</td>
           <td>{objective}</td>{extra_cells}
         </tr>"""
@@ -47,15 +47,15 @@ def build_sig_threshold_row(row: pd.Series) -> str:
     row structure. Eliminates the duplicated ``_build_row`` in both modules.
 
     Args:
-        row: A DataFrame row. Must contain ``title``, ``url``, ``registration_date``,
-             ``objective``, ``signatures_collected``, and ``signatures_threshold_met``.
+        row: A DataFrame row. Must contain ``title``, ``initiative_url``, ``registration_date``,
+             ``objective``, ``signatures_collected``, and ``signatures_countries_threshold_met_count``.
 
     Returns:
         A ``<tr>...</tr>`` HTML string.
     """
     extra = (
         f"\n          <td>{sig_cell(row['signatures_collected'])}</td>"
-        f"\n          <td>{threshold_cell(row['signatures_threshold_met'])}</td>"
+        f"\n          <td>{threshold_cell(row['signatures_countries_threshold_met_count'])}</td>"
     )
     return build_initiative_row(row, extra)
 
@@ -80,13 +80,13 @@ def build_response_row(row: pd.Series) -> str:
     Shared by ``commission_engaged``, ``rejected_legislation``, and ``got_response``.
 
     Args:
-        row: Must contain ``title``, ``url``, ``registration_date``,
-             ``objective``, and ``commission_answer_text``.
+        row: Must contain ``title``, ``initiative_url``, ``registration_date``,
+             ``objective``, and ``commission_answer``.
 
     Returns:
         A ``<tr>...</tr>`` HTML string.
     """
-    response = truncate(row["commission_answer_text"], max_len=200)
+    response = truncate(row["commission_answer"], max_len=200)
     return build_initiative_row(row, f"\n          <td>{response}</td>")
 
 

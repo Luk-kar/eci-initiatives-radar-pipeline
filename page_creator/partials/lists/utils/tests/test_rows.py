@@ -23,11 +23,11 @@ def base_row():
     return pd.Series(
         {
             "title": "Stop Plastic Pollution",
-            "url": "https://eci.ec.europa.eu/001",
+            "initiative_url": "https://eci.ec.europa.eu/001",
             "registration_date": "1 Jan 2020",
             "objective": "Reduce single-use plastic across the EU.",
             "signatures_collected": 1_200_000,
-            "signatures_threshold_met": 9,
+            "signatures_countries_threshold_met_count": 9,
         }
     )
 
@@ -37,10 +37,10 @@ def response_row():
     return pd.Series(
         {
             "title": "Save the Bees",
-            "url": "https://eci.ec.europa.eu/002",
+            "initiative_url": "https://eci.ec.europa.eu/002",
             "registration_date": "5 Mar 2019",
             "objective": "Protect pollinators across the EU.",
-            "commission_answer_text": "The Commission acknowledges the initiative.",
+            "commission_answer": "The Commission acknowledges the initiative.",
         }
     )
 
@@ -50,12 +50,15 @@ def response_df():
     return pd.DataFrame(
         {
             "title": ["Save the Bees", "Ban Glyphosate"],
-            "url": ["https://eci.ec.europa.eu/002", "https://eci.ec.europa.eu/003"],
+            "initiative_url": [
+                "https://eci.ec.europa.eu/002",
+                "https://eci.ec.europa.eu/003",
+            ],
             "registration_date": ["05/03/2019", "10/06/2017"],
             "objective": ["Protect pollinators.", "Remove glyphosate from EU."],
-            "commission_answer_text": ["Response A.", "Response B."],
+            "commission_answer": ["Response A.", "Response B."],
             "signatures_collected": [1_100_000, 1_300_000],
-            "signatures_threshold_met": [11, 10],
+            "signatures_countries_threshold_met_count": [11, 10],
         }
     )
 
@@ -111,7 +114,7 @@ class TestBuildResponseRow:
 
     def test_long_response_is_truncated(self, response_row):
         response_row = response_row.copy()
-        response_row["commission_answer_text"] = "A" * 300
+        response_row["commission_answer"] = "A" * 300
         result = build_response_row(response_row)
         assert "A" * 300 not in result
         assert "A" * 100 in result  # truncated but not empty
@@ -135,10 +138,10 @@ class TestBuildResponseRows:
         empty_df = pd.DataFrame(
             columns=[
                 "title",
-                "url",
+                "initiative_url",
                 "registration_date",
                 "objective",
-                "commission_answer_text",
+                "commission_answer",
             ]
         )
         assert build_response_rows(empty_df) == ""
@@ -210,10 +213,10 @@ class TestGenerateResponseCard:
         empty_df = pd.DataFrame(
             columns=[
                 "title",
-                "url",
+                "initiative_url",
                 "registration_date",
                 "objective",
-                "commission_answer_text",
+                "commission_answer",
             ]
         )
         title = build_card_title("📬", "Got EU Response", 0, "#006064")
@@ -230,10 +233,10 @@ class TestGenerateResponseCard:
         empty_df = pd.DataFrame(
             columns=[
                 "title",
-                "url",
+                "initiative_url",
                 "registration_date",
                 "objective",
-                "commission_answer_text",
+                "commission_answer",
             ]
         )
         title = build_card_title("📬", "Got EU Response", 0, "#006064")
@@ -281,11 +284,11 @@ class TestGenerateSigThresholdCard:
         empty_df = pd.DataFrame(
             columns=[
                 "title",
-                "url",
+                "initiative_url",
                 "registration_date",
                 "objective",
                 "signatures_collected",
-                "signatures_threshold_met",
+                "signatures_countries_threshold_met_count",
             ]
         )
         title = build_card_title("✅", "Reached 1M Signatures", 0, "#527445")
@@ -296,11 +299,11 @@ class TestGenerateSigThresholdCard:
         empty_df = pd.DataFrame(
             columns=[
                 "title",
-                "url",
+                "initiative_url",
                 "registration_date",
                 "objective",
                 "signatures_collected",
-                "signatures_threshold_met",
+                "signatures_countries_threshold_met_count",
             ]
         )
         title = build_card_title("✅", "Reached 1M Signatures", 0, "#527445")
