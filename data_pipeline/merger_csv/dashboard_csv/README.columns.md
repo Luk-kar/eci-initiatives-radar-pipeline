@@ -4,23 +4,27 @@ Describes the fields produced by the final dashboard merger pipeline step (`data
 
 ## Column definitions
 
-| Field | Type | Required? | Why mandatory / optional (Logical Intent) |
-|---|---|---:|---|
-| `registration_number` | `str` | Yes | The unique identifier for an initiative. The primary key used to join the three upstream datasets. Sourced from `eci_initiatives`. Must follow the `YYYY/NNNNNN` format. |
-| `title` | `str` | Yes | The official title of the initiative. Mandatory because it's the primary human-readable identifier. |
-| `registration_year` | `str` | Yes | The year the initiative was registered. Extracted from the `registration_number`. Essential for filtering and grouping by year on the dashboard. |
-| `registration_date` | `str` | Yes | The exact date the initiative was registered (`DD/MM/YYYY`). Mapped from `timeline_registered`. Mandatory for chronological sorting and display. |
-| `current_status` | `Literal[...]` | Yes | The synthesized status of the initiative (e.g., "Collection Unsuccessful", "Law Passed"). Derived from the raw status and legislation outcomes. Mandatory to inform users of the initiative's current standing. |
-| `objective` | `str` | Yes | A text description of the initiative's goals. Must be non-empty to provide context on the dashboard. |
-| `commission_answer` | `str` | No | Extracted main answer from the Commission (from `eci_responses`). Empty string if the Commission has not answered yet or if the answer is missing. |
-| `initiative_url` | `str` | Yes | The URL to the official details page on the ECI portal. Mandatory for linking out to the source. |
-| `signatures_collected_by_country` | `str` | No | JSON-formatted string detailing signatures per country. Empty string if collection data is unavailable. Must be valid JSON if provided. |
-| `signatures_countries_threshold_met_count` | `str` | No | The count of countries that met the signature threshold. |
-| `signatures_collected` | `str` | No | The total number of signatures collected, as a comma-formatted number (e.g., "1,234"). |
-| `funding_total` | `str` | No | Total funding received, as a comma-formatted number. |
-| `timeline_collection_closed` | `str` | No | The date the signature collection period closed (`DD/MM/YYYY`). Empty string if not closed yet. |
-| `timeline_collection_start` | `str` | No | The date the signature collection period started (`DD/MM/YYYY`). Renamed from `timeline_collection_start_date`. |
-| `law_passed` | `str` | No | Textual evidence that legislation has progressed, extracted from the upstream legislation dataset. Empty string if no law has passed or if there is no legislation data. |
+| Field                                    | Type                     | Required?             | Why mandatory / optional                                                             | Example value                                                                                                               |
+| ---------------------------------------- | ------------------------ | --------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| registration_number                      | string  | Yes  | The unique identifier for an initiative; primary join key; must follow YYYY/NNNNNN.  | 2012/000001                                                                           |
+| title                                    | string  | Yes  | The official title of the initiative and main human-readable identifier.             | Fraternité 2020 - Mobility. Progress. Europe.                                         |
+| registration_year                        | Int64   | Yes  | The year the initiative was registered, used for filtering and grouping.             | 2012                                                                                  |
+| registration_date                        | datetime| Yes  | The registration date in DD/MM/YYYY format.                                          | 09/05/2012                                                                            |
+| current_status                           | string  | Yes  | The synthesized current status of the initiative.                                    | Collection Unsuccessful                                                               |
+| objective                                | string  | Yes  | A text description of the initiative's goals.                                        | F2020 wants to enhance EU exchange programmes...                                      |
+| commission_answer                        | string  | No   | Main answer extracted from the Commission response; empty string if unavailable.     | The Commission committed, in particular, to taking the following actions: ...         |
+| initiative_url                           | string  | Yes  | Link to the official initiative page on the ECI portal.                              | https://citizens-initiative.europa.eu/initiatives/details/2012/000001_en              |
+| signatures_collected_by_country          | json    | No   | JSON-formatted signatures by country; empty string if unavailable.                   | {"Austria": {"signatures": "57,643", "threshold": "14,250", "percentage": "404.51%"}, "Belgium": { ... }, ... } |
+| signatures_countries_threshold_met_count | Int64   | No   | Count of countries that met the threshold.                                           | 12                                                                                    |
+| signatures_collected                     | string  | No   | Total signatures as a comma-formatted number.                                        | 1,659,543                                                                             |
+| funding_total                            | string  | No   | Total funding received as a formatted string.                                        | 140,000.00                                                                            |
+| timeline_collection_closed               | datetime| No   | Date the collection period closed in DD/MM/YYYY format.                              | 01/11/2013                                                                            |
+| timeline_collection_start                | datetime| No   | Date the collection period started in DD/MM/YYYY format.                             | 10/05/2012                                                                            |
+| law_passed                               | string  | No   | Textual evidence that legislation progressed; empty string if none.                  | An amendment to the Drinking Water Directive came into force on 28 October 2015.      |
+
+## Schema Configuration (`columns_types.json`)
+
+To assist with automated parsing and data loading (e.g., via `pandas`), a machine-readable schema map is provided in [`columns_types.json`](./columns_types.json). 
 
 ## Expected Structure Notes
 

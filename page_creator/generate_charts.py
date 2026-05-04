@@ -11,6 +11,15 @@ import pandas as pd
 # Ensure the project root is on sys.path regardless of the working directory
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+# Import pipeline shared constants and utilities
+from data_pipeline.pipeline_shared.consts import (
+    DATA_DIR,
+    INITIATIVES_DIR_NAME,
+    ECI_DASHBOARD_CSV_PATTERN,
+    FilePatterns,
+)
+from data_pipeline.pipeline_shared.locate_run_dir import find_newest_scraped_data_dir
+
 # local
 from page_creator.partials.charts import (
     generate_chart_outcomes,
@@ -35,31 +44,36 @@ from page_creator.partials.lists import (
 )
 from page_creator.partials.date_stamp.last_data_update import generate_last_data_update
 
-_TIMESTAMP_RE = re.compile(r"^initiatives_(\d{4}-\d{2}-\d{2})_\d{2}-\d{2}-\d{2}\.csv$")
+# Dynamically build the regex: "^eci_dashboard_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})\.csv$"
+_expected_filename_regex = (
+    "^"
+    + ECI_DASHBOARD_CSV_PATTERN.format(
+        timestamp=f"({FilePatterns.TIMESTAMP_DIR_PATTERN})"
+    ).replace(".", r"\.")
+    + "$"
+)
+_TIMESTAMP_RE = re.compile(_expected_filename_regex)
 
 
-def _find_latest_csv(data_dir: Path) -> tuple[Path, str]:
-    """Return the path and date string of the most recent ``initiatives_*.csv`` file.
-
-    Args:
-        data_dir: Directory to search for CSV files.
+def _find_latest_csv() -> tuple[Path, str]:
+    """Return the path and date string of the most recent dashboard CSV file
+    from the newest valid timestamped run directory.
 
     Returns:
         A ``(path, date_str)`` tuple where ``date_str`` is ``YYYY-MM-DD``.
-
-    Raises:
-        FileNotFoundError: If ``data_dir`` does not exist.
-        FileNotFoundError: If no matching ``initiatives_*.csv`` files are found.
-        ValueError:        If the winning filename has a malformed timestamp.
-        ValueError:        If the CSV file cannot be parsed (empty or corrupted).
     """
-    if not data_dir.exists():
-        raise FileNotFoundError(f"Data directory not found: {data_dir}")
 
-    candidates = sorted(data_dir.glob("initiatives_*.csv"), reverse=True)
+    # 1. Use the shared pipeline utility to find the newest run directory
+    run_dir = find_newest_scraped_data_dir(DATA_DIR, INITIATIVES_DIR_NAME)
+
+    # 2. Build the glob pattern using the constant (e.g., "eci_dashboard_*.csv")
+    glob_pattern = ECI_DASHBOARD_CSV_PATTERN.format(timestamp="*")
+    candidates = sorted(run_dir.glob(glob_pattern), reverse=True)
 
     if not candidates:
-        raise FileNotFoundError(f"No 'initiatives_*.csv' files found in: {data_dir}")
+        raise FileNotFoundError(
+            f"No '{glob_pattern}' files found in run directory: {run_dir}"
+        )
 
     for csv_path in candidates:
         match = _TIMESTAMP_RE.fullmatch(csv_path.name)
@@ -74,16 +88,19 @@ def _find_latest_csv(data_dir: Path) -> tuple[Path, str]:
                 f"CSV file appears corrupted and cannot be read: {csv_path}"
             ) from exc
 
-        return csv_path, match.group(1)
+        # match.group(1) contains the full timestamp (YYYY-MM-DD_HH-MM-SS)
+        # We slice [:10] to return just the YYYY-MM-DD portion
+        full_timestamp = match.group(1)
+        return csv_path, full_timestamp[:10]
 
     raise ValueError(
-        f"No 'initiatives_*.csv' files with a valid timestamp found in: {data_dir}. "
-        "Expected format: initiatives_YYYY-MM-DD_HH-MM-SS.csv"
+        f"No files matching the pattern found in: {run_dir}. "
+        f"Expected pattern: {ECI_DASHBOARD_CSV_PATTERN.format(timestamp='YYYY-MM-DD_HH-MM-SS')}"
     )
 
 
-DATA_DIR = Path(__file__).parent / "data"
-CSV_PATH, DATA_DATE = _find_latest_csv(DATA_DIR)
+CSV_PATH, DATA_DATE = _find_latest_csv()
+
 PARTIALS_DIR = Path(__file__).parent / "partials"
 OUT_DIR = Path(__file__).parent.parent / "page_to_export" / "partials"
 

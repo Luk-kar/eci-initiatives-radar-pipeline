@@ -1,0 +1,17 @@
+{
+  "registration_number": { "type": "string", "required": true },
+  "title": { "type": "string", "required": true },
+  "registration_year": { "type": "Int64", "required": true },
+  "registration_date": { "type": "datetime", "required": true, "format": "%d/%m/%Y" },
+  "current_status": { "type": "string", "required": true },
+  "objective": { "type": "string", "required": true },
+  "commission_answer": { "type": "string", "required": false },
+  "initiative_url": { "type": "string", "required": true },
+  "signatures_collected_by_country": { "type": "json", "required": false },
+  "signatures_countries_threshold_met_count": { "type": "Int64", "required": false },
+  "signatures_collected": { "type": "string", "required": false },
+  "funding_total": { "type": "string", "required": false },
+  "timeline_collection_closed": { "type": "datetime", "required": false, "format": "%d/%m/%Y" },
+  "timeline_collection_start": { "type": "datetime", "required": false, "format": "%d/%m/%Y" },
+  "law_passed": { "type": "string", "required": false }
+}
