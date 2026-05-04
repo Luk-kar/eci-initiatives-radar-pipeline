@@ -78,7 +78,6 @@ class TestDashboardRow:
 
 class TestDashboardRowTypes:
 
-    # 1. Explicitly categorize every field in the model
     STR_FIELDS = {
         "registration_number",
         "title",
@@ -87,39 +86,62 @@ class TestDashboardRowTypes:
         "objective",
         "commission_answer",
         "initiative_url",
-        "signatures_collected_by_country",  # stringified json
+        "signatures_collected_by_country",
         "timeline_collection_closed",
         "timeline_collection_start",
         "law_passed",
     }
 
-    INT_FIELDS = {
-        "registration_year",
+    # Split the integer fields based on their required/optional status
+    OPTIONAL_INT_FIELDS = {
         "signatures_collected",
         "signatures_countries_threshold_met_count",
     }
-    FLOAT_FIELDS = {"funding_total"}
+    REQUIRED_INT_FIELDS = {
+        "registration_year",
+    }
+
+    FLOAT_FIELDS = {
+        "funding_total",
+    }
+
+    def test_all_model_fields_are_accounted_for(self) -> None:
+        """
+        Verify that every field in the DashboardRow model is explicitly categorized
+        for type testing, and no extra fields are defined in the test sets.
+        """
+        model_fields = set(DashboardRow.model_fields.keys())
+        expected_fields = (
+            self.STR_FIELDS
+            | self.OPTIONAL_INT_FIELDS
+            | self.REQUIRED_INT_FIELDS
+            | self.FLOAT_FIELDS
+        )
+
+        missing_from_tests = model_fields - expected_fields
+        extra_in_tests = expected_fields - model_fields
+
+        assert (
+            not missing_from_tests
+        ), f"Fields missing from type tests: {missing_from_tests}"
+        assert (
+            not extra_in_tests
+        ), f"Extra fields in type tests not found in model: {extra_in_tests}"
 
     def test_string_fields_are_typed_correctly(self) -> None:
         """
-        Verify that all fields, except specifically designated numeric ones,
-        are strictly typed as strings or string literals.
+        Verify that designated string fields are strictly typed as strings or string literals.
         """
-        for field_name, field_info in DashboardRow.model_fields.items():
-
-            # Skip the numeric fields
-            if (
-                field_name in self.INT_FIELDS
-                or field_name in self.FLOAT_FIELDS
-                or field_name not in self.STR_FIELDS
-            ):
-                continue
+        for field_name in self.STR_FIELDS:
+            field_info = DashboardRow.model_fields.get(field_name)
+            assert (
+                field_info is not None
+            ), f"Field {field_name} is missing from the model"
 
             annotation = field_info.annotation
             origin = typing.get_origin(annotation)
 
             if origin is typing.Literal:
-                # If it's a Literal, ensure all literal arguments are strings
                 all_args_are_strings = all(
                     isinstance(arg, str) for arg in typing.get_args(annotation)
                 )
@@ -127,18 +149,17 @@ class TestDashboardRowTypes:
                     all_args_are_strings
                 ), f"Expected Literal args for {field_name} to be strings"
             else:
-                # Allow strictly str OR str | None
                 assert annotation in (
                     str,
                     str | None,
                     typing.Optional[str],
                 ), f"Expected field {field_name} to be typed as str, str | None, or Literal[str], got {annotation}"
 
-    def test_int_fields_are_typed_correctly(self) -> None:
+    def test_optional_int_fields_are_typed_correctly(self) -> None:
         """
         Verify that designated integer fields are strictly typed as optional ints.
         """
-        for field_name in self.INT_FIELDS:
+        for field_name in self.OPTIONAL_INT_FIELDS:
             field_info = DashboardRow.model_fields.get(field_name)
             assert (
                 field_info is not None
@@ -149,6 +170,21 @@ class TestDashboardRowTypes:
                 int | None,
                 typing.Optional[int],
             ), f"Expected field {field_name} to be typed as int | None, got {annotation}"
+
+    def test_required_int_fields_are_typed_correctly(self) -> None:
+        """
+        Verify that designated required integer fields are strictly typed as ints.
+        """
+        for field_name in self.REQUIRED_INT_FIELDS:
+            field_info = DashboardRow.model_fields.get(field_name)
+            assert (
+                field_info is not None
+            ), f"Field {field_name} is missing from the model"
+
+            annotation = field_info.annotation
+            assert (
+                annotation is int
+            ), f"Expected field {field_name} to be typed as strict int, got {annotation}"
 
     def test_float_fields_are_typed_correctly(self) -> None:
         """

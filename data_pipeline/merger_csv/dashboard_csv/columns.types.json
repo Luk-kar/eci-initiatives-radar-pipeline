@@ -7,7 +7,7 @@
   "objective": { "type": "string", "required": true },
   "commission_answer": { "type": "string", "required": false },
   "initiative_url": { "type": "string", "required": true },
-  "signatures_collected_by_country": { "type": "json", "required": false },
+  "signatures_collected_by_country": { "type": "string", "required": false },
   "signatures_countries_threshold_met_count": { "type": "Int64", "required": false },
   "signatures_collected": { "type": "Int64", "required": false },
   "funding_total": { "type": "float64", "required": false },

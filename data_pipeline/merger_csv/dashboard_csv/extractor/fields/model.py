@@ -26,7 +26,7 @@ class DashboardRow(BaseModel):
 
     registration_number: str = Field(pattern=r"^\d{4}/\d{6}$")
     title: str = Field(min_length=1)
-    registration_year: int | None = Field(default=None, ge=2012, le=2099)
+    registration_year: int = Field(ge=2012, le=2099)
     registration_date: str = Field(pattern=r"^\d{2}/\d{2}/\d{4}$")
 
     current_status: Literal[
