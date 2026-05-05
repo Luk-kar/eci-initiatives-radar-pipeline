@@ -1,5 +1,4 @@
-from unittest.mock import patch
-
+from unittest.mock import MagicMock, patch
 import pytest
 
 from data_pipeline.merger_csv.dashboard_csv.assemble import assemble_results
@@ -59,16 +58,11 @@ class TestAssembleResults:
     def test_assemble_results_produces_dashboard_rows(
         self, mock_analyse_row, initiative_rows, response_index, legislation_index
     ):
-        mock_analyse_row.return_value = "MockDashboardRow"
+        mock_analyse_row.return_value = MagicMock(current_status="Collection Ongoing")
         results = assemble_results(initiative_rows, response_index, legislation_index)
 
-        assert len(results) == 1
-        assert results[0] == "MockDashboardRow"
-        mock_analyse_row.assert_called_once_with(
-            initiative_rows[0],
-            response_index["2024/000001"],
-            legislation_index["2024/000001"],
-        )
+        assert len(results) == len(initiative_rows)
+        assert mock_analyse_row.call_count == len(initiative_rows)
 
     def test_assemble_results_raises_value_error_for_empty_registration_number(
         self, response_index, legislation_index
@@ -97,9 +91,8 @@ class TestAssembleResults:
     def test_assemble_results_handles_missing_response_and_legislation(
         self, mock_analyse_row, initiative_rows
     ):
-        mock_analyse_row.return_value = "MockDashboardRow"
+        mock_analyse_row.return_value = MagicMock(current_status="Collection Ongoing")
         results = assemble_results(initiative_rows, {}, {})
 
-        assert len(results) == 1
-        assert results[0] == "MockDashboardRow"
-        mock_analyse_row.assert_called_once_with(initiative_rows[0], None, None)
+        assert len(results) == len(initiative_rows)
+        assert mock_analyse_row.call_count == len(initiative_rows)

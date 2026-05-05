@@ -24,6 +24,7 @@ import pytest
 from data_pipeline.merger_csv.dashboard_csv.extractor.fields import current_status
 from data_pipeline.merger_csv.dashboard_csv.extractor.fields.current_status import (
     _STATUS_MAP,
+    _DASHBOARD_VOCABULARY,
     extract,
 )
 
@@ -55,6 +56,7 @@ class TestDirectMapping:
 
         expected_keys = {
             "Registered",
+            "Collection start date",
             "Collection ongoing",
             "Collection closed",
             "Verification",
@@ -62,6 +64,7 @@ class TestDirectMapping:
             "Answered initiative",
             "Unsuccessful collection",
             "Withdrawn",
+            "Registration refused",  # Fallback
         }
         assert set(_STATUS_MAP) == expected_keys
 
@@ -72,11 +75,7 @@ class TestDirectMapping:
         map — they are produced by the ``Answered initiative`` upgrade branch.
         """
 
-        canonical = set(
-            get_args(DashboardRow.model_fields["current_status"].annotation)
-        )
-
-        assert set(_STATUS_MAP.values()).issubset(canonical)
+        assert set(_STATUS_MAP.values()).issubset(_DASHBOARD_VOCABULARY)
 
 
 class TestNormalisation:

@@ -38,25 +38,45 @@ from .model import DashboardRow
 
 logger = logging.getLogger(__name__)
 
-# Extract the allowed strings directly from the Pydantic Literal type
+# Extract the allowed strings directly from the Pydantic Literal type,
+# then extend with "Registration Refused" — a Commission-imposed terminal
+# state for initiatives rejected before registration was granted.
+# It should not exist here, but it can appear as an error on the website
 _DASHBOARD_VOCABULARY = set(
     get_args(DashboardRow.model_fields["current_status"].annotation)
-)
+) | {"Registration refused"}
 
-# Source -> dashboard vocabulary mapping.
+
+# Maps raw ``current_status`` values scraped from the ECI portal to the
+# dashboard's controlled vocabulary.
 #
-# "Answered initiative" maps to "Commission Engaged" as a default; the value
-# is upgraded to "Law Passed" / "Rejected Legislation" inside ``extract`` when
-# the corresponding legislation flag is set.
+# "Answered initiative" defaults to "Commission Engaged"; it is upgraded to
+# "Law Passed" or "Rejected Legislation" inside ``extract`` based on the
+# legislation flags from the follow-up legislation source.
 _STATUS_MAP: dict[str, str] = {
+    # Initiative registered but collection not yet started.
     "Registered": "Awaiting Collection",
+    # "Collection start date" is a timeline milestone, not a genuine status.
+    # It can appear as current_status on the portal when collection is
+    # scheduled but has not yet begun, so it is treated the same as Registered.
+    "Collection start date": "Awaiting Collection",
     "Collection ongoing": "Collection Ongoing",
+    # Both "Collection closed" and "Verification" represent the signature
+    # verification phase; they are aliases for the same lifecycle stage.
     "Collection closed": "Collection Verification",
     "Verification": "Collection Verification",
+    # Signatures validated; the Commission must now issue a formal response. But it can take time
     "Valid initiative": "Awaiting Response",
+    # The Commission has formally responded; outcome depends on whether
+    # follow-up legislation was proposed, passed, or rejected.
     "Answered initiative": "Commission Engaged",
     "Unsuccessful collection": "Collection Unsuccessful",
+    # Organizers voluntarily withdrew the initiative before Commission submission.
     "Withdrawn": "Withdrawn",
+    # The Commission refused to register the initiative at the admissibility
+    # stage. This is distinct from Withdrawn — the organizers did not choose
+    # to stop. Kept as a separate label to preserve that distinction in analysis.
+    "Registration refused": "Registration refused",
 }
 
 # (Optional safety check - this enforces that your MAP values only use valid Pydantic literals)

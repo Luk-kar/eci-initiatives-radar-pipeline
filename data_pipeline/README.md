@@ -25,6 +25,15 @@ python3 -m data_pipeline.extractor.responses_followup
 python3 -m data_pipeline.merger_csv.responses_followup_legislation
 python3 -m data_pipeline.merger_csv.dashboard_csv
 
+python3 -m data_pipeline.scraper.initiatives
+python3 -m data_pipeline.extractor.initiatives
+python3 -m data_pipeline.scraper.responses
+python3 -m data_pipeline.extractor.responses
+python3 -m data_pipeline.scraper.responses_followup
+python3 -m data_pipeline.extractor.responses_followup
+python3 -m data_pipeline.merger_csv.responses_followup_legislation
+python3 -m data_pipeline.merger_csv.dashboard_csv
+
 python -m data_pipeline.scraper.initiatives && python -m data_pipeline.extractor.initiatives && python -m data_pipeline.scraper.responses && python -m data_pipeline.extractor.responses && python -m data_pipeline.scraper.responses_followup && python -m data_pipeline.extractor.responses_followup
 # 5. For tests:
 uv pip install -e data_pipeline[dev]

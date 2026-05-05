@@ -65,5 +65,29 @@ def assemble_results(
 
         results.append(analyse_row(initiative, response, legislation))
 
-    logger.info("Assembled %d dashboard row(s)", len(results))
-    return results
+    results_sanitized = _exclude_non_public_initiatives(results)
+
+    logger.info("Assembled %d dashboard row(s)", len(results_sanitized))
+    return results_sanitized
+
+
+def _exclude_non_public_initiatives(rows: list[DashboardRow]) -> list[DashboardRow]:
+    """Exclude initiatives that were never made public on the ECI portal.
+
+    Registration-refused initiatives are rejected by the Commission before
+    registration is granted and never enter the public ECI lifecycle.
+
+    They can appear in the source data if the ECI portal incorrectly
+    lists them alongside registered initiatives.
+    """
+    before = len(rows)
+
+    filtered = [row for row in rows if row.current_status != "Registration Refused"]
+
+    if filtered:
+        logger.info(
+            "Excluded %d registration-refused initiative(s) from the dashboard output",
+            before - len(filtered),
+        )
+
+    return filtered
