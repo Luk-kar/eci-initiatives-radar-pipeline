@@ -11,6 +11,8 @@ class KpiColors(NamedTuple):
     got_response: str = "#006064"
     law_passed: str = "#3CA371"
     awaiting_response: str = "#9E9E9E"
+    awaiting_collection: str = "#a0b4c8"
+    collection_verification: str = "#f0c060"
     collection_unsuccessful: str = "#8B1111"
     commission_engaged: str = "#9CCC65"
     rejected_legislation: str = "#F44336"
@@ -34,7 +36,9 @@ STATUS_COLORS: dict[str, str] = {
     "Commission Engaged": kpi_colors.commission_engaged,
     "Rejected Legislation": kpi_colors.rejected_legislation,
     "Awaiting Response": kpi_colors.awaiting_response,
+    "Awaiting Collection": kpi_colors.awaiting_collection,
     "Collection Ongoing": kpi_colors.collection_ongoing,
+    "Collection Verification": kpi_colors.collection_verification,
     "Collection Unsuccessful": kpi_colors.collection_unsuccessful,
     "Withdrawn": kpi_colors.withdrawn,
 }

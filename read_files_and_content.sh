@@ -16,7 +16,7 @@
 #   <output_file>      Path to the file where concatenated content is written.
 #
 # Example:
-#   ./read_files_and_content.sh "./page_creator" "code.md"
+#   ./read_files_and_content.sh "./page_creator" "page_creator.md"
 #
 # Notes:
 #   - Overwrites <output_file> if it already exists.

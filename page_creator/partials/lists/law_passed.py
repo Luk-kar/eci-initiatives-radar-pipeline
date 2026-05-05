@@ -52,7 +52,8 @@ def _build_row(row: pd.Series) -> str:
     Returns:
         A ``<tr>...</tr>`` HTML string.
     """
-    legislation = truncate(row["legislation"])
+    raw = row["law_passed"]
+    legislation = truncate(raw) if pd.notna(raw) and raw else "—"
     return build_initiative_row(row, f"\n          <td>{legislation}</td>")
 
 
