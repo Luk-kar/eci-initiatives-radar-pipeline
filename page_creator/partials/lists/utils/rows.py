@@ -4,7 +4,7 @@ import pandas as pd
 
 from page_creator.partials.lists.utils.signatures import sig_cell, threshold_cell
 from page_creator.partials.lists.utils.table import wrap_table_card
-from page_creator.partials.lists.utils.text import truncate
+from page_creator.partials.lists.utils.text import truncate, wrap_initiative_title
 from page_creator.partials.lists.utils.dates import normalise_registration_date
 from page_creator.utils import wrap_card
 
@@ -29,12 +29,14 @@ def build_initiative_row(row: pd.Series, extra_cells: str = "") -> str:
     Returns:
         A ``<tr>...</tr>`` HTML string.
     """
-    initiative_url = row.get("initiative_url") or "#"
+    # title = row["title"]
+    title = wrap_initiative_title(row["title"])
+    initiative_url = row["initiative_url"]
     registration = row["registration_date"]
-    objective = truncate(row.get("objective", ""))
+    objective = truncate(row["objective"])
     return f"""
         <tr>
-          <td><a href="{initiative_url}" target="_blank" rel="noopener noreferrer">{row["title"]}</a></td>
+          <td><a href="{initiative_url}" target="_blank" rel="noopener noreferrer">{title}</a></td>
           <td>{registration}</td>
           <td>{objective}</td>{extra_cells}
         </tr>"""

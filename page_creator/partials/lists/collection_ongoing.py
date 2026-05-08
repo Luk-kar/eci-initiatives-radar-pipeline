@@ -14,6 +14,7 @@ from page_creator.partials.lists.utils import (
     SCROLL_THRESHOLD,
 )
 from page_creator.partials.styles.colors import kpi_colors as colors
+from page_creator.partials.lists.utils.text import wrap_initiative_title
 
 _STATUS = "Collection Ongoing"
 _HEADERS = ["Initiative", "Objective", "Days Left", "Signatures", "Countries Threshold"]
@@ -97,6 +98,7 @@ def _build_row(row: pd.Series) -> str:
     Returns:
         A ``<tr>...</tr>`` HTML string.
     """
+    title = wrap_initiative_title(row["title"])
     initiative_url = row.get("initiative_url") or "#"
     objective = truncate(row.get("objective", ""))
 
@@ -107,7 +109,7 @@ def _build_row(row: pd.Series) -> str:
 
     return f"""
         <tr>
-          <td><a href="{initiative_url}" target="_blank" rel="noopener noreferrer">{row["title"]}</a></td>
+          <td><a href="{initiative_url}" target="_blank" rel="noopener noreferrer">{title}</a></td>
           <td>{objective}</td>
           {_days_left_cell(date_start, date_closed)}
           <td>{sig_cell(row["signatures_collected"])}</td>
