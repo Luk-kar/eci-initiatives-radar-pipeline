@@ -24,8 +24,6 @@ def wrap_initiative_title(title: str) -> str:
         title: Raw initiative title string.
     """
 
-    _MAX_TOTAL_CHARS = 100 + 10  # ECI enforced characters limit + spaces
-
     def _split_part(parts: list[str]) -> list[str]:
         result: list[str] = []
 
@@ -135,7 +133,7 @@ def wrap_initiative_title(title: str) -> str:
             "wrap_initiative_title: title must not be empty or whitespace-only."
         )
 
-    HTML_NEW_LINE = " <br> "
+    HTML_NEW_LINE = "<br>"
 
     segments_on_dots_etc = [s.strip() for s in re.split(r"[!;:.]", title) if s.strip()]
     title_new_lined = _split_part(segments_on_dots_etc)
