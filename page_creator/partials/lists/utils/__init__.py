@@ -22,7 +22,11 @@ from page_creator.partials.lists.utils.rows import (
 )
 from page_creator.partials.lists.utils.signatures import sig_cell, threshold_cell
 from page_creator.partials.lists.utils.table import build_table, wrap_table_card
-from page_creator.partials.lists.utils.text import truncate
+from page_creator.partials.lists.utils.text import (
+    truncate,
+    strip_markdown_links,
+    strip_boilerplate_headers,
+)
 from page_creator.partials.lists.utils.sort import sort_by_registration_date
 
 __all__ = [
@@ -54,4 +58,6 @@ __all__ = [
     "wrap_table_card",
     # text
     "truncate",
+    "strip_markdown_links",
+    "strip_boilerplate_headers",
 ]

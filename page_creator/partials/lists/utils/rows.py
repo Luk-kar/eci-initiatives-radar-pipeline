@@ -4,7 +4,12 @@ import pandas as pd
 
 from page_creator.partials.lists.utils.signatures import sig_cell, threshold_cell
 from page_creator.partials.lists.utils.table import wrap_table_card
-from page_creator.partials.lists.utils.text import truncate, wrap_initiative_title
+from page_creator.partials.lists.utils.text import (
+    truncate,
+    wrap_initiative_title,
+    strip_markdown_links,
+    strip_boilerplate_headers,
+)
 from page_creator.partials.lists.utils.dates import normalise_registration_date
 from page_creator.utils import wrap_card
 
@@ -33,7 +38,8 @@ def build_initiative_row(row: pd.Series, extra_cells: str = "") -> str:
     title = wrap_initiative_title(row["title"])
     initiative_url = row["initiative_url"]
     registration = row["registration_date"]
-    objective = truncate(row["objective"])
+    objective = strip_markdown_links(truncate(row["objective"]))
+
     return f"""
         <tr>
           <td><a href="{initiative_url}" target="_blank" rel="noopener noreferrer">{title}</a></td>
@@ -88,7 +94,11 @@ def build_response_row(row: pd.Series) -> str:
     Returns:
         A ``<tr>...</tr>`` HTML string.
     """
-    response = truncate(row["commission_answer"], max_len=200)
+    removed_links = strip_markdown_links(row["commission_answer"])
+
+    no_boilerplate = strip_boilerplate_headers(removed_links)
+    response = truncate(no_boilerplate, max_len=200)
+
     return build_initiative_row(row, f"\n          <td>{response}</td>")
 
 

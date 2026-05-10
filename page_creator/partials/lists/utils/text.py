@@ -143,3 +143,89 @@ def wrap_initiative_title(title: str) -> str:
     title_truncated = _truncate_if_too_long(title_joined)
 
     return title_truncated
+
+
+def strip_markdown_links(text: str) -> str:
+    """Replace Markdown inline links with their link text, preserving all other content.
+
+    ``[Communication](https://ec.europa.eu/...)`` → ``Communication``
+
+    Args:
+        text: Raw string potentially containing ``[text](url)`` patterns.
+
+    Returns:
+        The input string with every inline Markdown link replaced by its
+        display text. Returns an empty string for NaN or None values.
+    """
+
+    # ─── Markdown Link Pattern Fragments ─────────────────────────────────────────
+
+    # Label part: one or more characters that are not [ or ]
+    _MD_LABEL = r"[^\[\]]+"
+
+    # URL part: non-paren characters, allowing one level of nested parentheses
+    # e.g. matches C(2026)3225&lang=en without stopping at the inner `)`
+    _MD_URL_SAFE_CHARS = r"[^()]*"  # chars with no parentheses
+    _MD_URL_INNER_PAREN = r"\([^()]*\)"  # one (...) pair, nothing nested
+
+    # URL pattern: start with plain non-paren chars, then allow zero or more
+    # segments of "(...)" plus more non-paren chars. This lets URLs contain
+    # a single level of parentheses (e.g. "C(2026)3225&lang=en") without
+    # prematurely terminating the overall Markdown link match.
+    _MD_URL = (
+        _MD_URL_SAFE_CHARS + r"(?:" + _MD_URL_INNER_PAREN + _MD_URL_SAFE_CHARS + r")*"
+    )
+
+    # Full inline Markdown link: [label](url)
+    _MARKDOWN_LINK_RE = re.compile(
+        r"\[(" + _MD_LABEL + r")\]" r"\((" + _MD_URL + r")\)"
+    )
+
+    # ─────────────────────────────────────────────────────────────────────────────
+
+    if not text or pd.isna(text):
+        return ""
+
+    return _MARKDOWN_LINK_RE.sub(r"\1", text)
+
+
+def strip_boilerplate_headers(text: str) -> str:
+    """
+    Remove known boilerplate header lines (e.g. 'Main conclusions of the …:')
+    from a multi-line description string.
+
+    Args:
+        text: Arbitrary multi-line string, potentially containing boilerplate
+            headers at the start of lines.
+
+    Returns:
+        The input text with any matching header lines removed, preserving all
+        other content and line breaks.
+    """
+
+    # Precompile patterns for the boilerplate header lines we want to remove
+
+    _HEADER_LINE_PATTERNS = [
+        # "Main conclusions of the Communication ." or "Main conclusions of the Communication:"
+        re.compile(r"^Main conclusions of the.*[.:]\s*$", re.MULTILINE),
+        # "The Commission commits to:" / "The Commission commits to :"
+        re.compile(r"^The Commission commits to\s*[.:]\s*$", re.MULTILINE),
+        # "Official document:" / "Official documents related to the decision:"
+        re.compile(r"^Official document.*[.:]\s*$", re.MULTILINE),
+        # "The Commission committed, in particular, to taking the following actions:"
+        re.compile(r"^The Commission committed.*[.:]\s*$", re.MULTILINE),
+    ]
+
+    if not isinstance(text, str):
+        raise TypeError(
+            f"strip_boilerplate_headers: expected str, got {type(text).__name__!r}."
+        )
+
+    cleaned = text
+    for pattern in _HEADER_LINE_PATTERNS:
+        # Replace entire matching lines with the empty string
+        cleaned = pattern.sub("", cleaned)
+
+    # Optionally normalise multiple blank lines that may result
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned).strip()
+    return cleaned
