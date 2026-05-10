@@ -70,89 +70,112 @@ def _parse_count(raw_value: str | int | dict) -> int:
     return int(str(raw).replace(",", "").replace("*", ""))
 
 
+def _resolve_alpha2(key: str) -> str | None:
+    """Resolve a country key (alpha-2 or display name) to a known alpha-2 code."""
+
+    return key if key in _COUNTRIES else _NAME_TO_ALPHA2.get(key)
+
+
+def _parse_breakdown(raw: str) -> dict:
+    """Safely parse a raw signatures_collected_by_country string into a dict."""
+
+    return ast.literal_eval(raw) if raw and not pd.isna(raw) else {}
+
+
+def _accumulate_row(
+    breakdown: dict,
+    title: str,
+    totals: dict[str, int],
+    threshold_met: dict[str, int],
+    top_ecis: dict[str, list[tuple[int, str]]],
+) -> None:
+    """Accumulate one ECI row's breakdown into the running aggregation dicts."""
+
+    for key, value in breakdown.items():
+
+        alpha2 = _resolve_alpha2(key)
+
+        if alpha2 is None:
+            continue
+
+        count = _parse_count(value)
+        totals[alpha2] = totals.get(alpha2, 0) + count
+        top_ecis.setdefault(alpha2, []).append((count, title))
+
+        if isinstance(value, dict):
+            try:
+                if float(value.get("percentage", 0)) >= 100.0:
+                    threshold_met[alpha2] = threshold_met.get(alpha2, 0) + 1
+            except ValueError:
+                pass
+
+
+def _build_country_row(
+    alpha2: str,
+    total: int,
+    threshold_met: dict[str, int],
+    top_ecis: dict[str, list[tuple[int, str]]],
+) -> dict:
+    """Build a single output row dict for one country."""
+
+    name, alpha3, lat, lon = _COUNTRIES[alpha2]
+
+    ecis_sorted = sorted(top_ecis[alpha2], reverse=True)
+
+    items = [f"• {t}: {_format_sigs(c)}" for c, t in ecis_sorted[:MAX_HOVER_ITEMS]]
+
+    if len(ecis_sorted) > MAX_HOVER_ITEMS:
+        items.append(f"<i>… (and {len(ecis_sorted) - MAX_HOVER_ITEMS} more)</i>")
+
+    return {
+        "alpha2": alpha2,
+        "alpha3": alpha3,
+        "name": name,
+        "lat": lat,
+        "lon": lon,
+        "total": total,
+        "threshold_met_count": threshold_met.get(alpha2, 0),
+        "label": _format_sigs(total),
+        "eci_list": "<br>".join(items),
+    }
+
+
+_COUNTRY_DF_COLUMNS = [
+    "alpha2",
+    "alpha3",
+    "name",
+    "lat",
+    "lon",
+    "total",
+    "threshold_met_count",
+    "label",
+    "eci_list",
+]
+
+
 def _build_country_df(df: pd.DataFrame) -> pd.DataFrame:
     """
     Aggregate per-country signature totals,
     threshold-met counts, and
     top ECI lists from the raw JSON breakdown column.
     """
-
     totals: dict[str, int] = {}
-    threshold_met: dict[str, int] = {}  # ← new: count of ECIs where country hit ≥100%
+    threshold_met: dict[str, int] = {}
     top_ecis: dict[str, list[tuple[int, str]]] = {}
 
     for _, row in df.iterrows():
 
-        raw = row["signatures_collected_by_country"]
+        breakdown = _parse_breakdown(row["signatures_collected_by_country"])
 
-        if not raw or pd.isna(raw):
-            continue
+        if breakdown:
+            _accumulate_row(breakdown, row["title"], totals, threshold_met, top_ecis)
 
-        breakdown: dict = ast.literal_eval(raw)
+    if not totals:
+        return pd.DataFrame(columns=_COUNTRY_DF_COLUMNS)
 
-        title = row["title"]
-
-        for key, value in breakdown.items():
-
-            alpha2_country = key if key in _COUNTRIES else _NAME_TO_ALPHA2.get(key)
-
-            if alpha2_country is None:
-                continue
-
-            count = _parse_count(value)
-
-            totals[alpha2_country] = totals.get(alpha2_country, 0) + count
-
-            top_ecis.setdefault(alpha2_country, []).append((count, title))
-
-            # Count how many ECIs this country met the threshold in
-            if isinstance(value, dict):
-                pct_raw = value.get("percentage", 0)
-                try:
-                    if float(pct_raw) >= 100.0:
-                        threshold_met[alpha2_country] = (
-                            threshold_met.get(alpha2_country, 0) + 1
-                        )
-                except ValueError:
-                    pass
-
-    rows = []
-    for alpha2_country, total in totals.items():
-        name, alpha3, lat, lon = _COUNTRIES[alpha2_country]
-        ecis_sorted = sorted(top_ecis[alpha2_country], reverse=True)
-        items = [f"• {t}: {_format_sigs(c)}" for c, t in ecis_sorted[:MAX_HOVER_ITEMS]]
-        if len(ecis_sorted) > MAX_HOVER_ITEMS:
-            items.append(f"<i>… (and {len(ecis_sorted) - MAX_HOVER_ITEMS} more)</i>")
-        rows.append(
-            {
-                "alpha2": alpha2_country,
-                "alpha3": alpha3,
-                "name": name,
-                "lat": lat,
-                "lon": lon,
-                "total": total,
-                "threshold_met_count": threshold_met.get(
-                    alpha2_country, 0
-                ),  # ← new column
-                "label": _format_sigs(total),
-                "eci_list": "<br>".join(items),
-            }
-        )
-
-    if not rows:
-        return pd.DataFrame(
-            columns=[
-                "alpha2",
-                "alpha3",
-                "name",
-                "lat",
-                "lon",
-                "total",
-                "threshold_met_count",
-                "label",
-                "eci_list",
-            ]
-        )
+    rows = [
+        _build_country_row(a2, t, threshold_met, top_ecis) for a2, t in totals.items()
+    ]
 
     return (
         pd.DataFrame(rows).sort_values("total", ascending=False).reset_index(drop=True)
