@@ -182,6 +182,108 @@ def _build_country_df(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 
+def _build_choropleth_trace(cdf: pd.DataFrame) -> go.Choropleth:
+    """Choropleth fill layer: Viridis-scaled countries with hover tooltip."""
+    return go.Choropleth(
+        locations=cdf["alpha3"],
+        z=cdf["total"],
+        text=cdf["name"],
+        customdata=cdf[["total", "threshold_met_count", "eci_list"]].values,
+        colorscale="Viridis",
+        colorbar=dict(title="Total<br>Signatures", tickformat=","),
+        hovertemplate=(
+            "<b>%{text}</b><br>"
+            "Total Signatures: %{customdata[0]:,.0f}<br>"
+            "Signatures Threshold Met: %{customdata[1]:,.0f}<br><br>"
+            "<b>Top ECIs:</b><br>%{customdata[2]}"
+            "<extra></extra>"
+        ),
+        showscale=True,
+    )
+
+
+_LABEL_OFFSETS = [
+    (-0.15, 0),
+    (0.15, 0),
+    (0, -0.15),
+    (0, 0.15),
+    (-0.1, -0.1),
+    (-0.1, 0.1),
+    (0.1, -0.1),
+    (0.1, 0.1),
+]
+
+
+def _build_label_outline_traces(cdf: pd.DataFrame) -> list[go.Scattergeo]:
+    """Dark-outline Scattergeo layers offset in 8 directions for label legibility."""
+    return [
+        go.Scattergeo(
+            lon=cdf["lon"] + dx,
+            lat=cdf["lat"] + dy,
+            text=cdf["label"],
+            mode="text",
+            textfont=dict(
+                size=10, color=kpi_colors.map_text_outline, family="Arial Black"
+            ),
+            hoverinfo="skip",
+            showlegend=False,
+        )
+        for dx, dy in _LABEL_OFFSETS
+    ]
+
+
+def _build_label_trace(cdf: pd.DataFrame) -> go.Scattergeo:
+    """White text layer rendered on top of the outline layers."""
+    return go.Scattergeo(
+        lon=cdf["lon"],
+        lat=cdf["lat"],
+        text=cdf["label"],
+        mode="text",
+        textfont=dict(size=10, color="white", family="Arial Black"),
+        hoverinfo="skip",
+        showlegend=False,
+    )
+
+
+_EUROPE_LONGITUDE_PADDING = 16
+
+
+def _apply_geo_layout(fig: go.Figure, total_sigs: str) -> None:
+    """Configure map projection, Europe clip bounds, title, and dimensions in-place."""
+    fig.update_geos(
+        scope="world",
+        projection_type="natural earth",
+        showland=True,
+        landcolor="rgb(243, 243, 243)",
+        coastlinecolor="rgb(204, 204, 204)",
+        showcountries=True,
+        countrycolor="rgb(204, 204, 204)",
+        lataxis_range=[32, 72],
+        lonaxis_range=[
+            -14 - _EUROPE_LONGITUDE_PADDING,
+            36 + _EUROPE_LONGITUDE_PADDING,
+        ],
+    )
+    fig.update_layout(
+        title=dict(
+            text=f"ECI Signatures by Country ({total_sigs} total)",
+            x=0.015,
+            xanchor="left",
+        ),
+        height=MAP_HEIGHT,
+        width=MAP_WIDTH,
+        margin=dict(l=0, r=0, t=50, b=0),
+        dragmode=False,
+    )
+
+
+_MAP_CONFIG = {
+    "responsive": True,
+    "scrollZoom": False,
+    "displayModeBar": False,
+}
+
+
 def generate_chart_signatures_map(df: pd.DataFrame) -> str:
     """
     Return an HTML card containing a choropleth map of ECI signatures by EU member state.
@@ -203,106 +305,19 @@ def generate_chart_signatures_map(df: pd.DataFrame) -> str:
     """
 
     cdf = _build_country_df(df)
+
     if cdf.empty:
         return wrap_card("<p>No country-level signature data available.</p>")
 
-    total_sigs = _format_sigs(int(cdf["total"].sum()))
-
     fig = go.Figure()
 
-    # Choropleth fill layer
-    fig.add_trace(
-        go.Choropleth(
-            locations=cdf["alpha3"],
-            z=cdf["total"],
-            text=cdf["name"],
-            customdata=cdf[["total", "threshold_met_count", "eci_list"]].values,
-            colorscale="Viridis",
-            colorbar=dict(
-                title="Total<br>Signatures",
-                tickformat=",",
-            ),
-            hovertemplate=(
-                "<b>%{text}</b><br>"
-                "Total Signatures: %{customdata[0]:,.0f}<br>"
-                "Signatures Threshold Met: %{customdata[1]:,.0f}<br><br>"
-                "<b>Top ECIs:</b><br>%{customdata[2]}"
-                "<extra></extra>"
-            ),
-            showscale=True,
-        )
-    )
+    fig.add_trace(_build_choropleth_trace(cdf))
 
-    # Text label outline (dark purple offset layers for legibility)
-    _OFFSETS = [
-        (-0.15, 0),
-        (0.15, 0),
-        (0, -0.15),
-        (0, 0.15),
-        (-0.1, -0.1),
-        (-0.1, 0.1),
-        (0.1, -0.1),
-        (0.1, 0.1),
-    ]
-    for dx, dy in _OFFSETS:
-        fig.add_trace(
-            go.Scattergeo(
-                lon=cdf["lon"] + dx,
-                lat=cdf["lat"] + dy,
-                text=cdf["label"],
-                mode="text",
-                textfont=dict(
-                    size=10, color=kpi_colors.map_text_outline, family="Arial Black"
-                ),
-                hoverinfo="skip",
-                showlegend=False,
-            )
-        )
+    for trace in _build_label_outline_traces(cdf):
+        fig.add_trace(trace)
 
-    # White text on top
-    fig.add_trace(
-        go.Scattergeo(
-            lon=cdf["lon"],
-            lat=cdf["lat"],
-            text=cdf["label"],
-            mode="text",
-            textfont=dict(size=10, color="white", family="Arial Black"),
-            hoverinfo="skip",
-            showlegend=False,
-        )
-    )
+    fig.add_trace(_build_label_trace(cdf))
 
-    add_space_to_europe = 16
+    _apply_geo_layout(fig, _format_sigs(int(cdf["total"].sum())))
 
-    fig.update_geos(
-        scope="world",
-        projection_type="natural earth",
-        showland=True,
-        landcolor="rgb(243, 243, 243)",
-        coastlinecolor="rgb(204, 204, 204)",
-        showcountries=True,
-        countrycolor="rgb(204, 204, 204)",
-        lataxis_range=[32, 72],
-        lonaxis_range=[(-14 - add_space_to_europe), (36 + add_space_to_europe)],
-    )
-
-    fig.update_layout(
-        title=dict(
-            text=f"ECI Signatures by Country ({total_sigs} total)",
-            x=0.015,
-            xanchor="left",
-        ),
-        height=MAP_HEIGHT,
-        width=MAP_WIDTH,
-        margin=dict(l=0, r=0, t=50, b=0),
-        # disable drag-to-pan on the layout level
-        dragmode=False,
-    )
-
-    _map_config = {
-        "responsive": True,
-        "scrollZoom": False,  # no scroll-to-zoom
-        "displayModeBar": False,  # hide the toolbar entirely
-    }
-
-    return wrap_card(fig.to_html(**{**DIV_ARGS, "config": _map_config}))
+    return wrap_card(fig.to_html(**{**DIV_ARGS, "config": _MAP_CONFIG}))
