@@ -87,10 +87,10 @@ def _normalize_timeline_title(title: str) -> Optional[str]:
     title_mapping = {
         "Registered": "timeline_registered",
         "Collection start date": "timeline_collection_start_date",
+        # "Collection ongoing" removed — it's a status marker, not a date field
         "Collection closed": "timeline_collection_closed",
         "Verification": "timeline_verification_start",
         "Answered initiative": "timeline_response_commission_date",
-        "Collection ongoing": "timeline_collection_start_date",  # Map ongoing to start date
         "Registration": "timeline_registered",
     }
 

@@ -148,6 +148,7 @@ def generate_collection_ongoing(df: pd.DataFrame) -> str:
         An HTML string wrapping the table in a ``card`` div, or a card with a
         fallback message if no initiatives are collection ongoing.
     """
+
     df_filter = _filter(df)
     df_open = _sort(df_filter)
 
