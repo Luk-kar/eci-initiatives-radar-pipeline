@@ -127,15 +127,9 @@ def _format_sigs(n: int) -> str:
 # ─── Parsing Helpers ─────────────────────────────────────────────────────────
 
 
-def _parse_count(raw_value: str | int | dict) -> int:
-    """Extract a plain integer from a raw per-country value.
-
-    Handles two input shapes:
-      - Legacy int/str format: ``57643`` or ``"57,643"``
-      - New nested-dict format: ``{'signatures': 57643, 'threshold': ..., 'percentage': ...}``
-    """
-    raw = raw_value.get("signatures", 0) if isinstance(raw_value, dict) else raw_value
-    return int(str(raw).replace(",", "").replace("*", ""))
+def _parse_count(value: dict) -> int:
+    """Extract the integer signature count from a per-country value dict."""
+    return int(str(value.get("signatures", 0)).replace(",", "").replace("*", ""))
 
 
 def _resolve_alpha2(key: str) -> str | None:
@@ -388,9 +382,8 @@ def generate_chart_signatures_map(df: pd.DataFrame) -> str:
 
                 Python dict literal (as a string)
                 representing per-country breakdowns, parsed via ``ast.literal_eval``.
-                Keyed by country name or alpha-2 code; values are either a plain
-                integer (legacy format) or a nested dict with ``signatures``,
-                ``threshold``, and ``percentage`` keys (new format).
+                Keyed by country name or alpha-2 code; values are nested dicts
+                with ``signatures``, ``threshold``, and ``percentage`` keys.
 
               - ``title``:
 
