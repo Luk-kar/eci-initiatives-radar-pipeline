@@ -1,6 +1,7 @@
 """Renders a choropleth map of total ECI signatures collected per EU member state."""
 
 # Python
+import ast
 import json
 
 # Third Party
@@ -64,13 +65,9 @@ _NAME_TO_ALPHA2: dict[str, str] = {v[0]: k for k, v in _COUNTRIES.items()}
 
 def _parse_count(raw_value: str | int | dict) -> int:
     """Extract integer from both old format (int) and new format (nested dict)."""
-    if isinstance(raw_value, int):
-        return raw_value
-    if isinstance(raw_value, dict):
-        sos = raw_value.get("statements_of_support", "0")
-        return int(str(sos).replace(",", "").replace("*", ""))
-    # plain string fallback
-    return int(str(raw_value).replace(",", "").replace("*", ""))
+
+    raw = raw_value.get("signatures", 0) if isinstance(raw_value, dict) else raw_value
+    return int(str(raw).replace(",", "").replace("*", ""))
 
 
 def _build_country_df(df: pd.DataFrame) -> pd.DataFrame:
@@ -85,49 +82,58 @@ def _build_country_df(df: pd.DataFrame) -> pd.DataFrame:
     top_ecis: dict[str, list[tuple[int, str]]] = {}
 
     for _, row in df.iterrows():
-        raw = row.get("signatures_collected_by_country")
+
+        raw = row["signatures_collected_by_country"]
+
         if not raw or pd.isna(raw):
             continue
-        try:
-            breakdown: dict = json.loads(raw)
-        except (json.JSONDecodeError, TypeError):
-            continue
+
+        breakdown: dict = ast.literal_eval(raw)
 
         title = row["title"]
+
         for key, value in breakdown.items():
-            alpha2 = key if key in _COUNTRIES else _NAME_TO_ALPHA2.get(key)
-            if alpha2 is None:
+
+            alpha2_country = key if key in _COUNTRIES else _NAME_TO_ALPHA2.get(key)
+
+            if alpha2_country is None:
                 continue
 
             count = _parse_count(value)
-            totals[alpha2] = totals.get(alpha2, 0) + count
-            top_ecis.setdefault(alpha2, []).append((count, title))
+
+            totals[alpha2_country] = totals.get(alpha2_country, 0) + count
+
+            top_ecis.setdefault(alpha2_country, []).append((count, title))
 
             # Count how many ECIs this country met the threshold in
             if isinstance(value, dict):
-                pct_raw = value.get("percentage", "0%").rstrip("%")
+                pct_raw = value.get("percentage", 0)
                 try:
                     if float(pct_raw) >= 100.0:
-                        threshold_met[alpha2] = threshold_met.get(alpha2, 0) + 1
+                        threshold_met[alpha2_country] = (
+                            threshold_met.get(alpha2_country, 0) + 1
+                        )
                 except ValueError:
                     pass
 
     rows = []
-    for alpha2, total in totals.items():
-        name, alpha3, lat, lon = _COUNTRIES[alpha2]
-        ecis_sorted = sorted(top_ecis[alpha2], reverse=True)
+    for alpha2_country, total in totals.items():
+        name, alpha3, lat, lon = _COUNTRIES[alpha2_country]
+        ecis_sorted = sorted(top_ecis[alpha2_country], reverse=True)
         items = [f"• {t}: {_format_sigs(c)}" for c, t in ecis_sorted[:MAX_HOVER_ITEMS]]
         if len(ecis_sorted) > MAX_HOVER_ITEMS:
             items.append(f"<i>… (and {len(ecis_sorted) - MAX_HOVER_ITEMS} more)</i>")
         rows.append(
             {
-                "alpha2": alpha2,
+                "alpha2": alpha2_country,
                 "alpha3": alpha3,
                 "name": name,
                 "lat": lat,
                 "lon": lon,
                 "total": total,
-                "threshold_met_count": threshold_met.get(alpha2, 0),  # ← new column
+                "threshold_met_count": threshold_met.get(
+                    alpha2_country, 0
+                ),  # ← new column
                 "label": _format_sigs(total),
                 "eci_list": "<br>".join(items),
             }
