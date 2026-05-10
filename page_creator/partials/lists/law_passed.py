@@ -1,4 +1,4 @@
-"""Renders a scrollable table of ECI initiatives that directly led to EU legislation."""
+import ast
 
 import pandas as pd
 
@@ -13,48 +13,46 @@ from page_creator.partials.styles.colors import kpi_colors as colors
 from page_creator.partials.lists.utils.sort import sort_by_registration_date
 from page_creator.utils import wrap_card
 
-_STATUS = "Law Passed"
-_HEADERS = ["Initiative", "Registration", "Objective", "Legislation Example"]
+STATUS = "Law Passed"
+HEADERS = ("Initiative", "Registration", "Objective", "Legislation Example")
 
 
 def _filter(df: pd.DataFrame) -> pd.DataFrame:
-    """Filter for initiatives with ``Law Passed`` status.
-
-    Args:
-        df: The full ECI initiatives DataFrame.
-
-    Returns:
-        Filtered DataFrame containing only ``_STATUS`` rows.
-    """
-    return df[df["current_status"] == _STATUS]
+    """Filter for initiatives with Law Passed status."""
+    return df[df["current_status"] == STATUS]
 
 
 def _sort(df: pd.DataFrame) -> pd.DataFrame:
-    """Normalise dates and sort by registration date descending.
-
-    Args:
-        df: Filtered DataFrame of ``Law Passed`` initiatives.
-
-    Returns:
-        Sorted and date-normalised DataFrame.
-    """
-
+    """Normalise dates and sort by registration date descending."""
     return sort_by_registration_date(df)
 
 
+def _parse_last_legislation(raw) -> str:
+    """Return the last item from a stringified list, or empty string."""
+    if not raw or pd.isna(raw):
+        return ""
+    try:
+        items = ast.literal_eval(str(raw))
+    except (ValueError, SyntaxError):
+        return ""
+    if not isinstance(items, list) or not items:
+        return ""
+    return items[-1]
+
+
 def _build_row(row: pd.Series) -> str:
-    """Return a ``<tr>`` for a single initiative that law passed.
+    """Return a <tr> for a single initiative that led to passed legislation.
 
     Args:
-        row: A DataFrame row. Must contain ``title``, ``initiative_url``, ``registration_date``,
-             ``objective``, and ``legislation``.
+        row: A DataFrame row. Must contain title, initiativ_eurl,
+             registrationd_ate, objective, and law_passed.
 
     Returns:
-        A ``<tr>...</tr>`` HTML string.
+        A <tr>...</tr> HTML string.
     """
-    raw = row["law_passed"]
-    legislation = truncate(raw) if pd.notna(raw) and raw else "—"
-    return build_initiative_row(row, f"\n          <td>{legislation}</td>")
+    last = _parse_last_legislation(row["law_passed"])
+    legislation = truncate(last, 150) if last else ""
+    return build_initiative_row(row, f"<td>{legislation}</td>")
 
 
 def _build_rows(filtered_df: pd.DataFrame) -> str:
@@ -70,32 +68,33 @@ def _build_rows(filtered_df: pd.DataFrame) -> str:
 
 
 def generate_law_passed(df: pd.DataFrame) -> str:
-    """Return an HTML card containing a table of ECIs that led to passed legislation.
+    """
+    Return an HTML card containing a table of ECIs that led to passed legislation.
 
-    Filters for rows with ``current_status == 'Law Passed'``, sorted by
-    registration date descending.
+    Filters for rows with ``current_status == "Law Passed"``, sorted by
+    registration date descending.  The "Legislation Example" column shows the
+    *last* entry from the ``law_passed`` list — the most recently recorded
+    piece of legislation linked to the initiative — truncated to fit.
 
     Args:
-        df: The full ECI initiatives DataFrame. Must contain ``current_status``,
-            ``title``, ``initiative_url``, ``objective``, ``registration_date``, and
-            ``legislation`` columns.
+        df: The full ECI initiatives DataFrame.  Must contain
+            ``current_status``, ``title``, ``initiative_url``, ``objective``,
+            ``registration_date``, and ``law_passed`` columns.
 
     Returns:
-        An HTML string wrapping the table in a ``card`` div, or a card with a
-        fallback message if no initiatives law passed.
+        An HTML string wrapping the table in a card div, or a card with a
+        fallback message if no initiatives have law passed.
     """
-
     df_filtered = _filter(df)
     df_sorted = _sort(df_filtered)
     df_final = normalise_registration_date(df_sorted)
 
     color = colors.law_passed
-    title = build_card_title("⚖️", "Law Passed", len(df_final), color)
+    title = build_card_title("⚖️", STATUS, len(df_final), color)
 
     if df_final.empty:
-
         return wrap_card(
-            title + '<p class="list-empty">No initiatives have law passed yet.</p>'
+            f"{title}<p class='list-empty'>No initiatives have led to passed legislation yet.</p>"
         )
 
-    return wrap_table_card(title, _build_rows(df_final), df_final, _HEADERS, color)
+    return wrap_table_card(title, _build_rows(df_final), df_final, HEADERS, color)

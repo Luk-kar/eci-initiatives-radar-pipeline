@@ -54,7 +54,7 @@ class DashboardRow(BaseModel):
     funding_total: float | None = None
     timeline_collection_closed: str | None = None
     timeline_collection_start: str | None = None
-    law_passed: str | None = None
+    law_passed: list[str] | None = None
 
     @field_validator("signatures_collected_by_country")
     @classmethod

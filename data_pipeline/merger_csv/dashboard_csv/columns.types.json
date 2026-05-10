@@ -13,5 +13,5 @@
   "funding_total": { "type": "float64", "required": false },
   "timeline_collection_closed": { "type": "datetime", "required": false, "format": "%d/%m/%Y" },
   "timeline_collection_start": { "type": "datetime", "required": false, "format": "%d/%m/%Y" },
-  "law_passed": { "type": "string", "required": false }
+  "law_passed": {"type": "list[string]","required": false}
 }

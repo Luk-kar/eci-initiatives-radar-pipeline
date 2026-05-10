@@ -35,7 +35,7 @@ def dummy_dashboard_row():
         funding_total=10000,
         timeline_collection_closed="01/01/2025",
         timeline_collection_start="01/01/2024",
-        law_passed="",
+        law_passed=None,
     )
 
 

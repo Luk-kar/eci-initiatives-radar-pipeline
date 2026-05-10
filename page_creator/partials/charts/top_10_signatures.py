@@ -74,6 +74,16 @@ STATUS_MARKERS = {
         "color": STATUS_COLORS["Collection Ongoing"],
         "label": "Collection Ongoing",
     },
+    "Awaiting Collection": {
+        "symbol": "circle",
+        "color": STATUS_COLORS["Awaiting Collection"],
+        "label": "Awaiting Collection",
+    },
+    "Collection Verification": {
+        "symbol": "hourglass",
+        "color": STATUS_COLORS["Collection Verification"],
+        "label": "Collection Verification",
+    },
 }
 _COMMISSION_ANSWER_FALLBACK = {
     "Collection Unsuccessful": "<i>Did not reach the required signatures.</i>",

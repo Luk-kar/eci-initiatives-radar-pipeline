@@ -20,7 +20,7 @@ Describes the fields produced by the final dashboard merger pipeline step (`data
 | **funding_total** | float64 | No (Total funding received as a float.) | `140000.00` |
 | **timeline_collection_closed** | datetime | No (Date the collection period closed in DD/MM/YYYY format.) | `01/11/2013` |
 | **timeline_collection_start** | datetime | No (Date the collection period started in DD/MM/YYYY format.) | `10/05/2012` |
-| **law_passed** | string | No (Textual evidence that legislation progressed; empty string if none.) | `An amendment to the Drinking Water Directive came into force on 28 October 2015.` |
+| **law_passed** | list[string] | No (List of laws as evidence that legislation progressed; empty string if none.) | `["Amendment to the Drinking Water Directive came into force.", "A proposal for a regulation on minimum requirements was adopted in May 2018.",]`
 
 ## Schema Configuration (`columns.types.json`)
 To assist with automated parsing and data loading (e.g., via `pandas`), a machine-readable schema map is provided in `columns.types.json`.
