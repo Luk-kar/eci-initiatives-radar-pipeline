@@ -7,7 +7,7 @@ from page_creator.partials.lists.utils.sort import sort_by_registration_date
 from page_creator.partials.lists.utils import build_card_title, generate_response_card
 
 _STATUS = "Commission Engaged"
-_HEADERS = ["Initiative", "Registration", "Objective", "Commission Response"]
+_HEADERS = ["Initiative", "Registration", "Objective", "Response"]
 
 
 def _filter(df: pd.DataFrame) -> pd.DataFrame:
