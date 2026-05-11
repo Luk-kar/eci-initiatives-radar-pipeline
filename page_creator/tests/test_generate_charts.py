@@ -109,7 +109,10 @@ class TestBuildGeneratedJs:
 
     def test_contains_filename_entry(self):
         result = build_generated_js({"chart_outcomes.html": "chart-outcomes-slot"})
-        assert '["partials/chart_outcomes.html", "chart-outcomes-slot"],' in result
+        assert (
+            '["generated/partials/chart_outcomes.html", "chart-outcomes-slot"],'
+            in result
+        )
 
     def test_contains_slot_id_entry(self):
         result = build_generated_js({"chart_outcomes.html": "chart-outcomes-slot"})
@@ -124,7 +127,7 @@ class TestBuildGeneratedJs:
         }
         result = build_generated_js(slot_map)
         for filename, slot_id in slot_map.items():
-            assert f'["partials/{filename}", "{slot_id}"],' in result
+            assert f'["generated/partials/{filename}", "{slot_id}"],' in result
 
     def test_empty_slot_map_produces_empty_array(self):
         result = build_generated_js({})
@@ -132,4 +135,4 @@ class TestBuildGeneratedJs:
 
     def test_entries_are_arrays_of_two_strings(self):
         result = build_generated_js({"kpi_row.html": "kpi-row-slot"})
-        assert '["partials/kpi_row.html", "kpi-row-slot"],' in result
+        assert '["generated/partials/kpi_row.html", "kpi-row-slot"],' in result
