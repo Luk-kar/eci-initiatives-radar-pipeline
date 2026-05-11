@@ -1,8 +1,14 @@
 """Tests for truncate in utils/text.py."""
 
+import pandas as pd
 import pytest
 
-from page_creator.partials.lists.utils.text import truncate, wrap_initiative_title
+from page_creator.partials.lists.utils.text import (
+    truncate,
+    wrap_initiative_title,
+    strip_markdown_links,
+    strip_boilerplate_headers,
+)
 from page_creator.partials.lists.utils.constants import DEFAULT_TRUNCATE
 
 
@@ -107,6 +113,40 @@ class TestWrapInitiativeTitle:
         with pytest.raises(ValueError):
             wrap_initiative_title("   ")
 
+    def test_none_raises(self):
+        with pytest.raises(ValueError, match="must not be None"):
+            wrap_initiative_title(None)
+
+    def test_empty_string_raises(self):
+        with pytest.raises(ValueError, match="empty or whitespace"):
+            wrap_initiative_title("")
+
+    def test_whitespace_only_raises(self):
+        with pytest.raises(ValueError, match="empty or whitespace"):
+            wrap_initiative_title("   ")
+
+    def test_invalid_type_raises(self):
+        with pytest.raises(TypeError, match="expected str"):
+            wrap_initiative_title(123)
+
+
+class TestStripMarkdownLinks:
+
+    def test_basic_link(self):
+        assert strip_markdown_links("See [this](http://example.com).") == "See this."
+
+    def test_multiple_links(self):
+        assert strip_markdown_links("[A](url1) and [B](url2)") == "A and B"
+
+    def test_no_links_unchanged(self):
+        assert strip_markdown_links("No links here.") == "No links here."
+
+    def test_nan_returns_empty(self):
+        assert strip_markdown_links(float("nan")) == ""
+
+    def test_none_returns_empty(self):
+        assert strip_markdown_links(None) == ""
+
 
 class TestTruncate:
     def test_short_text_unchanged(self):
@@ -159,3 +199,17 @@ class TestTruncate:
         result = truncate(text)
         assert result.endswith("…")
         assert len(result) == DEFAULT_TRUNCATE
+
+
+class TestStripBoilerplateHeaders:
+
+    def test_removes_known_header(self):
+        text = "Main conclusions of the Communication:\nReal content."
+        assert strip_boilerplate_headers(text) == "Real content."
+
+    def test_no_match_unchanged(self):
+        assert strip_boilerplate_headers("Regular text.") == "Regular text."
+
+    def test_invalid_type_raises(self):
+        with pytest.raises(TypeError):
+            strip_boilerplate_headers(123)

@@ -12,6 +12,10 @@ from page_creator.partials.lists.utils import (
 from page_creator.partials.styles.colors import kpi_colors as colors
 from page_creator.partials.lists.utils.sort import sort_by_registration_date
 from page_creator.utils import wrap_card
+from page_creator.partials.lists.utils.text import (
+    strip_boilerplate_headers,
+    strip_markdown_links,
+)
 
 STATUS = "Law Passed"
 HEADERS = ("Initiative", "Registration", "Objective", "Legislation Example")
@@ -50,8 +54,21 @@ def _build_row(row: pd.Series) -> str:
     Returns:
         A <tr>...</tr> HTML string.
     """
+    # Legislation
     last = _parse_last_legislation(row["law_passed"])
-    legislation = truncate(last, 150) if last else ""
+
+    legislation = None
+
+    if last:
+        salinized = strip_boilerplate_headers(strip_markdown_links(last))
+        legislation = truncate(salinized, 150)
+    else:
+        legislation = ""
+
+    # Objective
+    row = row.copy()
+    row["objective"] = strip_markdown_links(row["objective"])
+
     return build_initiative_row(row, f"<td>{legislation}</td>")
 
 
