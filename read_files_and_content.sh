@@ -54,7 +54,7 @@ MEDIA_EXTENSIONS="mp3|mp4|wav|ogg|flac|aac|mkv|avi|mov|webm|m4a|m4v|pdf"
 BINARY_PATTERN="\.($IMAGE_EXTENSIONS|$BINARY_EXTENSIONS|$ARCHIVE_EXTENSIONS|$FONT_EXTENSIONS|$MEDIA_EXTENSIONS)$"
 
 find "$INPUT_DIR" \
-  -type d \( -name .git -o -name __pycache__ -o -name dbt -o -name .venv \) -prune -o \
+  -type d \( -name .git -o -name __pycache__ -o -name dbt -o -name .venv -o -name .pytest_cache -o -name .venv.data_pipeline \) -prune -o \
   -type f ! -name "*.csv" -print | sort | while read -r FILE; do
   echo "\`$FILE\`:"
   echo '```'
