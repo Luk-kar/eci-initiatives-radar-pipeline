@@ -59,8 +59,6 @@ Desktop.ini
 /*.md
 !/README.md
 
-# created page to export
-page_to_export/partials/*
 # ==============================================================================
 # ECI PROJECT SPECIFIC DATA RULES
 # ==============================================================================
@@ -81,4 +79,4 @@ data/latest_session/*.html
 # ==============================================================================
 # Generated data driven dashboard page
 # ==============================================================================
-page_to_export/generated
+page_to_export/generated/
