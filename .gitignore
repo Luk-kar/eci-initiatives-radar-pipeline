@@ -77,3 +77,8 @@ page_to_export/partials/*
 data/latest_session/*.html
 /data/
 /data_pipeline/data/
+
+# ==============================================================================
+# Generated data driven dashboard page
+# ==============================================================================
+page_to_export/generated
