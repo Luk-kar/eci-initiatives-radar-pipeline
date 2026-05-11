@@ -1,6 +1,6 @@
 # 💾 Data Pipeline
 
-A modular data pipeline for collecting, extracting, and preparing European Citizens’ Initiative (ECI) data from the official [EU portal](https://european-union.europa.eu/index_en)
+A modular data pipeline for collecting, extracting, and preparing European Citizens’ Initiative (ECI) data from the official [EU portal](https://citizens-initiative.europa.eu/index_en)
 
 The package is organized around reusable scraping, extraction, merging data, and shared pipeline utilities, with dedicated modules for `initiatives`, `Commission responses`, and `follow-up` content.
 
