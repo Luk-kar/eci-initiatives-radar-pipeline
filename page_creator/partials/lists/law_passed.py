@@ -48,8 +48,8 @@ def _build_row(row: pd.Series) -> str:
     """Return a <tr> for a single initiative that led to passed legislation.
 
     Args:
-        row: A DataFrame row. Must contain title, initiativ_eurl,
-             registrationd_ate, objective, and law_passed.
+        row: A DataFrame row. Must contain title, initiative_url,
+             registration)date, objective, and law_passed.
 
     Returns:
         A <tr>...</tr> HTML string.
