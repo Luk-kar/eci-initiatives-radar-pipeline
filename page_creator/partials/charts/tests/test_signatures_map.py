@@ -17,19 +17,19 @@ from page_creator.partials.charts.signatures_map import (
 def base_df():
     country_data = {
         "Germany": {
-            "statements_of_support": "380,455",
-            "threshold": "74,250",
-            "percentage": "512.40%",
+            "signatures": "380,455",
+            "threshold": 74250,
+            "percentage": 512.40,
         },
         "France": {
-            "statements_of_support": "281,397",
-            "threshold": "55,500",
-            "percentage": "507.02%",
+            "signatures": "281,397",
+            "threshold": 55500,
+            "percentage": 507.02,
         },
         "Poland": {
-            "statements_of_support": "177,747",
-            "threshold": "38,250",
-            "percentage": "464.70%",
+            "signatures": "177,747",
+            "threshold": 38250,
+            "percentage": 464.70,
         },
     }
     return pd.DataFrame(
@@ -62,19 +62,24 @@ class TestFormatSigs:
 
 class TestParseCount:
     def test_int_passthrough(self):
-        assert _parse_count(12345) == 12345
+
+        assert _parse_count({"signatures": 12345}) == 12345
 
     def test_dict_with_comma_formatted_string(self):
-        assert _parse_count({"statements_of_support": "380,455"}) == 380455
+
+        assert _parse_count({"signatures": "380,455"}) == 380455
 
     def test_dict_with_asterisk(self):
-        assert _parse_count({"statements_of_support": "333*"}) == 333
+
+        assert _parse_count({"signatures": "333*"}) == 333
 
     def test_plain_string(self):
-        assert _parse_count("12,980") == 12980
+
+        assert _parse_count({"signatures": "12,980"}) == 12980
 
     def test_string_with_asterisk(self):
-        assert _parse_count("333*") == 333
+
+        assert _parse_count({"signatures": "333*"}) == 333
 
 
 class TestBuildCountryDf:

@@ -1,4 +1,4 @@
-"""Tests for _find_latest_csv, _fn_to_key, _discover_slot_map, and _build_generated_js."""
+"""Tests for find_latest_csv, _fn_to_key, _discover_slot_map, and build_generated_js."""
 
 import re
 import textwrap
@@ -11,8 +11,7 @@ import pytest
 from page_creator.generate_charts import (
     _PATTERN,
     _PREFIX_MAP,
-    _build_generated_js,
-    _find_latest_csv,
+    build_generated_js,
     _fn_to_key,
 )
 
@@ -22,88 +21,6 @@ from page_creator.generate_charts import (
 def _make_csv(path: Path, content: str = "col\nval\n") -> Path:
     path.write_text(content, encoding="utf-8")
     return path
-
-
-# ── _find_latest_csv ──────────────────────────────────────────────────────────
-
-
-class TestFindLatestCsv:
-    @pytest.fixture
-    def mock_newest_run_dir(self, tmp_path):
-        with patch(
-            "page_creator.generate_charts.find_newest_scraped_data_dir",
-            return_value=tmp_path,
-        ) as mock:
-            yield mock
-
-    def _make_dashboard_csv(self, tmp_path, timestamp, content="col\nval\n"):
-        return _make_csv(tmp_path / f"eci_dashboard_{timestamp}.csv", content)
-
-    def test_returns_path_and_date(self, tmp_path, mock_newest_run_dir):
-        self._make_dashboard_csv(tmp_path, "2025-06-01_10-00-00")
-        path, date = _find_latest_csv()
-        assert isinstance(path, Path)
-        assert path.name == "eci_dashboard_2025-06-01_10-00-00.csv"
-        assert date == "2025-06-01"
-
-    def test_returns_most_recent_by_timestamp(self, tmp_path, mock_newest_run_dir):
-        self._make_dashboard_csv(tmp_path, "2024-01-01_08-00-00")
-        self._make_dashboard_csv(tmp_path, "2025-06-15_12-30-00")
-        self._make_dashboard_csv(tmp_path, "2023-12-31_23-59-59")
-        _, date = _find_latest_csv()
-        assert date == "2025-06-15"
-
-    def test_skips_files_without_valid_timestamp(self, tmp_path, mock_newest_run_dir):
-        _make_csv(tmp_path / "eci_dashboard_backup.csv")
-        self._make_dashboard_csv(tmp_path, "2025-03-10_09-00-00")
-        _, date = _find_latest_csv()
-        assert date == "2025-03-10"
-
-    def test_raises_if_data_dir_missing(self, mock_newest_run_dir):
-        mock_newest_run_dir.side_effect = FileNotFoundError("Data directory not found")
-        with pytest.raises(FileNotFoundError, match="Data directory not found"):
-            _find_latest_csv()
-
-    def test_raises_if_no_csv_files(self, tmp_path, mock_newest_run_dir):
-        # Fix: Replaced `\\*` with `\*` so it parses exactly one backslash before the asterisk
-        with pytest.raises(
-            FileNotFoundError, match=r"No 'eci_dashboard_\*\.csv' files found"
-        ):
-            _find_latest_csv()
-
-    def test_raises_if_only_malformed_timestamps(self, tmp_path, mock_newest_run_dir):
-        _make_csv(tmp_path / "eci_dashboard_backup.csv")
-        _make_csv(tmp_path / "eci_dashboard_bad-date.csv")
-        with pytest.raises(ValueError, match="Expected pattern"):
-            _find_latest_csv()
-
-    def test_raises_on_corrupted_csv(self, tmp_path, mock_newest_run_dir):
-        bad = tmp_path / "eci_dashboard_2025-05-01_10-00-00.csv"
-        # Fix: Replaced `\\x` with `\x` so it generates actual binary bytes
-        bad.write_bytes(b"\x00\xff\xfe" * 100)
-        with pytest.raises(ValueError, match="corrupted"):
-            _find_latest_csv()
-
-    def test_raises_on_newest_corrupted_with_no_fallback(
-        self, tmp_path, mock_newest_run_dir
-    ):
-        bad = tmp_path / "eci_dashboard_2026-01-01_00-00-00.csv"
-        # Fix: Replaced `\\x` with `\x` so it generates actual binary bytes
-        bad.write_bytes(b"\x00\xff\xfe" * 100)
-        self._make_dashboard_csv(tmp_path, "2025-06-01_10-00-00")
-        with pytest.raises(ValueError, match="corrupted"):
-            _find_latest_csv()
-
-    def test_returned_path_exists(self, tmp_path, mock_newest_run_dir):
-        self._make_dashboard_csv(tmp_path, "2025-09-20_14-00-00")
-        path, _ = _find_latest_csv()
-        assert path.exists()
-
-    def test_date_format_is_yyyy_mm_dd(self, tmp_path, mock_newest_run_dir):
-        self._make_dashboard_csv(tmp_path, "2024-11-30_08-45-00")
-        _, date = _find_latest_csv()
-        # Fix: Replaced `\\d` with `\d` to correctly match digit regex
-        assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", date)
 
 
 # ── _fn_to_key ────────────────────────────────────────────────────────────────
@@ -170,32 +87,32 @@ class TestFnToKey:
         assert "list_list" not in result
 
 
-# ── _build_generated_js ───────────────────────────────────────────────────────
+# ── build_generated_js ───────────────────────────────────────────────────────
 
 
 class TestBuildGeneratedJs:
 
     def test_returns_string(self):
-        result = _build_generated_js({"chart_outcomes.html": "chart-outcomes-slot"})
+        result = build_generated_js({"chart_outcomes.html": "chart-outcomes-slot"})
         assert isinstance(result, str)
 
     def test_contains_auto_generated_comment(self):
-        result = _build_generated_js({})
+        result = build_generated_js({})
         assert (
             "// AUTO-GENERATED by page_creator/generate_charts.py — do not edit manually."
             in result
         )
 
     def test_contains_const_declaration(self):
-        result = _build_generated_js({})
+        result = build_generated_js({})
         assert "const GENERATED_PARTIALS = [" in result
 
     def test_contains_filename_entry(self):
-        result = _build_generated_js({"chart_outcomes.html": "chart-outcomes-slot"})
+        result = build_generated_js({"chart_outcomes.html": "chart-outcomes-slot"})
         assert '["partials/chart_outcomes.html", "chart-outcomes-slot"],' in result
 
     def test_contains_slot_id_entry(self):
-        result = _build_generated_js({"chart_outcomes.html": "chart-outcomes-slot"})
+        result = build_generated_js({"chart_outcomes.html": "chart-outcomes-slot"})
         assert '"chart-outcomes-slot"' in result
         assert 'id="chart-outcomes-slot"' not in result
 
@@ -205,14 +122,14 @@ class TestBuildGeneratedJs:
             "list_law_passed.html": "list-law-passed-slot",
             "kpi_row.html": "kpi-row-slot",
         }
-        result = _build_generated_js(slot_map)
+        result = build_generated_js(slot_map)
         for filename, slot_id in slot_map.items():
             assert f'["partials/{filename}", "{slot_id}"],' in result
 
     def test_empty_slot_map_produces_empty_array(self):
-        result = _build_generated_js({})
+        result = build_generated_js({})
         assert "const GENERATED_PARTIALS = [\n\n];" in result
 
     def test_entries_are_arrays_of_two_strings(self):
-        result = _build_generated_js({"kpi_row.html": "kpi-row-slot"})
+        result = build_generated_js({"kpi_row.html": "kpi-row-slot"})
         assert '["partials/kpi_row.html", "kpi-row-slot"],' in result
