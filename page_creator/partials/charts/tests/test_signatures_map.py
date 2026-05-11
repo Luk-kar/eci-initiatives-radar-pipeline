@@ -17,17 +17,17 @@ from page_creator.partials.charts.signatures_map import (
 def base_df():
     country_data = {
         "Germany": {
-            "signatures": "380,455",
+            "signatures": 380455,
             "threshold": 74250,
             "percentage": 512.40,
         },
         "France": {
-            "signatures": "281,397",
+            "signatures": 281397,
             "threshold": 55500,
             "percentage": 507.02,
         },
         "Poland": {
-            "signatures": "177,747",
+            "signatures": 177747,
             "threshold": 38250,
             "percentage": 464.70,
         },
