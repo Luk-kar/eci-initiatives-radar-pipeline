@@ -4,6 +4,12 @@ A modular data pipeline for collecting, extracting, and preparing European Citiz
 
 The package is organized around reusable scraping, extraction, merging data, and shared pipeline utilities, with dedicated modules for `initiatives`, `Commission responses`, and `follow-up` content.
 
+## Submodules
+
+- **[Scraper](./scraper/README.scraper.md)**: Orchestrates Selenium and BeautifulSoup to automate data collection and download raw HTML pages from ECI portals.
+- **[Extractor](./extractor/README.extractor.md)**: Parses the downloaded HTML, validates data structure using Pydantic, and outputs structured CSV records.
+- **[Merger CSV](./merger_csv/README.merger_csv.md)**: Joins and cleans the extracted CSV datasets (`initiatives`, `responses`, and `responses_followup_legislation`) into a unified `dashboard.csv` for analysis.
+- 
 ## Overview
 
 The `data_pipeline` package contains the data acquisition and transformation layer for the ECI project.

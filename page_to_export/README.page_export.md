@@ -43,7 +43,7 @@ page_to_export/
 
 ## Running locally
 
-Because this dashboard uses JavaScript to dynamically fetch and assemble its components, browser security rules (CORS) prevent it from loading correctly if you simply double-click the `index.html` file. 
+Because this dashboard uses JavaScript to dynamically fetch and assemble its components, it will not load correctly if you simply double-click the `index.html` file. 
 
 It must be served through a local development server. You can use any standard server tool of your choice:
 

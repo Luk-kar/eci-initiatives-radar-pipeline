@@ -1,5 +1,0 @@
-[console_scripts]
-eci-extract-legislation = data_pipeline.merger_csv.responses_followup.__main__:main
-eci-scrape-followup = data_pipeline.scraper.responses_followup.main:scrape_followup_websites
-eci-scrape-initiatives = data_pipeline.scraper.initiatives.__main__:scrape_eci_initiatives
-eci-scrape-responses = data_pipeline.scraper.responses.main:scrape_commission_responses
