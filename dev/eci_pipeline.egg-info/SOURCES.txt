@@ -1,4 +1,3 @@
-README.md
 pyproject.toml
 eci_pipeline.egg-info/PKG-INFO
 eci_pipeline.egg-info/SOURCES.txt

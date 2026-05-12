@@ -4,7 +4,3 @@ Version: 0.1.0
 Requires-Python: >=3.12
 Provides-Extra: dev
 Requires-Dist: pylint>=3.0; extra == "dev"
-Provides-Extra: test
-Requires-Dist: pytest>=8.0; extra == "test"
-Requires-Dist: pytest-cov>=5.0; extra == "test"
-Requires-Dist: page-creator @ file:///${PROJECT_ROOT}/../page_creator ; extra == "test"
