@@ -16,7 +16,7 @@ Published via [**GitHub Pages**](https://luk-kar.github.io/eci-initiatives-radar
 
 *The project is also intended to be reusable, so it can serve as a starting point for related any public-transparency initiatives.*
 
-## Architecture Overview
+## 🏗️ Architecture Overview
 
 The project is composed of four tightly integrated layers, each living in its own directory.
 
@@ -61,7 +61,7 @@ eci-pipeline/
 
 ---
 
-## Data Flow
+## 🔀 Data Flow
 
 ```
 EU Portal (live HTML)
@@ -87,7 +87,7 @@ EU Portal (live HTML)
 
 ---
 
-## Modules
+## 📦 Modules
 
 ### 💾 [`data_pipeline/`](./data_pipeline/README.data_pipeline.md)
 
@@ -176,7 +176,7 @@ Any step failure halts the job immediately.
 
 ---
 
-## Installation
+## ⚙️ Installation
 
 Both Python packages are installed using [`uv`](https://docs.astral.sh/uv/), an extremely fast package installer.
 
@@ -203,7 +203,7 @@ uv pip install -e page_creator
 
 ---
 
-## Running the Full Pipeline Locally
+## 🚀 Running the Full Pipeline Locally
 
 ```bash
 # 1. Activate the data_pipeline environment
@@ -232,7 +232,7 @@ cd page_to_export && python3 -m http.server 8000
 
 ---
 
-## Testing
+## 🧪 Testing
 
 ```bash
 # data_pipeline unit tests
@@ -248,7 +248,7 @@ pytest page_creator
 
 ---
 
-## One-time CI/CD Setup
+## 🔑 One-time CI/CD Setup
 
 Before the GitHub Actions workflow can open Pull Requests into the dashboard repo, three things must be configured:
 
@@ -262,7 +262,7 @@ Full instructions: [`.github/README.workflows.md`](./.github/README.workflows.md
 
 ---
 
-## Porting to Another CI Provider
+## 🚚 Porting to Another CI Provider
 
 The three scripts in `.github/commands/` are plain Bash with no GitHub-specific logic and run identically on any Linux runner. Only `run_pipeline.yml` is provider-specific. Key equivalences:
 
@@ -277,12 +277,12 @@ The three scripts in `.github/commands/` are plain Bash with no GitHub-specific 
 
 ---
 
-## Data Documentation
+## 📋 Data Documentation
 
 Column-by-column field descriptions are available in each module's `README.columns.md`. The final output schema is documented at:
 
 [`data_pipeline/merger_csv/dashboard_csv/README.columns.md`](./data_pipeline/merger_csv/dashboard_csv/README.columns.md)
 
-## LICENSE
+## 📜 LICENSE
 
 Just look at [`LICENSE`](LICENSE)
