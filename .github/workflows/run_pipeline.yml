@@ -1,0 +1,198 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# run_pipeline.yml
+#
+# PURPOSE
+#   Full end-to-end ECI pipeline run:
+#     1. Set up Python virtual environments (data_pipeline + page_creator).
+#     2. Execute all 9 pipeline stages (scrape → extract → merge → generate).
+#     3. Compress the latest data run directory and save as a workflow artifact.
+#     4. Copy page_to_export/ to the dashboard repo via a Pull Request.
+#
+# GitLab MR equivalent using the official glab CLI (v 2.92.0, April 2026):
+#   https://github.com/cli/cli/releases
+#
+# DICTIONARY TERMS FOR EASIER TRANSITION TO ANOTHER PROVIDER
+#
+#   • "on:"                          — when to trigger the workflow
+#
+#   • "runs-on:"                     — which machine runs the job
+#
+#   • "actions/cache"                — reuse folders (venvs) between runs
+#
+#   • "actions/upload-artifact"      — make a file downloadable after the run
+#
+#   • "peter-evans/create-pull-request" — push branch + open PR in one step
+#
+#   • "secrets.DASHBOARD_REPO_PAT"   — secret token, never plain text in YAML
+#
+# REQUIRED GITHUB SECRET (set once per pipeline repo — see setup instructions):
+#
+#   DASHBOARD_REPO_PAT  — fine-grained PAT with write access to
+#                          Your-Own-User/eci-initiatives-radar-dashboard
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Run ECI Pipeline & Export Dashboard
+
+on:
+  # Run manually from the Actions tab at any time
+  workflow_dispatch:
+  # Run automatically on a schedule — every Monday at 03:00 UTC
+  schedule:
+    - cron: '3 3 * * 6'
+
+# Least-privilege permissions for the pipeline repo token.
+# The dashboard repo write access comes from the PAT, not this token.
+permissions:
+  contents: read
+
+jobs:
+  pipeline:
+    # Pin to a specific Ubuntu LTS for reproducibility.
+    # Bump deliberately when you want to upgrade the runner OS.
+    # GitLab equivalent: image: ubuntu:24.04
+    runs-on: ubuntu-24.04
+
+    steps:
+      # ── 0. Checkout pipeline repo ─────────────────────────────────────────
+      # Checks out the pipeline source code into the default working directory.
+      # GitLab equivalent: the repo is already available as $CI_PROJECT_DIR.
+      - name: Checkout pipeline repo
+        uses: actions/checkout@v4
+        with:
+          path: pipeline-repo
+
+      # ── 1. Restore cached venvs ───────────────────────────────────────────
+      # Cache key includes both pyproject.toml hashes so the cache is
+      # invalidated automatically whenever dependencies change.
+      # GitLab equivalent: cache: key: files: [data_pipeline/pyproject.toml, ...]
+      - name: Restore cached Python venvs
+        id: cache-venvs
+        uses: actions/cache@v4
+        with:
+          path: |
+            pipeline-repo/data_pipeline/.venv.data_pipeline
+            pipeline-repo/page_creator/.venv.page_creator
+          key: venvs-ubuntu-24.04-${{ hashFiles(
+                 'pipeline-repo/data_pipeline/pyproject.toml',
+                 'pipeline-repo/page_creator/pyproject.toml'
+               ) }}
+          # Fall back to any previous venv cache if the exact key is missing.
+          # uv pip install will update only what changed.
+          restore-keys: |
+            venvs-ubuntu-24.04-
+
+      # ── 2. Set up environments ────────────────────────────────────────────
+      # Installs uv (if missing), creates venvs, and installs both packages
+      # in editable mode. Skips venv creation if the cache was restored.
+      # A pre-existing venv on a fresh runner is logged as a WARNING.
+      # Any failure here is critical — the job stops immediately (set -euo pipefail).
+      - name: Set up environments
+        working-directory: pipeline-repo
+        run: bash commands/set_up_enviro.sh
+
+      # ── 2. Random Delay ───────────────────────────────────────────────────
+      # Sleep a random number of seconds (1-328 = up to 6 minutes)
+      # so the actual work starts somewhere between 03:00 and 03:06 AM.
+      # This staggers load on shared runners across repositories.
+      - name: Random start delay
+        run: sleep echo $((1 + $RANDOM / 20))
+
+      # ── 3. Run full pipeline ──────────────────────────────────────────────
+      # Executes all 9 stages sequentially:
+      #   data_pipeline: scrape → extract → merge (8 stages)
+      #   page_creator:  generate HTML partials + generated.js (1 stage)
+      # Any stage failure is critical — the job stops immediately.
+      - name: Run pipeline
+        working-directory: pipeline-repo
+        run: bash commands/run_pipeline.sh
+
+      # ── 4. Resolve latest data directory ─────────────────────────────────
+      # give_path_latest_data.sh finds the most recent eci_dashboard_*.csv,
+      # validates it has more than 2 rows, and outputs the parent run directory.
+      # Exits non-zero (job fails) if the CSV is missing or near-empty.
+      - name: Resolve latest data directory
+        id: latest
+        working-directory: pipeline-repo
+        run: |
+          # Store the resolved path as a step output for downstream steps.
+          # GitLab equivalent: echo "LATEST_DIR=$(bash ...)" >> build.env + artifacts: reports: dotenv
+          LATEST_DIR=$(bash commands/give_path_latest_data.sh)
+          echo "latest_dir=${LATEST_DIR}" >> "$GITHUB_OUTPUT"
+
+      # ── 5. Compress latest data run ───────────────────────────────────────
+      # Creates a .tar.gz of the run directory (contains the dashboard CSV
+      # and any other per-run artefacts) for inspection after the job finishes.
+      - name: Compress latest data run
+        run: |
+          tar -czf data_run.tar.gz \
+            -C "$(dirname "${{ steps.latest.outputs.latest_dir }}")" \
+            "$(basename "${{ steps.latest.outputs.latest_dir }}")"
+
+      # ── 6. Upload data run as workflow artifact ───────────────────────────
+      # Saves the archive as a downloadable artifact in the Actions run UI.
+      # Retained for 30 days; download from Actions → run → Artifacts section.
+      - name: Upload data run artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: eci-data-run-${{ github.run_id }}
+          path: data_run.tar.gz
+          retention-days: 30
+
+      # ── 7. Checkout dashboard repo ────────────────────────────────────────
+      # Checks out the separate static-site repo using a PAT so we can push
+      # a branch and open a Pull Request.
+      - name: Checkout dashboard repo
+        uses: actions/checkout@v4
+        with:
+          repository: Luk-kar/eci-initiatives-radar-dashboard
+          token: ${{ secrets.DASHBOARD_REPO_PAT }}
+          path: dashboard-repo
+
+      # ── 8. Sync page_to_export into dashboard repo ────────────────────────
+      # Mirrors the full page_to_export/ tree (including generated partials,
+      # generated.js, static assets, and index.html) into the dashboard repo
+      # root. rsync --delete removes files in the target that no longer exist
+      # in the source, keeping the repo clean.
+      - name: Sync page_to_export to dashboard repo
+        run: |
+          rsync -av --delete \
+            pipeline-repo/page_to_export/ \
+            dashboard-repo/
+
+      # ── 9. Open Pull Request in dashboard repo ────────────────────────────
+      # Creates (or updates) a PR in Your-Own-User/eci-initiatives-radar-dashboard
+      # on branch "automated/pipeline-update". If the branch already exists
+      # from a previous run, the PR is updated in place.
+      # delete-branch: true — the branch is removed automatically after merge.
+      # GitLab equivalent: glab mr create --fill --target-branch main
+      - name: Get current date
+        id: date
+        run: echo "date=$(date -u +'%Y-%m-%d %H:%M UTC')" >> "$GITHUB_OUTPUT"
+
+      - name: Create Pull Request in dashboard repo
+        uses: peter-evans/create-pull-request@v6
+        with:
+          path: dashboard-repo
+          token: ${{ secrets.DASHBOARD_REPO_PAT }}
+          commit-message: "chore: update dashboard from pipeline run ${{ github.run_id }}"
+          committer: "GitHub Actions Bot <actions@github.com>"
+          author: "${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>"
+          branch: automated/pipeline-update
+          delete-branch: true
+          title: "🚀 Dashboard update — pipeline run #${{ github.run_id }}"
+          body: |
+            Automated PR generated by the `eci-initiatives-radar-pipeline` workflow.
+
+            **Date:** `${{ steps.date.outputs.date }}`
+            **Pipeline run:** [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            **Triggered by:** `${{ github.event_name }}`
+            **Actor:** @${{ github.actor }}
+
+            ### What changed
+            - `page_to_export/` synced from the latest pipeline run
+            - Generated HTML partials, `generated.js`, and static assets updated
+
+            > Review the diff before merging. The data run archive is available
+            > as a workflow artifact for the run linked above.
+          base: main
+          labels: automated-pr

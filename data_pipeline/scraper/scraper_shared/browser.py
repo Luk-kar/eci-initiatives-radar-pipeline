@@ -27,6 +27,10 @@ def initialize_browser(logger, log_messages: dict | None = None) -> webdriver.Ch
     for option in CHROME_OPTIONS:
         chrome_options.add_argument(option)
 
+    # NOTE:
+    # Locally: uses the Chrome binary installed on the system.
+    # On GitHub Actions (ubuntu-24.04): Chrome is pre-installed on the runner.
+    # In both cases, Selenium Manager auto-resolves the matching chromedriver at runtime.
     driver = webdriver.Chrome(options=chrome_options)
 
     if log_messages is not None:

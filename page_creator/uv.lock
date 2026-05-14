@@ -110,7 +110,7 @@ wheels = [
 [[package]]
 name = "page-creator"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "pandas" },
     { name = "plotly" },
@@ -118,8 +118,8 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "pandas" },
-    { name = "plotly" },
+    { name = "pandas", specifier = "==3.0.1" },
+    { name = "plotly", specifier = "==6.5.2" },
 ]
 
 [[package]]

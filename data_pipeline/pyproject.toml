@@ -40,6 +40,3 @@ markers = [
 [build-system]
 requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
-
-[tool.uv]
-venv = ".venv.data_pipeline"

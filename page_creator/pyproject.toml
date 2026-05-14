@@ -3,9 +3,20 @@ name = "page-creator"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
-    "pandas",
-    "plotly",
+    "pandas==3.0.1", # If it works set explicitly
+    "plotly==6.5.2",
 ]
 
 [project.scripts]
-generate = "__main__"
+generate = "page_creator.__main__:main"
+
+[tool.setuptools.packages.find]
+where = [".."]
+include = ["page_creator*"]
+
+[tool.setuptools]
+package-dir = {"" = ".."}
+
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
