@@ -29,17 +29,22 @@ Any step failure is critical — the job stops immediately.
 
 ## One-time setup
 
+*(As of 14.02.2026)*
+
 ### 1. Create a Personal Access Token (PAT)
 
 Go to **GitHub → Settings → Developer settings → Personal access tokens →
 Fine-grained tokens → Generate new token** and configure:
 
+- **Token name:** `eci-dashboard-deploy`
+- **Description:** `Allows the eci-initiatives-radar-pipeline workflow to push updates and open PRs in the dashboard repo.`
+- **Expiration:** 1 year (set a calendar reminder to rotate it)
 - **Repository access:** only `eci-initiatives-radar-dashboard`
-- **Permissions:** `Contents` → Read and write, `Pull requests` → Read and write
+- **Minimum Permissions:** `Contents` → Read and write, `Pull requests` → Read and write
 
 ### 2. Add the PAT as a repository secret
 
-Go to **pipeline repo → Settings → Secrets and variables → Actions →
+Go to **`pipeline repo` → Settings → Secrets and variables → Actions →
 New repository secret**:
 
 - **Name:** `DASHBOARD_REPO_PAT`
@@ -50,11 +55,10 @@ New repository secret**:
 Go to **`eci-initiatives-radar-dashboard` → Issues → Labels → New label**
 and create a label named `automated-pr`.
 
-### 4. Configure GitHub Pages (optional)
+### 4. Configure GitHub Pages
 
 Go to **`eci-initiatives-radar-dashboard` → Settings → Pages →
-Build and deployment → Deploy from a branch** and select the target branch
-(`main` or `gh-pages`) and root folder.
+Build and deployment → Deploy from a branch** and select **`update-dashboard-html`** and the **`/docs`** folder.
 
 ## Porting to another provider
 

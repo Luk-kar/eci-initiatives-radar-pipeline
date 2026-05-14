@@ -7,7 +7,7 @@
 
 A fully automated, end-to-end data pipeline and dashboard system for tracking [**European Citizens' Initiatives (ECIs)**](https://citizens-initiative.europa.eu/index_en) — from raw HTML scraping of the official EU portal through to a live, published static dashboard.
 
-Published via [**GitHub Pages**](https://luk-kar.github.io/eci-initiatives-radar/)
+Published via [**GitHub Pages**](https://luk-kar.github.io/eci-initiatives-radar-dashboard)
 
 > **Live dashboard repo →** [`eci-initiatives-radar-dashboard`](https://github.com/Luk-kar/eci-initiatives-radar-dashboard) *(updated automatically every Saturday)*
 ---

@@ -156,8 +156,7 @@ jobs:
       - name: Sync page_to_export to dashboard repo
         run: |
           rsync -av --delete \
-            pipeline-repo/page_to_export/ \
-            dashboard-repo/
+            pipeline-repo/page_to_export/ dashboard-repo/docs/
 
       # ── 9. Open Pull Request in dashboard repo ────────────────────────────
       # Creates (or updates) a PR in Your-Own-User/eci-initiatives-radar-dashboard
