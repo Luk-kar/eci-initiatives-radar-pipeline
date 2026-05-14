@@ -95,7 +95,11 @@ jobs:
       # so the actual work starts somewhere between 03:00 and 03:06 AM.
       # This staggers load on shared runners across repositories.
       - name: Random start delay
-        run: sleep echo $((1 + $RANDOM / 20))
+        run: |
+          delay=$((1 + RANDOM % 20))
+          echo "Sleeping ${delay}s to stagger runner load..."
+          sleep "$delay"
+          echo "Now awake and eager to scrape!"
 
       # ── 3. Run full pipeline ──────────────────────────────────────────────
       # Executes all 9 stages sequentially:
