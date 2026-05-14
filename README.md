@@ -20,18 +20,22 @@ Published via [**GitHub Pages**](https://luk-kar.github.io/eci-initiatives-radar
 
 The project is composed of four tightly integrated layers, each living in its own directory.
 
-The design is intentionally lightweight — no database, no microservices, no message queue.
+**The design is intentionally lightweight:**<br>
+ — no database, no microservices, no message queue.
 ECI data changes slowly (at most a handful of new initiatives per run so far), so a weekly batch
 job writing to static files is a better fit than a live API or a streaming pipeline.
 The entire system is a linear script chain: scrape → extract → merge → render → publish.
 
-The trade-off is deliberate: the dashboard is always a few days behind the source portal,
+**The trade-off is deliberate:**<br>
+the dashboard is always a few days behind the source portal,
 but the system needs no server to keep running, no infrastructure to maintain, and no
 on-call response when something breaks at 3 AM. A smaller dependency footprint also means
 the pipeline runs on any machine with Python and a browser — nothing to install beyond the
-packages declared in each `pyproject.toml`.
+packages declared in each `pyproject.toml`. The Saturday schedule is a deliberate choice
+— low-traffic moment — a quiet slot that fits a volunteer-maintained project.
 
-However the EU portal's structure is also unlikely to change frequently — large institutions
+**The EU portal's structure is also unlikely to change frequently:**<br>
+large institutions
 and legislative processes tend to move slowly by nature — so the scraping logic **should** stay
 stable between runs.
 
