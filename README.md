@@ -31,6 +31,10 @@ on-call response when something breaks at 3 AM. A smaller dependency footprint a
 the pipeline runs on any machine with Python and a browser — nothing to install beyond the
 packages declared in each `pyproject.toml`.
 
+However the EU portal's structure is also unlikely to change frequently — large institutions
+and legislative processes tend to move slowly by nature — so the scraping logic **should** stay
+stable between runs.
+
 ```
 eci-pipeline/
 │
