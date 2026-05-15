@@ -4,6 +4,8 @@ A modular data pipeline for collecting, extracting, and preparing European Citiz
 
 The package is organized around reusable scraping, extraction, merging data, and shared pipeline utilities, with dedicated modules for `initiatives`, `Commission responses`, and `follow-up` content.
 
+Try to "Don't be evil" and not abuse the EU servers, or you can be blocked for some time.
+
 ## Submodules
 
 - **[Scraper](./scraper/README.scraper.md)**: Orchestrates Selenium and BeautifulSoup to automate data collection and download raw HTML pages from ECI portals.
