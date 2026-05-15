@@ -60,6 +60,21 @@ and create a label named `automated-pr`.
 Go to **`european_citizens_initiatives_tracker` → Settings → Pages →
 Build and deployment → Deploy from a branch** and select **`automated/pipeline-update`** and the **`/docs`** folder.
 
+## Running the workflow manually
+
+Use this to test the setup or trigger an unscheduled run at any time.
+
+1. Go to the pipeline repo on GitHub
+2. Click the **Actions** tab
+3. Select **Run ECI Pipeline & Export Dashboard** from the left sidebar
+4. Click **Run workflow** → choose the branch (`main`) → click the green **Run workflow** button
+5. The run appears in the list within a few seconds — click it to follow the live log
+
+After a successful run:
+
+- The `.tar.gz` data archive is available under **Artifacts** at the bottom of the run page (kept 30 days)
+- A Pull Request is opened (or updated) in `european_citizens_initiatives_tracker` on branch `automated/pipeline-update`
+
 ## Porting to another provider
 
 The three shell scripts in `commands/` contain no GitHub-specific logic —
