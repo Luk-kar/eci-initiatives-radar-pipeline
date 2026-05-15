@@ -21,7 +21,7 @@ or manually on demand:
 | 5 | Resolve the latest data run directory via `commands/give_path_latest_data.sh` |
 | 6 | Compress the run directory into a `.tar.gz` artifact |
 | 7 | Upload the archive (kept 30 days, downloadable from the Actions run page) |
-| 8 | Checkout the dashboard repo (`eci-initiatives-radar-dashboard`) |
+| 8 | Checkout the dashboard repo (`european_citizens_initiatives_tracker`) |
 | 9 | Sync `page_to_export/` into the dashboard repo via `rsync` |
 | 10 | Open a Pull Request in the dashboard repo with a link back to this run |
 
@@ -37,9 +37,9 @@ Go to **GitHub → Settings → Developer settings → Personal access tokens �
 Fine-grained tokens → Generate new token** and configure:
 
 - **Token name:** `eci-dashboard-deploy`
-- **Description:** `Allows the eci-initiatives-radar-pipeline workflow to push updates and open PRs in the dashboard repo.`
+- **Description:** `Allows the european_citizens_initiatives_pipeline workflow to push updates and open PRs in the dashboard repo.`
 - **Expiration:** 1 year (set a calendar reminder to rotate it)
-- **Repository access:** only `eci-initiatives-radar-dashboard`
+- **Repository access:** only `european_citizens_initiatives_tracker`
 - **Minimum Permissions:** `Contents` → Read and write, `Pull requests` → Read and write
 
 ### 2. Add the PAT as a repository secret
@@ -52,13 +52,13 @@ New repository secret**:
 
 ### 3. Add the PR label in the dashboard repo
 
-Go to **`eci-initiatives-radar-dashboard` → Issues → Labels → New label**
+Go to **`european_citizens_initiatives_tracker` → Issues → Labels → New label**
 and create a label named `automated-pr`.
 
 ### 4. Configure GitHub Pages
 
-Go to **`eci-initiatives-radar-dashboard` → Settings → Pages →
-Build and deployment → Deploy from a branch** and select **`update-dashboard-html`** and the **`/docs`** folder.
+Go to **`european_citizens_initiatives_tracker` → Settings → Pages →
+Build and deployment → Deploy from a branch** and select **`automated/pipeline-update`** and the **`/docs`** folder.
 
 ## Porting to another provider
 

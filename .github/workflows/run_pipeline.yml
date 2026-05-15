@@ -28,7 +28,7 @@
 # REQUIRED GITHUB SECRET (set once per pipeline repo — see setup instructions):
 #
 #   DASHBOARD_REPO_PAT  — fine-grained PAT with write access to
-#                          Your-Own-User/eci-initiatives-radar-dashboard
+#                          Your-Own-User/european_citizens_initiatives_tracker
 # ─────────────────────────────────────────────────────────────────────────────
 
 name: Run ECI Pipeline & Export Dashboard
@@ -148,7 +148,7 @@ jobs:
       - name: Checkout dashboard repo
         uses: actions/checkout@v4
         with:
-          repository: Luk-kar/eci-initiatives-radar-dashboard
+          repository: Luk-kar/european_citizens_initiatives_tracker
           token: ${{ secrets.DASHBOARD_REPO_PAT }}
           path: dashboard-repo
 
@@ -163,7 +163,7 @@ jobs:
             pipeline-repo/page_to_export/ dashboard-repo/docs/
 
       # ── 9. Open Pull Request in dashboard repo ────────────────────────────
-      # Creates (or updates) a PR in Your-Own-User/eci-initiatives-radar-dashboard
+      # Creates (or updates) a PR in Your-Own-User/european_citizens_initiatives_tracker
       # on branch "automated/pipeline-update". If the branch already exists
       # from a previous run, the PR is updated in place.
       # delete-branch: true — the branch is removed automatically after merge.

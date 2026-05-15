@@ -1,4 +1,4 @@
-# 🇪🇺⚙️ ECI Pipeline — European Citizens' Initiative Tracker
+# 🇪🇺⚙️ European Citizens' Initiative Pipeline
 
 <p align="center">
   <img src="doc/images/eci_participation_campaign.jpg" alt="ECI Pipeline promo" /><br/>
@@ -7,9 +7,9 @@
 
 A fully automated, end-to-end data pipeline and dashboard system for tracking [**European Citizens' Initiatives (ECIs)**](https://citizens-initiative.europa.eu/index_en) — from raw HTML scraping of the official EU portal through to a live, published static dashboard.
 
-Published via [**GitHub Pages**](https://luk-kar.github.io/eci-initiatives-radar-dashboard)
+Published via [**GitHub Pages**](https://luk-kar.github.io/european_citizens_initiatives_tracker)
 
-> **Live dashboard repo →** [`eci-initiatives-radar-dashboard`](https://github.com/Luk-kar/eci-initiatives-radar-dashboard) *(updated automatically every Saturday)*
+> **Live dashboard repo →** [`european_citizens_initiatives_tracker`](https://github.com/Luk-kar/european_citizens_initiatives_tracker) *(updated automatically every Saturday)*
 ---
 
 *The main goal is to build independent tools that improve public understanding of how institutions operate and help verify whether real-world practice matches declared goals.*
@@ -90,7 +90,7 @@ EU Portal (live HTML)
  [5] page_to_export/generated/     — Static artifacts ready to serve
         │
         ▼
- [6] eci-initiatives-radar-dashboard  — GitHub Pages (auto PR via Actions)
+ [6] european_citizens_initiatives_tracker  — GitHub Pages (auto PR via Actions)
 ```
 
 ---
@@ -260,7 +260,7 @@ pytest page_creator
 
 Before the GitHub Actions workflow can open Pull Requests into the dashboard repo, three things must be configured:
 
-1. **Create a Fine-Grained PAT** with `Contents` (read/write) and `Pull requests` (read/write) access scoped to `eci-initiatives-radar-dashboard`.
+1. **Create a Fine-Grained PAT** with `Contents` (read/write) and `Pull requests` (read/write) access scoped to `european_citizens_initiatives_tracker`.
 2. **Add the PAT as a repository secret** named `DASHBOARD_REPO_PAT` in this pipeline repo.
 3. **Create the `automated-pr` label** in the dashboard repo (Issues → Labels → New label).
 
