@@ -9,6 +9,10 @@ handles timeouts or missing content, and properly records parsed URLs.
 import os
 from unittest.mock import MagicMock, patch
 
+import pytest
+
+from data_pipeline.scraper.scraper_shared.errors import EmptyListingsError
+
 from data_pipeline.scraper.initiatives.fetchers.listings.fetcher import (
     scrape_all_listings,
     scrape_single_listing_page,
@@ -109,20 +113,10 @@ class TestScrapeSingleListingPage:
         assert data == fake_initiatives
         assert path == "/p1.html"
 
-    def test_returns_empty_on_failure(self, mock_driver, tmp_path):
-
-        with patch(f"{MODULE}.download_with_retry", return_value=False), patch(
-            f"{MODULE}.random.uniform", return_value=0.1
-        ):
-            data, path = scrape_single_listing_page(
-                mock_driver, BASE_URL, str(tmp_path), 1, BASE_URL + ROUTE
-            )
-
-        assert data == []
-        assert path == ""
-
-    def test_parse_called_with_correct_base_url(self, mock_driver, tmp_path):
-
+    def test_raises_empty_listings_error_when_parse_returns_empty(
+        self, mock_driver, tmp_path
+    ):
+        """Empty parse result must raise EmptyListingsError regardless of retry success."""
         with patch(
             f"{MODULE}.download_with_retry", side_effect=_fake_retry_calls_attempt
         ), patch(f"{MODULE}.check_rate_limiting"), patch(
@@ -131,6 +125,24 @@ class TestScrapeSingleListingPage:
             f"{MODULE}.save_listing_page", return_value=("source", "/p1.html")
         ), patch(
             f"{MODULE}.parse_initiatives_list_data", return_value=[]
+        ), patch(
+            f"{MODULE}.random.uniform", return_value=0.1
+        ):
+            with pytest.raises(EmptyListingsError):
+                scrape_single_listing_page(
+                    mock_driver, BASE_URL, str(tmp_path), 1, BASE_URL + ROUTE
+                )
+
+    def test_parse_called_with_correct_base_url(self, mock_driver, tmp_path):
+        with patch(
+            f"{MODULE}.download_with_retry", side_effect=_fake_retry_calls_attempt
+        ), patch(f"{MODULE}.check_rate_limiting"), patch(
+            f"{MODULE}.wait_for_listing_page_content"
+        ), patch(
+            f"{MODULE}.save_listing_page", return_value=("source", "/p1.html")
+        ), patch(
+            f"{MODULE}.parse_initiatives_list_data",
+            return_value=[{"url": "https://example.test/eci/1"}],  # non-empty
         ) as mock_parse, patch(
             f"{MODULE}.random.uniform", return_value=0.1
         ):

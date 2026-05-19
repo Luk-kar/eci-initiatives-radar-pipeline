@@ -22,6 +22,7 @@ from selenium.common.exceptions import TimeoutException
 
 # Shared
 from data_pipeline.pipeline_shared.consts import FILE_ENCODING
+from data_pipeline.scraper.scraper_shared.errors import EmptyListingsError
 
 from ....scraper_shared.fetch_utils import (
     check_rate_limiting,
@@ -175,6 +176,9 @@ def scrape_single_listing_page(
         retry_wait_base=random.uniform(*RETRY_WAIT_BASE),
         logger=logger,
     )
+
+    if "data" not in result or not result["data"]:
+        raise EmptyListingsError()
 
     if not success:
         logger.error(LOG_MESSAGES["listing_page_failed"].format(page=current_page))
