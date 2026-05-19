@@ -23,13 +23,17 @@ from ._logger import logger
 
 from ..scraper_shared.files_utils import ensure_dirs
 
+from data_pipeline.scraper.scraper_shared.errors import EmptyDownloadsError
+
 from data_pipeline.pipeline_shared.consts import (
     LOG_SCRAPER_RESPONSES_PATTERN,
     DATA_DIR,
     INITIATIVES_DIR_NAME,
 )
 from data_pipeline.pipeline_shared.logger import get_logger
-from data_pipeline.pipeline_shared.errors import RunDirectoryValidationError
+from data_pipeline.pipeline_shared.errors import (
+    RunDirectoryValidationError,
+)
 from data_pipeline.pipeline_shared.locate_run_dir import find_newest_scraped_data_dir
 
 
@@ -151,14 +155,27 @@ def _run_downloads(
 
     Returns:
         Tuple of (updated_data, failed_urls).
+
+    Raises:
+        EmptyDownloadsError: If no response pages were successfully downloaded.
     """
     driver = initialize_browser()
 
     try:
-        return download_all_responses(driver, responses_dir, response_links)
+        updated_data, failed_urls = download_all_responses(
+            driver, responses_dir, response_links
+        )
     finally:
         driver.quit()
         logger.info(LOG_MESSAGES["browser_closed"])
+
+    if not updated_data:
+        raise EmptyDownloadsError(
+            f"All {len(response_links)} response page(s) failed to download — "
+            f"no HTML files were saved under: {responses_dir}"
+        )
+
+    return updated_data, failed_urls
 
 
 def _finalise_csv(csv_path: str, updated_data: list) -> None:

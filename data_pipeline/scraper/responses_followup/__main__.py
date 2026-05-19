@@ -28,6 +28,7 @@ from .statistics import display_completion_summary
 from ._logger import logger
 
 from ..scraper_shared.files_utils import ensure_dirs
+from ..scraper_shared.errors import EmptyDownloadsError
 
 from data_pipeline.pipeline_shared.consts import (
     LOG_SCRAPER_RESPONSES_FOLLOWUP_PATTERN,
@@ -232,14 +233,27 @@ def _run_downloads(
 
     Returns:
         Tuple of (updated_data, failed_urls).
+
+    Raises:
+        EmptyDownloadsError: If no follow-up pages were successfully downloaded.
     """
     driver = initialize_browser()
 
     try:
-        return download_all_responses(driver, responses_dir, response_links)
+        updated_data, failed_urls = download_all_responses(
+            driver, responses_dir, response_links
+        )
     finally:
         driver.quit()
         logger.info(LOG_MESSAGES["browser_closed"])
+
+    if not updated_data:
+        raise EmptyDownloadsError(
+            f"All {len(response_links)} follow-up page(s) failed to download — "
+            f"no HTML files were saved under: {responses_dir}"
+        )
+
+    return updated_data, failed_urls
 
 
 def _finalise_csv(csv_path: str, updated_data: list) -> None:
