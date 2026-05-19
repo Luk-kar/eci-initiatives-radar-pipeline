@@ -105,10 +105,16 @@ jobs:
       # Executes all 9 stages sequentially:
       #   data_pipeline: scrape → extract → merge (8 stages)
       #   page_creator:  generate HTML partials + generated.js (1 stage)
-      # Any stage failure is critical — the job stops immediately.
+      # Retried up to 3 times on failure (e.g. EmptyListingsError from a
+      # transient ECI portal rendering issue). Any stage failure on all
+      # attempts is critical — the job stops.
       - name: Run pipeline
-        working-directory: pipeline-repo
-        run: bash commands/run_pipeline.sh
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 30
+          max_attempts: 3
+          retry_wait_seconds: 60
+          command: bash pipeline-repo/commands/run_pipeline.sh
 
       # ── 4. Resolve latest data directory ─────────────────────────────────
       # give_path_latest_data.sh finds the most recent eci_dashboard_*.csv,
