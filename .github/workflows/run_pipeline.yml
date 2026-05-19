@@ -111,9 +111,9 @@ jobs:
       - name: Run pipeline
         uses: nick-fields/retry@v3
         with:
-          timeout_minutes: 30
+          timeout_minutes: 60 # it takes usually ~20 mins, but we are generous here
           max_attempts: 3
-          retry_wait_seconds: 60
+          retry_wait_seconds: 180 # 3 mins
           command: bash pipeline-repo/commands/run_pipeline.sh
 
       # ── 4. Resolve latest data directory ─────────────────────────────────

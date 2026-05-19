@@ -17,7 +17,7 @@ or manually on demand:
 | 1 | Restore cached Python virtual environments |
 | 2 | Set up `data_pipeline` and `page_creator` environments via `commands/set_up_enviro.sh` |
 | 3 | Random short delay to stagger load on shared runners |
-| 4 | Run all 9 pipeline stages via `commands/run_pipeline.sh` |
+| 4 | Run all 9 pipeline stages via `commands/run_pipeline.sh` (retried up to 3 times on failure, with a 3 mins wait between attempts) |
 | 5 | Resolve the latest data run directory via `commands/give_path_latest_data.sh` |
 | 6 | Compress the run directory into a `.tar.gz` artifact |
 | 7 | Upload the archive (kept 30 days, downloadable from the Actions run page) |
