@@ -12,7 +12,6 @@ from page_creator.partials.charts.utils import (
     STATUS_SECTION_MAP,
 )
 
-
 # One category per STATUS_COLORS entry — order controls stacking order (bottom → top).
 _CATEGORIES = [
     {"name": name, "statuses": {name}, "color": color}
@@ -87,16 +86,16 @@ def generate_chart_ecis_year(df: pd.DataFrame) -> str:
         xaxis=dict(title="Registration Year", tickmode="linear", dtick=1),
         yaxis=dict(
             title="Number of Initiatives",
-            domain=[0, 0.85],
+            domain=[0, 0.85 - 0.07],
         ),
         barmode="stack",
         margin=MARGIN,
-        height=HEIGHT / 4 * 3,
+        height=HEIGHT / 4 * 4,
         showlegend=True,
         legend=dict(
             orientation="h",
             yanchor="bottom",
-            y=0.87,
+            y=0.87 - 0.04,
             xanchor="right",
             x=1,
             traceorder="reversed",

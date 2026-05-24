@@ -185,6 +185,43 @@ class TestBuildCardTitle:
         result = build_card_title("⌛", "Awaiting Response", 3, "#9E9E9E")
         assert '<span class="card__count"' in result
 
+    # ── subtitle parameter ────────────────────────────────────────────────────
+
+    def test_no_subtitle_by_default(self):
+        result = build_card_title("🏛️", "Commission Engaged", 4, "#9CCC65")
+        assert "card__subtitle" not in result
+
+    def test_no_subtitle_empty_string(self):
+        result = build_card_title("🏛️", "Commission Engaged", 4, "#9CCC65", subtitle="")
+        assert "card__subtitle" not in result
+
+    def test_subtitle_renders_paragraph(self):
+        result = build_card_title(
+            "🏛️", "Commission Engaged", 4, "#9CCC65", subtitle="Some note."
+        )
+        assert '<p class="card__subtitle">Some note.</p>' in result
+
+    def test_subtitle_text_present(self):
+        result = build_card_title(
+            "✅", "Law Passed", 1, "#3CA371", subtitle="Binding legislation enacted."
+        )
+        assert "Binding legislation enacted." in result
+
+    def test_subtitle_follows_heading(self):
+        result = build_card_title("✅", "Law Passed", 1, "#3CA371", subtitle="A note.")
+        heading, subtitle_part = result.split("\n")
+        assert heading.startswith('<h3 class="card__title">')
+        assert heading.endswith("</h3>")
+        assert subtitle_part == '<p class="card__subtitle">A note.</p>'
+
+    def test_no_subtitle_result_ends_with_h3(self):
+        result = build_card_title("✅", "Law Passed", 1, "#3CA371")
+        assert result.endswith("</h3>")
+
+    def test_subtitle_result_ends_with_p(self):
+        result = build_card_title("✅", "Law Passed", 1, "#3CA371", subtitle="Note.")
+        assert result.endswith("</p>")
+
 
 class TestGenerateResponseCard:
     def test_returns_string(self, response_df):
