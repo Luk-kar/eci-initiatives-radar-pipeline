@@ -170,25 +170,42 @@ def wrap_sig_threshold_card(
 # ── Title builder ─────────────────────────────────────────────────────────────
 
 
-def build_card_title(emoji: str, label: str, count: int, color: str) -> str:
-    """Return a ``<h3 class="card__title">`` HTML string with a coloured count badge.
+def build_card_title(
+    emoji: str,
+    label: str,
+    count: int,
+    color: str,
+    subtitle: str = "",
+) -> str:
+    """Return a ``<h3 class="card__title">`` HTML string with a coloured count
+    badge, and an optional subtitle paragraph below it.
 
     Shared by every list partial to eliminate repeated f-string boilerplate.
 
     Args:
-        emoji:  Leading emoji character(s), e.g. ``"🏛️"``.
-        label:  Status label shown after the emoji, e.g. ``"Commission Engaged"``.
-        count:  Number of initiatives, rendered inside the coloured ``<span>``.
-        color:  CSS colour value for the count span.
+        emoji:    Leading emoji character(s), e.g. ``"🏛️"``.
+        label:    Status label shown after the emoji, e.g. ``"Commission Engaged"``.
+        count:    Number of initiatives, rendered inside the coloured ``<span>``.
+        color:    CSS colour value for the count span.
+        subtitle: Optional short clarifying sentence rendered as a muted
+                  ``<p class="card__subtitle">`` beneath the heading.
+                  Omitted when empty (default).
 
     Returns:
-        A ``<h3>…</h3>`` HTML string.
+        A ``<h3>…</h3>`` string, optionally followed by a
+        ``<p class="card__subtitle">…</p>`` string.
     """
-    return (
+
+    heading = (
         f'<h3 class="card__title">{emoji} {label}: '
         f'<span class="card__count" style="color:{color}">{count}</span>'
         "</h3>"
     )
+
+    if not subtitle:
+        return heading
+
+    return heading + f'\n<p class="card__subtitle">{subtitle}</p>'
 
 
 # ── Sig-threshold card pipeline ────────────────────────────────────────────────

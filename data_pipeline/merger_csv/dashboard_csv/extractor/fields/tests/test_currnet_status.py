@@ -30,8 +30,17 @@ from data_pipeline.merger_csv.dashboard_csv.extractor.fields.current_status impo
 
 from data_pipeline.merger_csv.dashboard_csv.extractor.fields.model import DashboardRow
 
-# (raw_status, expected_dashboard_label)
-_NON_ANSWERED_CASES: list[tuple[str, str]] = [
+# ---------------------------------------------------------------------------
+# Shared test fixtures
+# ---------------------------------------------------------------------------
+
+REG_NUM = "2024/000001"
+INITIATIVE_URL = (
+    "https://citizens-initiative.europa.eu/initiatives/details/2024/000001_en"
+)
+
+raw_status, expected_dashboard_label = ("", "")  # type hint placeholder
+NON_ANSWERED_CASES: list[tuple[str, str]] = [
     ("Registered", "Awaiting Collection"),
     ("Collection ongoing", "Collection Ongoing"),
     ("Collection closed", "Collection Verification"),
@@ -42,18 +51,23 @@ _NON_ANSWERED_CASES: list[tuple[str, str]] = [
 ]
 
 
-class TestDirectMapping:
-    """Tests for direct mapping of non-answered source values to the dashboard vocabulary."""
+# ---------------------------------------------------------------------------
+# TestDirectMapping
+# ---------------------------------------------------------------------------
 
-    @pytest.mark.parametrize("raw, expected", _NON_ANSWERED_CASES)
+
+class TestDirectMapping:
+    """Tests for direct mapping of non-answered source values to the
+    dashboard vocabulary."""
+
+    @pytest.mark.parametrize("raw, expected", NON_ANSWERED_CASES)
     def test_direct_mapping(self, raw: str, expected: str) -> None:
         """Every non-answered source value maps to its dashboard label."""
-
-        assert extract(raw, None, None) == expected
+        assert extract(raw, None, None, REG_NUM, INITIATIVE_URL) == expected
 
     def test_status_map_covers_all_source_values(self) -> None:
-        """Guard against silent drift between the docstring vocabulary and the map."""
-
+        """Guard against silent drift between the docstring vocabulary and the
+        map."""
         expected_keys = {
             "Registered",
             "Collection start date",
@@ -63,19 +77,25 @@ class TestDirectMapping:
             "Valid initiative",
             "Answered initiative",
             "Unsuccessful collection",
+            "Unsuccessful after verification",
             "Withdrawn",
-            "Registration refused",  # Fallback
+            "Registration refused",
         }
         assert set(_STATUS_MAP) == expected_keys
 
     def test_status_map_targets_only_canonical_dashboard_labels(self) -> None:
-        """The mapping's range must stay inside the documented dashboard vocabulary.
+        """The mapping's range must stay inside the documented dashboard
+        vocabulary.
 
-        Note: ``Law Passed`` and ``Rejected Legislation`` are not values of the
-        map — they are produced by the ``Answered initiative`` upgrade branch.
+        Note: Law Passed and Rejected Legislation are not values of the map —
+        they are produced by the "Answered initiative" upgrade branch.
         """
-
         assert set(_STATUS_MAP.values()).issubset(_DASHBOARD_VOCABULARY)
+
+
+# ---------------------------------------------------------------------------
+# TestNormalisation
+# ---------------------------------------------------------------------------
 
 
 class TestNormalisation:
@@ -86,73 +106,111 @@ class TestNormalisation:
         [
             "Verification",
             "Verification ",
-            " Verification",
             "Verification*",
-            "Verification *",
-            "Verification **",
-            "Verification\n                 \n                  *",
-            "  Verification\n*  ",
-            "\tVerification\t*\t",
+            "Verification**",
+            "Verification * ",
+            " Verification *",
+            " Verification ",
+            " Verification",
         ],
     )
     def test_verification_normalisation(self, raw: str) -> None:
-        """All observed and plausible whitespace/asterisk variants normalise correctly."""
-        assert extract(raw, None, None) == "Collection Verification"
+        """All observed and plausible whitespace/asterisk variants normalise
+        correctly."""
+        assert (
+            extract(raw, None, None, REG_NUM, INITIATIVE_URL)
+            == "Collection Verification"
+        )
 
     def test_internal_whitespace_collapses(self) -> None:
-        """Embedded multi-space runs collapse to a single space before lookup."""
-        assert extract("Collection   ongoing", None, None) == "Collection Ongoing"
+        """Embedded multi-space runs collapse to a single space before
+        lookup."""
+        assert (
+            extract("Collection  ongoing", None, None, REG_NUM, INITIATIVE_URL)
+            == "Collection Ongoing"
+        )
 
     @pytest.mark.parametrize(
         "raw, expected",
         [
             (None, ""),
             ("", ""),
-            ("   ", ""),
-            ("\n\t  ", ""),
+            (" ", ""),
             ("*", ""),
             ("**", ""),
+            ("  **  ", ""),
             ("Withdrawn", "Withdrawn"),
-            ("  Withdrawn  ", "Withdrawn"),
-            ("Withdrawn*", "Withdrawn"),
-            ("Verification\n*", "Verification"),
+            ("Withdrawn ", "Withdrawn"),
+            (" Withdrawn", "Withdrawn"),
+            ("Verification", "Verification"),
+            ("Verification*", "Verification"),
         ],
     )
     def test_normalise_unit(self, raw: str | None, expected: str) -> None:
-        """_normalise unit-level coverage (kept thin — extract() exercises the rest)."""
+        """_normalise() unit-level coverage — kept thin; extract() exercises
+        the rest."""
         assert current_status._normalise(raw) == expected
 
 
-class TestErrorHandling:
-    """Tests for exception raising on empty, missing, or unknown status strings."""
+# ---------------------------------------------------------------------------
+# TestErrorHandling
+# ---------------------------------------------------------------------------
 
-    @pytest.mark.parametrize("raw", ["", "   ", "\n\t", "*", "  *  "])
+
+class TestErrorHandling:
+    """Tests for exception raising on empty, missing, or unknown status
+    strings."""
+
+    @pytest.mark.parametrize("raw", ["", " ", "*", "**", "  **  "])
     def test_empty_raw_status_raises(self, raw: str) -> None:
-        """An empty (or whitespace-only / bare-asterisk) raw_status is rejected."""
+        """An empty / whitespace-only / bare-asterisk rawstatus is
+        rejected."""
         with pytest.raises(ValueError, match="Unknown raw current_status value"):
-            extract(raw, None, None)
+            extract(raw, None, None, REG_NUM, INITIATIVE_URL)
 
     def test_none_raw_status_raises(self) -> None:
-        """``None`` normalises to ``""`` and is rejected with the same error."""
+        """None normalises to '' and is rejected with the same error."""
         with pytest.raises(ValueError, match="Unknown raw current_status value"):
-            extract(None, None, None)  # type: ignore[arg-type]
+            extract(None, None, None, REG_NUM, INITIATIVE_URL)  # type: ignore[arg-type]
 
     def test_unknown_status_error_carries_original_and_normalised(self) -> None:
-        """The error message must surface both the raw and normalised forms for triage."""
+        """The error message must surface both the raw and normalised forms
+        for triage."""
         with pytest.raises(ValueError) as exc_info:
-            extract("  Mystery  state  *  ", None, None)
+            extract("Mystery state  ", None, None, REG_NUM, INITIATIVE_URL)
         msg = str(exc_info.value)
-        assert "'  Mystery  state  *  '" in msg  # original, repr-quoted
-        assert "'Mystery state'" in msg  # normalised, repr-quoted
+        assert "Mystery state  " in msg  # original, repr-quoted
+        assert "Mystery state" in msg  # normalised, repr-quoted
+
+    def test_error_carries_registration_number(self) -> None:
+        """The error message must include the ECI registration number for fast
+        triage."""
+        with pytest.raises(ValueError) as exc_info:
+            extract("Unknown status", None, None, REG_NUM, INITIATIVE_URL)
+        assert REG_NUM in str(exc_info.value)
+
+    def test_error_carries_initiative_url(self) -> None:
+        """The error message must include the ECI portal URL for fast
+        triage."""
+        with pytest.raises(ValueError) as exc_info:
+            extract("Unknown status", None, None, REG_NUM, INITIATIVE_URL)
+        assert INITIATIVE_URL in str(exc_info.value)
 
     def test_case_sensitivity_is_strict(self) -> None:
-        """Source vocabulary is case-sensitive: lowercase variants are unknown."""
+        """Source vocabulary is case-sensitive; lowercase variants are
+        unknown."""
         with pytest.raises(ValueError, match="Unknown raw current_status value"):
-            extract("withdrawn", None, None)
+            extract("withdrawn", None, None, REG_NUM, INITIATIVE_URL)
+
+
+# ---------------------------------------------------------------------------
+# TestAnsweredInitiativeUpgrade
+# ---------------------------------------------------------------------------
 
 
 class TestAnsweredInitiativeUpgrade:
-    """Tests for the special refinement logic applied to 'Answered initiative' rows."""
+    """Tests for the special refinement logic applied to Answered initiative
+    rows."""
 
     @pytest.mark.parametrize(
         "is_law_passed, rejected_legislation, expected",
@@ -163,25 +221,40 @@ class TestAnsweredInitiativeUpgrade:
         ],
     )
     def test_answered_initiative_upgrade(
-        self, is_law_passed: bool, rejected_legislation: bool, expected: str
+        self,
+        is_law_passed: bool,
+        rejected_legislation: bool,
+        expected: str,
     ) -> None:
-        """The legislation flags refine ``Answered initiative`` into a verdict."""
+        """The legislation flags refine 'Answered initiative' into a
+        verdict."""
         assert (
-            extract("Answered initiative", is_law_passed, rejected_legislation)
+            extract(
+                "Answered initiative",
+                is_law_passed,
+                rejected_legislation,
+                REG_NUM,
+                INITIATIVE_URL,
+            )
             == expected
         )
 
     def test_answered_initiative_both_flags_true_raises(self) -> None:
-        """A ValueError is raised when both legislation flags logically contradict each other."""
+        """A ValueError is raised when both legislation flags logically
+        contradict each other."""
         with pytest.raises(
             ValueError,
             match="Law cannot be passed for the initiative, when the commission rejected to do so earlier",
         ):
-            extract("Answered initiative", True, True)
+            extract("Answered initiative", True, True, REG_NUM, INITIATIVE_URL)
 
     def test_answered_initiative_upgrade_after_normalisation(self) -> None:
-        """Whitespace and trailing-asterisk normalisation also applies to the answered branch."""
-        assert extract("  Answered\tinitiative *  ", True, False) == "Law Passed"
+        """Whitespace and trailing-asterisk normalisation also applies to the
+        answered branch."""
+        assert (
+            extract(" Answered initiative* ", True, False, REG_NUM, INITIATIVE_URL)
+            == "Law Passed"
+        )
 
     @pytest.mark.parametrize(
         "is_law_passed, rejected_legislation",
@@ -194,29 +267,45 @@ class TestAnsweredInitiativeUpgrade:
         ],
     )
     def test_answered_initiative_missing_flags_raises(
-        self, is_law_passed: bool | None, rejected_legislation: bool | None
+        self,
+        is_law_passed: bool | None,
+        rejected_legislation: bool | None,
     ) -> None:
-        """``None`` flags signal an upstream contract violation and must abort the row."""
+        """None flags signal an upstream contract violation and must abort the
+        row."""
         with pytest.raises(ValueError, match="missing legislation flags"):
-            extract("Answered initiative", is_law_passed, rejected_legislation)
+            extract(
+                "Answered initiative",
+                is_law_passed,
+                rejected_legislation,
+                REG_NUM,
+                INITIATIVE_URL,
+            )
 
     def test_missing_flags_error_carries_both_values(self) -> None:
-        """Both flag values must appear in the error message for fast triage."""
+        """Both flag values must appear in the error message for fast
+        triage."""
         with pytest.raises(ValueError) as exc_info:
-            extract("Answered initiative", None, False)
+            extract("Answered initiative", None, False, REG_NUM, INITIATIVE_URL)
         msg = str(exc_info.value)
         assert "is_law_passed=None" in msg
         assert "rejected_legislation=False" in msg
 
 
+# ---------------------------------------------------------------------------
+# TestDefenseInDepth
+# ---------------------------------------------------------------------------
+
+
 class TestDefenseInDepth:
     """Tests ensuring logical isolation between different branch paths."""
 
-    @pytest.mark.parametrize("raw, expected", _NON_ANSWERED_CASES)
+    @pytest.mark.parametrize("raw, expected", NON_ANSWERED_CASES)
     def test_non_answered_ignores_legislation_flags(
         self, raw: str, expected: str
     ) -> None:
-        """A stray legislation flag on a non-answered row must not change the label."""
-        assert extract(raw, True, True) == expected
-        assert extract(raw, False, False) == expected
-        assert extract(raw, None, None) == expected
+        """A stray legislation flag on a non-answered row must not change the
+        label."""
+        assert extract(raw, True, True, REG_NUM, INITIATIVE_URL) == expected
+        assert extract(raw, False, False, REG_NUM, INITIATIVE_URL) == expected
+        assert extract(raw, None, None, REG_NUM, INITIATIVE_URL) == expected

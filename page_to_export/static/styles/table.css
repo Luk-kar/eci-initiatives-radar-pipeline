@@ -25,6 +25,13 @@
   letter-spacing: 0.02em;
 }
 
+.card__subtitle {
+    font-size: 0.85em;
+    color: var(--color-text-muted, #666);
+    margin-bottom: 1.6rem;
+    font-style: italic;
+}
+
 .data-table__scroll-wrapper {
   max-height: 320px;
   overflow-y: auto;

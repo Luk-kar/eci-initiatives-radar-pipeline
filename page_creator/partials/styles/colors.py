@@ -14,6 +14,7 @@ class KpiColors(NamedTuple):
     awaiting_collection: str = "#a0b4c8"
     collection_verification: str = "#f0c060"
     collection_unsuccessful: str = "#8B1111"
+    insufficient_verified_signatures: str = "#141313"
     commission_engaged: str = "#9CCC65"
     rejected_legislation: str = "#F44336"
     withdrawn: str = "#4B4B4B"
@@ -40,5 +41,6 @@ STATUS_COLORS: dict[str, str] = {
     "Collection Ongoing": kpi_colors.collection_ongoing,
     "Collection Verification": kpi_colors.collection_verification,
     "Collection Unsuccessful": kpi_colors.collection_unsuccessful,
+    "Insufficient Verified Signatures": kpi_colors.insufficient_verified_signatures,
     "Withdrawn": kpi_colors.withdrawn,
 }

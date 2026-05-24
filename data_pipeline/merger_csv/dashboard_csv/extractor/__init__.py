@@ -82,6 +82,8 @@ def analyse_row(
             raw_status=initiative.current_status,
             is_law_passed=is_law_passed,
             rejected_legislation=rejected,
+            registration_number=initiative.registration_number,
+            initiative_url=initiative.initiative_url,
         ),
         objective=objective.extract(initiative.objective),
         commission_answer=commission_answer.extract(

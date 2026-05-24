@@ -30,15 +30,16 @@ class DashboardRow(BaseModel):
     registration_date: str = Field(pattern=r"^\d{2}/\d{2}/\d{4}$")
 
     current_status: Literal[
+        "Awaiting Collection",
+        "Collection Ongoing",
+        "Collection Verification",
         "Collection Unsuccessful",
-        "Withdrawn",
+        "Insufficient Verified Signatures",
+        "Awaiting Response",
+        "Commission Engaged",
         "Law Passed",
         "Rejected Legislation",
-        "Collection Verification",
-        "Commission Engaged",
-        "Awaiting Response",
-        "Collection Ongoing",
-        "Awaiting Collection",
+        "Withdrawn",
     ]
 
     objective: str = Field(min_length=1)

@@ -3,7 +3,6 @@
 import json
 import textwrap
 
-
 _WRAP_WIDTH = 60
 _MAX_LINES = 6
 _MAX_HOVER_ITEMS = 10
@@ -15,6 +14,7 @@ STATUS_SECTION_MAP: dict[str, str] = {
     "AwaitingResponse": "awaiting-response-list-slot",
     "CollectionOngoing": "collection-ongoing-list-slot",
     "CollectionUnsuccessful": "collection-unsuccessful-list-slot",
+    "InsufficientVerifiedSignatures": "insufficient-verified-signatures-list-slot",
     "Withdrawn": "withdrawn-list-slot",
 }
 

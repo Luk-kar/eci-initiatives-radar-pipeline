@@ -67,6 +67,10 @@ _STATUS_MAP: dict[str, str] = {
     "Verification": "Collection Verification",
     # Signatures validated; the Commission must now issue a formal response. But it can take time
     "Valid initiative": "Awaiting Response",
+    # The initiative completed the collection phase, but during Member State
+    # verification, the number of valid signatures fell below the required
+    # 1 million total or the 7-country minimum threshold.
+    "Unsuccessful after verification": "Insufficient Verified Signatures",
     # The Commission has formally responded; outcome depends on whether
     # follow-up legislation was proposed, passed, or rejected.
     "Answered initiative": "Commission Engaged",
@@ -105,6 +109,8 @@ def extract(
     raw_status: str,
     is_law_passed: bool | None,
     rejected_legislation: bool | None,
+    registration_number: str,
+    initiative_url: str,
 ) -> str:
     """Map the raw status to the dashboard vocabulary.
 
@@ -120,6 +126,12 @@ def extract(
         rejected_legislation: Legislation flag from
                               ``eci_responses_followup_legislation``;
                               ``None`` when the initiative has no legislation row.
+
+        registration_number:  The official registration number of the ECI,
+                              used to enrich error reporting.
+
+        initiative_url:       The ECI portal URL for the initiative,
+                              used to enrich error reporting.
 
     Returns:
         One of the nine canonical dashboard status labels.
@@ -137,7 +149,7 @@ def extract(
 
         raise ValueError(
             f"Unknown raw current_status value: {raw_status!r} "
-            f"(normalised: {normalised!r})"
+            f"(normalised: {normalised!r}) for initiative '{registration_number}': {initiative_url}"
         ) from exc
 
     if normalised != _ANSWERED:
