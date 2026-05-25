@@ -47,5 +47,5 @@ CSV_FIELDNAMES = [
 
 # Module-specific Timing Configuration (in seconds)
 # Fine-tune these based on server response times and rate limiting behavior
-WAIT_BETWEEN_DOWNLOADS = (1.5, 1.9)  # Delay between downloading response pages
+WAIT_BETWEEN_DOWNLOADS = (1.5, 2.5)  # Delay between downloading response pages
 RETRY_WAIT_BASE = (2.0, 2.5)  # Base time for retry exponential backoff

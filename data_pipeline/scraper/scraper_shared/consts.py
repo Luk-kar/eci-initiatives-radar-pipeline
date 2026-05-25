@@ -26,7 +26,7 @@ CHROME_OPTIONS = [
 ]
 
 # Shared timing / waits (used or re‑exported by per‑scraper consts)
-WAIT_DYNAMIC_CONTENT = (1.5, 1.9)
+WAIT_DYNAMIC_CONTENT = (3.0, 4.0)
 WEBDRIVER_TIMEOUT_DEFAULT = 15
 WEBDRIVER_TIMEOUT_CONTENT = 20
 DEFAULT_MAX_RETRIES = 5
