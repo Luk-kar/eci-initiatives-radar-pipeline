@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+#
+# Runs only the data_pipeline stages (1–8).
+#
 # run_pipeline.sh
 # Runs the full ECI data pipeline followed by the page_creator.
 #
@@ -12,11 +15,14 @@
 #   7. merger_csv.responses_followup_legislation
 #   8. merger_csv.dashboard_csv
 #
-# Page generation (page_creator):
-#   9. page_creator  (generates HTML partials + generated.js into page_to_export/)
 #
 # Any step failure is critical — the script aborts immediately.
 # Run from the project root.
+#
+# Why as separate script:
+# Separated from page_creator so that retry logic targets only these stages,
+# where transient failures (e.g. EmptyListingsError, network timeouts,
+# blocked IPs, or cold/unresponsive runner instances) can occur.
 
 set -euo pipefail
 
@@ -62,10 +68,4 @@ log "7/9 merger_csv.responses_followup_legislation"
 log "8/9 merger_csv.dashboard_csv"
 "${PYTHON_PIPELINE}" -m data_pipeline.merger_csv.dashboard_csv
 
-# ---------------------------------------------------------------------------
-# page_creator
-# ---------------------------------------------------------------------------
-log "9/9 page_creator"
-"${PYTHON_PAGE}" -m page_creator
-
-log "All steps completed successfully."
+log "Data pipeline stages completed successfully."

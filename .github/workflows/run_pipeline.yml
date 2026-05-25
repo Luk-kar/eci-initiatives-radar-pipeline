@@ -101,22 +101,28 @@ jobs:
           sleep "$delay"
           echo "Now awake and eager to scrape!"
 
-      # ── 3. Run full pipeline ──────────────────────────────────────────────
-      # Executes all 9 stages sequentially:
-      #   data_pipeline: scrape → extract → merge (8 stages)
-      #   page_creator:  generate HTML partials + generated.js (1 stage)
+      # ── 3. Run data pipeline stages (with retry) ─────────────────────────
+      # Executes stages 1–8 (scrape → extract → merge).
       # Retried up to 3 times on failure (e.g. EmptyListingsError from a
       # transient ECI portal rendering issue). Any stage failure on all
       # attempts is critical — the job stops.
-      - name: Run pipeline
+      - name: Run data pipeline
         uses: nick-fields/retry@v3
         with:
-          timeout_minutes: 60 # it takes usually ~20 mins, but we are generous here
+          timeout_minutes: 55
           max_attempts: 3
           retry_wait_seconds: 180 # 3 mins
-          command: bash pipeline-repo/commands/run_pipeline.sh
+          command: bash pipeline-repo/commands/run_data_pipeline.sh
 
-      # ── 4. Resolve latest data directory ─────────────────────────────────
+      # ── 4. Run page creator (no retry) ───────────────────────────────────
+      # Executes stage 9: generates HTML partials + generated.js.
+      # Not retried — failure here is deterministic given valid pipeline output.
+      # Any failure is critical — the job stops.
+      - name: Run page creator
+        working-directory: pipeline-repo
+        run: bash commands/run_page_creator.sh
+
+      # ── 5. Resolve latest data directory ─────────────────────────────────
       # give_path_latest_data.sh finds the most recent eci_dashboard_*.csv,
       # validates it has more than 2 rows, and outputs the parent run directory.
       # Exits non-zero (job fails) if the CSV is missing or near-empty.
@@ -129,7 +135,7 @@ jobs:
           LATEST_DIR=$(bash commands/give_path_latest_data.sh)
           echo "latest_dir=${LATEST_DIR}" >> "$GITHUB_OUTPUT"
 
-      # ── 5. Compress latest data run ───────────────────────────────────────
+      # ── 6. Compress latest data run ───────────────────────────────────────
       # Creates a .tar.gz of the run directory (contains the dashboard CSV
       # and any other per-run artefacts) for inspection after the job finishes.
       - name: Compress latest data run
@@ -138,7 +144,7 @@ jobs:
             -C "$(dirname "${{ steps.latest.outputs.latest_dir }}")" \
             "$(basename "${{ steps.latest.outputs.latest_dir }}")"
 
-      # ── 6. Upload data run as workflow artifact ───────────────────────────
+      # ── 7. Upload data run as workflow artifact ───────────────────────────
       # Saves the archive as a downloadable artifact in the Actions run UI.
       # Retained for 30 days; download from Actions → run → Artifacts section.
       - name: Upload data run artifact
@@ -148,7 +154,7 @@ jobs:
           path: data_run.tar.gz
           retention-days: 30
 
-      # ── 7. Checkout dashboard repo ────────────────────────────────────────
+      # ── 8. Checkout dashboard repo ────────────────────────────────────────
       # Checks out the separate static-site repo using a PAT so we can push
       # a branch and open a Pull Request.
       - name: Checkout dashboard repo
@@ -158,7 +164,7 @@ jobs:
           token: ${{ secrets.DASHBOARD_REPO_PAT }}
           path: dashboard-repo
 
-      # ── 8. Sync page_to_export into dashboard repo ────────────────────────
+      # ── 9. Sync page_to_export into dashboard repo ────────────────────────
       # Mirrors the full page_to_export/ tree (including generated partials,
       # generated.js, static assets, and index.html) into the dashboard repo
       # root. rsync --delete removes files in the target that no longer exist
@@ -168,7 +174,7 @@ jobs:
           rsync -av --delete \
             pipeline-repo/page_to_export/ dashboard-repo/docs/
 
-      # ── 9. Open Pull Request in dashboard repo ────────────────────────────
+      # ── 10. Open Pull Request in dashboard repo ────────────────────────────
       # Creates (or updates) a PR in Your-Own-User/european_citizens_initiatives_tracker
       # on branch "automated/pipeline-update". If the branch already exists
       # from a previous run, the PR is updated in place.
