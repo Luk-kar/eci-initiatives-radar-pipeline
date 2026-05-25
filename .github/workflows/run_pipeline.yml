@@ -109,9 +109,9 @@ jobs:
       - name: Run data pipeline
         uses: nick-fields/retry@v3
         with:
-          timeout_minutes: 55
+          timeout_minutes: 60
           max_attempts: 3
-          retry_wait_seconds: 180 # 3 mins
+          retry_wait_seconds: 240 # 4 mins
           command: bash pipeline-repo/commands/run_data_pipeline.sh
 
       # ── 4. Run page creator (no retry) ───────────────────────────────────
