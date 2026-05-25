@@ -24,22 +24,38 @@
 # where transient failures (e.g. EmptyListingsError, network timeouts,
 # blocked IPs, or cold/unresponsive runner instances) can occur.
 
+
 set -euo pipefail
+
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
+
 VENV_PIPELINE="${ROOT_DIR}/data_pipeline/.venv.data_pipeline"
 VENV_PAGE="${ROOT_DIR}/page_creator/.venv.page_creator"
+
 
 PYTHON_PIPELINE="${VENV_PIPELINE}/bin/python3"
 PYTHON_PAGE="${VENV_PAGE}/bin/python3"
 
+
 log()  { echo "[run_pipeline] $*"; }
 fail() { echo "[run_pipeline] ERROR: $*" >&2; exit 1; }
 
+# Sleep a random number of seconds in [MIN, MAX] and log the duration.
+# Usage: scraper_sleep <min> <max>
+scraper_sleep() {
+    local min="${1}" max="${2}"
+    local duration=$(( RANDOM % (max - min + 1) + min ))
+    log "  Sleeping ${duration}s before next scraper (anti-throttle)..."
+    sleep "${duration}"
+}
+
+
 [ -x "${PYTHON_PIPELINE}" ] || fail "Python not found at '${PYTHON_PIPELINE}'. Has set_up_enviro.sh been run?"
 [ -x "${PYTHON_PAGE}" ]     || fail "Python not found at '${PYTHON_PAGE}'. Has set_up_enviro.sh been run?"
+
 
 # ---------------------------------------------------------------------------
 # data_pipeline stages
@@ -50,11 +66,15 @@ log "1/9 scraper.initiatives"
 log "2/9 extractor.initiatives"
 "${PYTHON_PIPELINE}" -m data_pipeline.extractor.initiatives
 
+scraper_sleep 10 30
+
 log "3/9 scraper.responses"
 "${PYTHON_PIPELINE}" -m data_pipeline.scraper.responses
 
 log "4/9 extractor.responses"
 "${PYTHON_PIPELINE}" -m data_pipeline.extractor.responses
+
+scraper_sleep 10 30
 
 log "5/9 scraper.responses_followup"
 "${PYTHON_PIPELINE}" -m data_pipeline.scraper.responses_followup
@@ -67,5 +87,6 @@ log "7/9 merger_csv.responses_followup_legislation"
 
 log "8/9 merger_csv.dashboard_csv"
 "${PYTHON_PIPELINE}" -m data_pipeline.merger_csv.dashboard_csv
+
 
 log "Data pipeline stages completed successfully."
