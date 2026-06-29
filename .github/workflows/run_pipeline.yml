@@ -228,3 +228,11 @@ jobs:
             > as a workflow artifact for the run linked above.
           base: main
           labels: automated-pr
+
+      # ── 11. Print dashboard link ──────────────────────────────────────────
+      # Prints the live dashboard URL to the workflow log for quick access.
+      - name: Print dashboard link
+        run: |
+          echo "────────────────────────────────────────────────────────────"
+          echo "📊 Dashboard: https://luk-kar.github.io/european_citizens_initiatives_tracker/"
+          echo "────────────────────────────────────────────────────────────"
