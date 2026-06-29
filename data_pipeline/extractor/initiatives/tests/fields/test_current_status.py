@@ -1,64 +1,102 @@
 import pytest
 from bs4 import BeautifulSoup
 
-from data_pipeline.extractor.extractor_shared.errors import FieldValueError
 from data_pipeline.extractor.initiatives.parser.fields.current_status import (
     extract_current_status,
 )
+from data_pipeline.extractor.extractor_shared.errors import FieldValueError
 
 
-def _soup(html: str) -> BeautifulSoup:
+# ── helpers ───────────────────────────────────────────────────────────────────
+
+def _make_soup(html: str) -> BeautifulSoup:
     return BeautifulSoup(html, "html.parser")
 
 
-def test_extract_current_status_happy_path():
+# ── normal path ───────────────────────────────────────────────────────────────
+
+def test_returns_current_marked_item():
 
     html = """
-    <html><body>
-      <ol class="ecl-timeline">
-        <li class="ecl-timeline__item ecl-timeline__item--current">
-          <div class="ecl-timeline__title">Answered</div>
-        </li>
-      </ol>
-    </body></html>
+    <ol class="ecl-timeline">
+      <li class="ecl-timeline__item">
+        <div class="ecl-timeline__title">Registered</div>
+      </li>
+      <li class="ecl-timeline__item ecl-timeline__item--current">
+        <div class="ecl-timeline__title">Collection ongoing</div>
+      </li>
+      <li class="ecl-timeline__item">
+        <div class="ecl-timeline__title">  </div>
+        <div class="ecl-timeline__content">15/07/2026</div>
+      </li>
+    </ol>
     """
+    assert extract_current_status(_make_soup(html)) == "Collection ongoing"
 
-    assert extract_current_status(_soup(html)) == "Answered"
 
-
-def test_extract_current_status_raises_when_no_current_item():
+def test_raises_when_current_item_has_no_title_element():
 
     html = """
-    <html><body>
-      <ol class="ecl-timeline">
-        <li class="ecl-timeline__item">
-          <div class="ecl-timeline__title">Registered</div>
-        </li>
-      </ol>
-    </body></html>
+    <ol class="ecl-timeline">
+      <li class="ecl-timeline__item ecl-timeline__item--current">
+        <!-- no ecl-timeline__title div at all -->
+      </li>
+    </ol>
     """
-
-    with pytest.raises(FieldValueError) as excinfo:
-        extract_current_status(_soup(html))
-
-    msg = str(excinfo.value)
-    assert "no active timeline item" in msg
+    
+    with pytest.raises(FieldValueError, match="no title element"):
+        extract_current_status(_make_soup(html))
 
 
-def test_extract_current_status_raises_when_title_missing():
+# ── fallback: no --current marker ─────────────────────────────────────────────
+
+def test_fallback_returns_last_nonempty_title(caplog):
+    """Mirrors the real 2025/000005 corrupted page structure."""
 
     html = """
-    <html><body>
-      <ol class="ecl-timeline">
-        <li class="ecl-timeline__item ecl-timeline__item--current">
-          <div class="ecl-timeline__content">No title here</div>
-        </li>
-      </ol>
-    </body></html>
+    <ol class="ecl-timeline">
+      <li class="ecl-timeline__item">
+        <div class="ecl-timeline__title">Registered</div>
+        <div class="ecl-timeline__content">25/11/2025</div>
+      </li>
+      <li class="ecl-timeline__item">
+        <div class="ecl-timeline__title">Collection start date</div>
+        <div class="ecl-timeline__content">13/01/2026</div>
+      </li>
+      <li class="ecl-timeline__item">
+        <div class="ecl-timeline__title"></div>
+        <div class="ecl-timeline__content">15/07/2026</div>
+      </li>
+    </ol>
     """
 
-    with pytest.raises(FieldValueError) as excinfo:
-        extract_current_status(_soup(html))
+    with caplog.at_level("WARNING"):
+        result = extract_current_status(_make_soup(html))
 
-    msg = str(excinfo.value)
-    assert "contains no title element" in msg
+    assert result == "Collection start date"
+    assert "Falling back to last non-empty title in timeline." in caplog.text
+
+
+def test_raises_when_all_titles_empty():
+    html = """
+    <ol class="ecl-timeline">
+      <li class="ecl-timeline__item">
+        <div class="ecl-timeline__title">  </div>
+        <div class="ecl-timeline__content">01/01/2025</div>
+      </li>
+      <li class="ecl-timeline__item">
+        <div class="ecl-timeline__title"></div>
+        <div class="ecl-timeline__content">15/07/2026</div>
+      </li>
+    </ol>
+    """
+
+    with pytest.raises(FieldValueError, match="no non-empty title found"):
+        extract_current_status(_make_soup(html))
+
+
+def test_raises_when_no_timeline_items_at_all():
+
+    html = "<div>No timeline here</div>"
+    with pytest.raises(FieldValueError, match="no active timeline item"):
+        extract_current_status(_make_soup(html))
