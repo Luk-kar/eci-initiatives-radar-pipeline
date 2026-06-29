@@ -20,7 +20,7 @@ from ..scraper_shared.files_utils import ensure_dirs, write_csv
 from ..scraper_shared.html_utils import validate_html, save_html
 from ..scraper_shared.errors import RateLimitError
 
-from data_pipeline.pipeline_shared.consts import FILE_ENCODING
+from data_pipeline.pipeline_shared.consts import FILE_ENCODING, DEBUGGING_DIR_NAME
 
 # Local
 from .consts import (
@@ -32,7 +32,6 @@ from .consts import (
 )
 from ._logger import logger
 from .log_messages import LOG_MESSAGES
-
 
 def setup_scraping_dirs(list_dir: str, pages_dir: str) -> None:
     """Create necessary directories for scraping output."""
